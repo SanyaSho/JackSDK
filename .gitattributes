@@ -1,0 +1,11 @@
+text eol=lf
+
+*.cpp text
+*.h text
+*.txt text
+*.bat text
+*.cmd text
+*.sh text
+
+.gitignore text
+.gitattributes text

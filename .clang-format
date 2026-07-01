@@ -1,0 +1,45 @@
+---
+BasedOnStyle: Microsoft
+AccessModifierOffset: -4
+AlignConsecutiveMacros:
+  Enabled: true
+  PadOperators: true
+AllowAllArgumentsOnNextLine: false
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: false
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+BreakBeforeBinaryOperators: NonAssignment
+ColumnLimit: 0
+LineEnding: LF
+MacroBlockBegin: ^BEGIN_DATADESC|\IMPLEMENT_.*_(D|S)T|\IMPLEMENT_.*_(D|S)T_NOBASE|\BEGIN_.*_TABLE_NOBASE|\BEGIN_.*_TABLE$
+MacroBlockEnd: ^END_DATADESC|\END_.*_TABLE$
+ReflowComments: false
+SortIncludes: Never
+SortUsingDeclarations: Never
+SpaceBeforeCpp11BracedList: true
+StatementMacros:
+  - Q_UNUSED
+  - QT_REQUIRE_VERSION
+  - NOTE_UNUSED
+UseTab: Always
+AllowAllConstructorInitializersOnNextLine: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+KeepEmptyLinesAtTheStartOfBlocks: true
+SpacesInConditionalStatement: true
+SpacesInParentheses: true
