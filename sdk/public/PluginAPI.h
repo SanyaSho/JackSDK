@@ -44,6 +44,7 @@ EDITORFLAGS:
 #include "BaseTypes.h"
 
 struct qEntity_s;
+struct qCamera_s;
 
 // clang-format off
 
@@ -150,6 +151,13 @@ typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
 typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( void *world, const char *classname );
 typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( void *world, const char *classname );
 typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( void *world, const char *key, const char *value );
+
+/* Camera API*/
+typedef qCamera_s *	(*pfnEditor_Camera_Create)				( void *world );
+typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *camera );
+typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, unsigned char *cbColorOut );
+typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const unsigned char *cbColor );
+typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
 
 /* Dialog API */
 
@@ -408,7 +416,11 @@ typedef struct plugin_funcs_s
 	void *group[7];
 
 	/* Camera API */
-	void *camera[5];
+	pfnEditor_Camera_Create pfnCamera_Create;
+	pfnEditor_Camera_Destroy pfnCamera_Destroy;
+	pfnEditor_Camera_GetColor pfnCamera_GetColor;
+	pfnEditor_Camera_SetColor pfnCamera_SetColor;
+	pfnEditor_Camera_Setup pfnCamera_Setup;
 
 	/* Shader API */
 	void *shader[11];

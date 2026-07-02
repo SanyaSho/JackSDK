@@ -4,6 +4,7 @@
 
 #include "PluginAPI.h"
 #include "PluginActions.h"
+#include "PluginCamera.h"
 #include "PluginProfile.h"
 #include "PluginData.h"
 #include "PluginEntity.h"
@@ -149,6 +150,25 @@ void SpawnEntity()
 
 pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "ExamplePlugin", 0, SpawnEntity };
 
+void CreateCamera()
+{
+	void *world = Global_GetCurrentWorld();
+	if ( !world )
+		return;
+
+	float vec3_origin[3] = { 0, 0, 0 };
+	float vec3_angles90[3] = { 0, 35, 90 };
+
+	qCamera_t *pCamera = Camera_Create( world );
+
+	Camera_Setup( pCamera, vec3_origin, vec3_angles90 );
+
+	unsigned char cbColor[4] = { 0x00, 0xFF, 0x00, 0x00 };
+	Camera_SetColor( pCamera, cbColor );
+}
+
+pluginActionInfo_t createCamera = { "Create Camera", "&Create Camera", "", "ExamplePlugin", 0, CreateCamera };
+
 /*
 ===============
 vpEnumActions
@@ -159,7 +179,8 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 {
 	registerAction( &runTests, pluginManager );
 	registerAction( &spawnEntity, pluginManager );
-	return 2;
+	registerAction( &createCamera, pluginManager );
+	return 3;
 }
 
 // clang-format off

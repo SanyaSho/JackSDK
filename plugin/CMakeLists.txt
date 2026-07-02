@@ -33,6 +33,7 @@ BEGIN_SRC( SDK_HEADER_FILES "SDK Header Files" )
 			"${SRCDIR}/sdk/public/BaseTypes.h"
 			"${SRCDIR}/sdk/public/PluginAPI.h"
 			"${SRCDIR}/sdk/public/PluginActions.h"
+			"${SRCDIR}/sdk/public/PluginCamera.h"
 			"${SRCDIR}/sdk/public/PluginData.h"
 			"${SRCDIR}/sdk/public/PluginEntity.h"
 			"${SRCDIR}/sdk/public/PluginFace.h"

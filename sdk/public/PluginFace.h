@@ -98,6 +98,13 @@ extern plugin_funcs_t gEditorfuncs;
 #define Entity_FindByTargetname		(gEditorfuncs.pfnEntity_FindByTargetname)
 #define Entity_FindByKeyValue		(gEditorfuncs.pfnEntity_FindByKeyValue)
 
+/* Camera API */
+#define Camera_Create				(gEditorfuncs.pfnCamera_Create)
+#define Camera_Destroy				(gEditorfuncs.pfnCamera_Destroy)
+#define Camera_GetColor				(gEditorfuncs.pfnCamera_GetColor)
+#define Camera_SetColor				(gEditorfuncs.pfnCamera_SetColor)
+#define Camera_Setup				(gEditorfuncs.pfnCamera_Setup)
+
 /* Dialog API */
 #define Dialog_CheckOptions			(gEditorfuncs.pfnDialog_CheckOptions)
 #define Dialog_MessageBox			(gEditorfuncs.pfnDialog_MessageBox)
