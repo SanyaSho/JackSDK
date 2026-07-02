@@ -1,6 +1,7 @@
 //=====================================================================================//
 //
 // Purpose: J.A.C.K. Plugin API
+// J.A.C.K. 1.2.4603
 // 
 // Author(-s): SanyaSho (2026)
 //
@@ -16,6 +17,34 @@
 #define DLL_EXPORT extern "C" __attribute__ ((visibility("default")))
 #define DLL_IMPORT extern "C" 
 #endif // WIN32
+
+// This macro predates universal static_assert support in our toolchains
+#define COMPILE_TIME_ASSERT( pred ) static_assert( pred, "Compile time assert constraint is not true: " #pred )
+
+/*
+ Plugin API is used to interact with the editor without having to manually find symbols in the stack.
+ This API is pretty much based on APIProxy/eiface from GoldSrc.
+
+ Example:
+ plugin_funcs_t gEditorfuncs;
+
+ DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
+ {
+ 	if ( editorFuncs->nIntefaceVersion < sizeof( plugin_funcs_t ) )
+ 		return -1;
+
+ 	if ( editorPluginVersion != PLUGIN_VERSION )
+ 		return PLUGIN_VERSION;
+
+ 	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->nIntefaceVersion );
+ 	setlocale( LC_ALL, "C" );
+ 	return 0;
+ }
+
+ editorFuncs is the pointer to a table of shared functions inside the editor which must be copied and used within the plugin.
+ editorFuncs->nIntefaceVersion is set to size of plugin_funcs_t in the editor and must be checked to be sure that we can load this plugin safely.
+ editorPluginVersion is set to current API level in the editor.
+*/
 
 // clang-format off
 
@@ -46,28 +75,49 @@ typedef long		(*pfnEditor_Sys_GetOption)			( int option );
 
 typedef char *		(*pfnEditor_SC_Token)				();
 typedef long		(*pfnEditor_SC_Line)				();
-typedef bool		(*pfnEditor_SC_ParseFromFile)		( const char *file, int offset, int size, int );
+typedef bool		(*pfnEditor_SC_ParseFromFile)		( const char *file, int offset, int size, int parseFlags );
 typedef bool		(*pfnEditor_SC_ParseFromMemory)		( const char *file, int offset, int size );
 typedef bool		(*pfnEditor_SC_CheckError)			();
 typedef void		(*pfnEditor_SC_ParseError)			( const char *format, ... );
 typedef void		(*pfnEditor_SC_ResetError)			();
-// SC_SafeGetToken
-// SC_GetToken
-// SC_TokenAvailable
-// SC_UnGetToken
-// SC_MatchToken
-// SC_SafeMatchToken
+typedef bool		(*pfnEditor_SC_SafeGetToken)		( bool a );
+typedef bool		(*pfnEditor_SC_GetToken)			( bool a );
+typedef bool		(*pfnEditor_SC_TokenAvailable)		();
+typedef void		(*pfnEditor_SC_UnGetToken)			();
+typedef void		(*pfnEditor_SC_MatchToken)			( const char *token );
+typedef void		(*pfnEditor_SC_SafeMatchToken)		( const char *token, bool a );
 // SC_Parse3DMatrix
 // SC_Parse2DMatrix
 // SC_Parse1DMatrix
+typedef bool		(*pfnEditor_SC_SkipRestOfLine)		();
+typedef void		(*pfnEditor_SC_EndOfParsing)		();
+typedef long		(*pfnEditor_SC_GetParseFlags)		();
+typedef void		(*pfnEditor_SC_SetParseFlags)		( long parseFlags );
+typedef bool		(*pfnEditor_SC_ShouldQuote)			( const char *token );
+typedef char *		(*pfnEditor_SC_CopyBlock)			(); // MUST BE Sys_Free'D
+typedef void		(*pfnEditor_SC_SkipBlock)			();
+typedef void		(*pfnEditor_SC_SkipLineOrBlock)		(); // TODO: Check the return
+typedef long		(*pfnEditor_SC_GetBlockSize)		();
 
 // PR[17]
 
 // FileSystem API
+
+/* Get current configuration base directory */
+/* Returns true on success, false on failure */
 typedef bool		(*pfnEditor_Sys_GetBaseDirectory)( char *dest, size_t n );
+
+/* Get current configuration mod directory */
+/* Mimics Sys_GetBaseDirectory if not set. */
+/* Returns true on success, false on failure */
 typedef bool		(*pfnEditor_Sys_GetModDirectory)( char *dest, size_t n );
+
+/* Get current configuration fallback directory */
+/* Returns true on success, false on failure */
 typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)( char *dest, size_t n );
-// FS[2]
+
+typedef void		(*pfnEditor_Sys_ExpandFileName)( const char *src, char *dest, size_t n );
+typedef char *		(*pfnEditor_Sys_MakeLocalFileName)( const char *file );
 typedef bool		(*pfnEditor_Sys_FileExists)( const char *file );
 typedef char *		(*pfnEditor_Sys_LoadFile)( const char *file, int *readBytes );
 typedef bool		(*pfnEditor_Sys_CreatePath)( const char *path );
@@ -117,7 +167,7 @@ typedef void *		(*pfnEditor_Entity_FindByKeyValue)( void *world, const char *key
 /* title: dialog title */
 /* text: dialog text */
 /* options: list of options split by | */
-/* returns a bitmask for each option selected */
+/* returns a bitmask for each option selected OR returns -1 if was closed */
 typedef long		(*pfnEditor_Dialog_CheckOptions)( const char *title, const char *text, const char *options );
 
 /* Display a message box */
@@ -276,7 +326,22 @@ typedef struct plugin_funcs_s
 	pfnEditor_SC_CheckError pfnSC_CheckError;
 	pfnEditor_SC_ParseError pfnSC_ParseError;
 	pfnEditor_SC_ResetError pfnSC_ResetError;
-	void *SC[18];
+	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
+	pfnEditor_SC_GetToken pfnSC_GetToken;
+	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
+	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
+	pfnEditor_SC_MatchToken pfnSC_MatchToken;
+	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
+	void *SC_Matrix[3];
+	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
+	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
+	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
+	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
+	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
+	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
+	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
+	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
+	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
 
 	/* Rendering API */
 	void *PR[17];
@@ -285,7 +350,8 @@ typedef struct plugin_funcs_s
 	pfnEditor_Sys_GetBaseDirectory pfnSys_GetBaseDirectory;
 	pfnEditor_Sys_GetModDirectory pfnSys_GetModDirectory;
 	pfnEditor_Sys_GetFallbackDirectory pfnSys_GetFallbackDirectory;
-	void *FS[2];
+	pfnEditor_Sys_ExpandFileName pfnSys_ExpandFileName;
+	pfnEditor_Sys_MakeLocalFileName pfnSys_MakeLocalFileName;
 	pfnEditor_Sys_FileExists pfnSys_FileExists;
 	pfnEditor_Sys_LoadFile pfnSys_LoadFile;
 	pfnEditor_Sys_CreatePath pfnSys_CreatePath;
@@ -377,6 +443,8 @@ typedef struct plugin_funcs_s
 	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
 	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
 } plugin_funcs_t;
+
+COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == 1512 );
 
 #define PLUGIN_VERSION 121
 
