@@ -30,6 +30,7 @@ BEGIN_SRC( SDK_HEADER_FILES "SDK Header Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			"${SRCDIR}/sdk/public/BaseTypes.h"
 			"${SRCDIR}/sdk/public/PluginAPI.h"
 			"${SRCDIR}/sdk/public/PluginActions.h"
 			"${SRCDIR}/sdk/public/PluginData.h"

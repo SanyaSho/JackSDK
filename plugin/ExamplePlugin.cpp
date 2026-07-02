@@ -10,6 +10,25 @@
 
 plugin_funcs_t gEditorfuncs;
 
+/*
+===============
+vpMain
+Application Entrypoint
+===============
+*/
+DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
+{
+	if ( editorFuncs->nIntefaceVersion < sizeof( plugin_funcs_t ) )
+		return -1;
+
+	if ( editorPluginVersion != PLUGIN_VERSION )
+		return PLUGIN_VERSION;
+
+	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->nIntefaceVersion );
+	setlocale( LC_ALL, "C" );
+	return 0;
+}
+
 void InternalCommand()
 {
 	char szText[256] = { 0 };
@@ -106,26 +125,29 @@ void RunTests()
 	Dialog_End();
 }
 
-/*
-===============
-vpMain
-Application Entrypoint
-===============
-*/
-DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
+pluginActionInfo_t runTests = { "Run tests", "&Run tests", "Call RunTests()", "ExamplePlugin", 0, RunTests };
+
+void SpawnEntity()
 {
-	if ( editorFuncs->nIntefaceVersion < sizeof( plugin_funcs_t ) )
-		return -1;
+	void *world = Global_GetCurrentWorld();
+	if ( !world )
+		return;
 
-	if ( editorPluginVersion != PLUGIN_VERSION )
-		return PLUGIN_VERSION;
+	float vec3_origin[3] = { 0, 0, 0, };
 
-	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->nIntefaceVersion );
-	setlocale( LC_ALL, "C" );
-	return 0;
+	qEntity_t *pEntity = Entity_Create( world, "info_player_start", vec3_origin, 0 );
+	//Sys_Printf( "pEntity: %p\n", pEntity );
+
+	Entity_AddToVisGroup( world, pEntity, 1 );
+
+	Entity_Build( pEntity, 1 << 0 );
+
+	FILE *f = fopen( "info_player_start.bin", "wb" );
+	fwrite( pEntity, sizeof( *pEntity ), 1, f );
+	fclose( f );
 }
 
-pluginActionInfo_t runTests = { "Run tests", "&Run tests", "Call RunTests()", "ExamplePlugin", 0, 0, RunTests };
+pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "ExamplePlugin", 0, SpawnEntity };
 
 /*
 ===============
@@ -136,7 +158,8 @@ Menu Actions
 DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginManager )
 {
 	registerAction( &runTests, pluginManager );
-	return 1;
+	registerAction( &spawnEntity, pluginManager );
+	return 2;
 }
 
 // clang-format off

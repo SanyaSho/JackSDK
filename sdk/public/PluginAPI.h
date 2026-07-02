@@ -10,17 +10,6 @@
 #if !defined( PLUGINAPI_H )
 #define PLUGINAPI_H
 
-#if defined( WIN32 )
-#define DLL_EXPORT extern "C" __declspec( dllexport )
-#define DLL_IMPORT extern "C" __declspec( dllimport )
-#else
-#define DLL_EXPORT extern "C" __attribute__ ((visibility("default")))
-#define DLL_IMPORT extern "C" 
-#endif // WIN32
-
-// This macro predates universal static_assert support in our toolchains
-#define COMPILE_TIME_ASSERT( pred ) static_assert( pred, "Compile time assert constraint is not true: " #pred )
-
 /*
  Plugin API is used to interact with the editor without having to manually find symbols in the stack.
  This API is pretty much based on APIProxy/eiface from GoldSrc.
@@ -46,20 +35,30 @@
  editorPluginVersion is set to current API level in the editor.
 */
 
+/*
+EDITORFLAGS:
+
+2 - Selected
+*/
+
+#include "BaseTypes.h"
+
+struct qEntity_s;
+
 // clang-format off
 
-typedef void		(*pfnEditor_Sys_Printf)				( const char *format, ... );
-typedef void		(*pfnEditor_Sys_DPrintf)			( const char *format, ... );
-typedef void		(*pfnEditor_Sys_Warning)			( const char *format, ... );
-typedef void		(*pfnEditor_Sys_Error)				( const char *format, ... );
+typedef void		(*pfnEditor_Sys_Printf)					( const char *format, ... );
+typedef void		(*pfnEditor_Sys_DPrintf)				( const char *format, ... );
+typedef void		(*pfnEditor_Sys_Warning)				( const char *format, ... );
+typedef void		(*pfnEditor_Sys_Error)					( const char *format, ... );
 
-typedef void		(*pfnEditor_Sys_Free)				( void *ptr );
-typedef void *		(*pfnEditor_Sys_Malloc)				( size_t size );
+typedef void		(*pfnEditor_Sys_Free)					( void *ptr );
+typedef void *		(*pfnEditor_Sys_Malloc)					( size_t size );
 
-typedef void *		(*pfnEditor_TempBuffer_GetSpace)	( int buffer, size_t size );
-typedef char *		(*pfnEditor_Sys_AllocString)		( const char *src );
+typedef void *		(*pfnEditor_TempBuffer_GetSpace)		( int buffer, size_t size );
+typedef char *		(*pfnEditor_Sys_AllocString)			( const char *src );
 
-typedef float		(*pfnEditor_Sys_FloatTime)			();
+typedef float		(*pfnEditor_Sys_FloatTime)				();
 
 #define SYS_OPTION_MAPSNAP		0
 #define SYS_OPTION_MAPGRID		1
@@ -68,36 +67,36 @@ typedef float		(*pfnEditor_Sys_FloatTime)			();
 #define SYS_OPTION_TOOLSIG		4
 #define SYS_OPTION_TOOLSCORDON	5
 
-typedef void		(*pfnEditor_Sys_SetOption)			( int option, int value );
-typedef long		(*pfnEditor_Sys_GetOption)			( int option );
+typedef void		(*pfnEditor_Sys_SetOption)				( int option, int value );
+typedef long		(*pfnEditor_Sys_GetOption)				( int option );
 
 // Steam_SetAchievemnt
 
-typedef char *		(*pfnEditor_SC_Token)				();
-typedef long		(*pfnEditor_SC_Line)				();
-typedef bool		(*pfnEditor_SC_ParseFromFile)		( const char *file, int offset, int size, int parseFlags );
-typedef bool		(*pfnEditor_SC_ParseFromMemory)		( const char *file, int offset, int size );
-typedef bool		(*pfnEditor_SC_CheckError)			();
-typedef void		(*pfnEditor_SC_ParseError)			( const char *format, ... );
-typedef void		(*pfnEditor_SC_ResetError)			();
-typedef bool		(*pfnEditor_SC_SafeGetToken)		( bool a );
-typedef bool		(*pfnEditor_SC_GetToken)			( bool a );
-typedef bool		(*pfnEditor_SC_TokenAvailable)		();
-typedef void		(*pfnEditor_SC_UnGetToken)			();
-typedef void		(*pfnEditor_SC_MatchToken)			( const char *token );
-typedef void		(*pfnEditor_SC_SafeMatchToken)		( const char *token, bool a );
+typedef char *		(*pfnEditor_SC_Token)					();
+typedef long		(*pfnEditor_SC_Line)					();
+typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
+typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int offset, int size );
+typedef bool		(*pfnEditor_SC_CheckError)				();
+typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
+typedef void		(*pfnEditor_SC_ResetError)				();
+typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool a );
+typedef bool		(*pfnEditor_SC_GetToken)				( bool a );
+typedef bool		(*pfnEditor_SC_TokenAvailable)			();
+typedef void		(*pfnEditor_SC_UnGetToken)				();
+typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
+typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool a );
 // SC_Parse3DMatrix
 // SC_Parse2DMatrix
 // SC_Parse1DMatrix
-typedef bool		(*pfnEditor_SC_SkipRestOfLine)		();
-typedef void		(*pfnEditor_SC_EndOfParsing)		();
-typedef long		(*pfnEditor_SC_GetParseFlags)		();
-typedef void		(*pfnEditor_SC_SetParseFlags)		( long parseFlags );
-typedef bool		(*pfnEditor_SC_ShouldQuote)			( const char *token );
-typedef char *		(*pfnEditor_SC_CopyBlock)			(); // MUST BE Sys_Free'D
-typedef void		(*pfnEditor_SC_SkipBlock)			();
-typedef void		(*pfnEditor_SC_SkipLineOrBlock)		(); // TODO: Check the return
-typedef long		(*pfnEditor_SC_GetBlockSize)		();
+typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
+typedef void		(*pfnEditor_SC_EndOfParsing)			();
+typedef long		(*pfnEditor_SC_GetParseFlags)			();
+typedef void		(*pfnEditor_SC_SetParseFlags)			( long parseFlags );
+typedef bool		(*pfnEditor_SC_ShouldQuote)				( const char *token );
+typedef char *		(*pfnEditor_SC_CopyBlock)				(); // MUST BE Sys_Free'D
+typedef void		(*pfnEditor_SC_SkipBlock)				();
+typedef void		(*pfnEditor_SC_SkipLineOrBlock)			(); // TODO: Check the return
+typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
 // PR[17]
 
@@ -105,51 +104,54 @@ typedef long		(*pfnEditor_SC_GetBlockSize)		();
 
 /* Get current configuration base directory */
 /* Returns true on success, false on failure */
-typedef bool		(*pfnEditor_Sys_GetBaseDirectory)( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
 
 /* Get current configuration mod directory */
 /* Mimics Sys_GetBaseDirectory if not set. */
 /* Returns true on success, false on failure */
-typedef bool		(*pfnEditor_Sys_GetModDirectory)( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 
 /* Get current configuration fallback directory */
 /* Returns true on success, false on failure */
-typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
 
-typedef void		(*pfnEditor_Sys_ExpandFileName)( const char *src, char *dest, size_t n );
-typedef char *		(*pfnEditor_Sys_MakeLocalFileName)( const char *file );
-typedef bool		(*pfnEditor_Sys_FileExists)( const char *file );
-typedef char *		(*pfnEditor_Sys_LoadFile)( const char *file, int *readBytes );
-typedef bool		(*pfnEditor_Sys_CreatePath)( const char *path );
+typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
+typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *file );
+typedef bool		(*pfnEditor_Sys_FileExists)				( const char *file );
+typedef char *		(*pfnEditor_Sys_LoadFile)				( const char *file, int *readBytes );
+typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
 
-typedef char *		(*pfnEditor_Sys_PrintValue)( float value );
-typedef char *		(*pfnEditor_Sys_PrintMapCoord)( float coord );
-typedef char *		(*pfnEditor_Sys_PrintAxis)( float axis );
-typedef void		(*pfnEditor_Sys_SnapVertex)( float *rgflVertex );
-typedef void		(*pfnEditor_Sys_SnapAxis)( int num, float *rgflAxis );
-typedef void		(*pfnEditor_Sys_SnapVertexToGrid)( float *rgflVertex );
-typedef void		(*pfnEditor_Sys_SnapMapVertex)( float *rgflVertex );
+/* Math API */
+typedef char *		(*pfnEditor_Sys_PrintValue)				( float value );
+typedef char *		(*pfnEditor_Sys_PrintMapCoord)			( float coord );
+typedef char *		(*pfnEditor_Sys_PrintAxis)				( float axis );
+typedef void		(*pfnEditor_Sys_SnapVertex)				( float *rgflVertex );
+typedef void		(*pfnEditor_Sys_SnapAxis)				( int num, float *rgflAxis );
+typedef void		(*pfnEditor_Sys_SnapVertexToGrid)		( float *rgflVertex );
+typedef void		(*pfnEditor_Sys_SnapMapVertex)			( float *rgflVertex );
 
-typedef char *		(*pfnEditor_V_VersionString)();
+typedef char *		(*pfnEditor_V_VersionString)			();
 
-typedef float		(*pfnEditor_Sys_GetTextureGamma)();
+typedef float		(*pfnEditor_Sys_GetTextureGamma)		();
 
-typedef void *		(*pfnEditor_Global_GetCurrentWorld)();
+typedef void *		(*pfnEditor_Global_GetCurrentWorld)		();
 
-typedef bool		(*pfnEditor_BuildPackageList)( void *pWorld ); // TODO
+typedef bool		(*pfnEditor_BuildPackageList)			( void *pWorld ); // TODO
 
-// Entity API
-typedef void *		(*pfnEditor_Entity_Create)( void *world, const char *classname, float *rgflOrigin, int editorFlags );
-typedef void		(*pfnEditor_Entity_Build)( void *mapEntity, int );
-typedef void		(*pfnEditor_Entity_GetColor)( void *mapEntity, char *cColorOut );
-typedef void		(*pfnEditor_Entity_SetColor)( void *mapEntity, char *cColor );
-typedef void		(*pfnEditor_Entity_AddToVisGroup)( void *world, void *mapEntity, int visGroupId );
-typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)( void *world, void *mapEntity, int visGroupId );
-typedef long		(*pfnEditor_Entity_GetVisGroupIdent)( void *mapEntity, int visGroupId );
-typedef long		(*pfnEditor_Entity_GetVisGroupCount)( void *mapEntity );
-typedef void *		(*pfnEditor_Entity_FindByClassname)( void *world, const char *classname );
-typedef void *		(*pfnEditor_Entity_FindByTargetname)( void *world, const char *classname );
-typedef void *		(*pfnEditor_Entity_FindByKeyValue)( void *world, const char *key, const char *value );
+/* Entity API */
+typedef qEntity_s *	(*pfnEditor_Entity_Create)				( void *world, const char *classname, const float *rgflOrigin, int editorFlags );
+typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int editorFlags );
+typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, unsigned char *cbColorOut );
+typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const unsigned char *cbColor );
+typedef void		(*pfnEditor_Entity_AddToVisGroup)		( void *world, qEntity_s *entityDef, int visGroupId );
+typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( void *world, qEntity_s *entityDef, int visGroupId );
+typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
+typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( void *world, const char *classname );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( void *world, const char *classname );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( void *world, const char *key, const char *value );
+
+/* Dialog API */
 
 #define DIALOG_NONE				( 1 << 0 )
 //#define DIALOG_ ( 1 << 1 )
@@ -161,57 +163,55 @@ typedef void *		(*pfnEditor_Entity_FindByKeyValue)( void *world, const char *key
 #define DIALOG_FILE_OPEN		( 1 << 1 ) /* Will make a dialog open files instead of saving them */
 #define DIALOG_FILE_CONNECT		( 1 << 2 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
 
-// Dialog API
-
 /* Check for custom options */
 /* title: dialog title */
 /* text: dialog text */
 /* options: list of options split by | */
 /* returns a bitmask for each option selected OR returns -1 if was closed */
-typedef long		(*pfnEditor_Dialog_CheckOptions)( const char *title, const char *text, const char *options );
+typedef long		(*pfnEditor_Dialog_CheckOptions)		( const char *title, const char *text, const char *options );
 
 /* Display a message box */
 /* title: dialog title */
 /* text: dialog text */
 /* flags: type and behavior flags */
-typedef long		(*pfnEditor_Dialog_MessageBox)( const char *title, const char *text, int flags );
+typedef long		(*pfnEditor_Dialog_MessageBox)			( const char *title, const char *text, int flags );
 
 /* Allocates a CPluginDialog instance (NOTE: Only one plugin dialog can be active) */
 /* title: dialog title */
-typedef void		(*pfnEditor_Dialog_Begin)( const char *title );
+typedef void		(*pfnEditor_Dialog_Begin)				( const char *title );
 
 /* buttonText: text that will be displayed on the button */
 /* command: command that will be executed after button is pressed */
-typedef void		(*pfnEditor_Dialog_InitExternalCommand)( const char *buttonText, const char *command );
+typedef void		(*pfnEditor_Dialog_InitExternalCommand)	( const char *buttonText, const char *command );
 
 /* buttonText: text that will be displayed on the button */
 /* pfnCommand: function that will be executed after button is pressed */
-typedef void		(*pfnEditor_Dialog_InitInternalCommand)( const char *buttonText, void (*pfnCommand)() );
+typedef void		(*pfnEditor_Dialog_InitInternalCommand)	( const char *buttonText, void (*pfnCommand)() );
 
 /* value: progress bar current value */
 /* maxValue: progress bar max value */
-typedef void		(*pfnEditor_Dialog_SetProgress)( int value, int maxValue );
+typedef void		(*pfnEditor_Dialog_SetProgress)			( int value, int maxValue );
 
 /* Add a textedit control to the dialog */
 /* controlName: internal control name */
 /* title: textedit title */
 /* defaultValue: initial text */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddTextEdit)( const char *controlName, const char *title, const char *defaultValue, int flags );
+typedef void		(*pfnEditor_Dialog_AddTextEdit)			( const char *controlName, const char *title, const char *defaultValue, int flags );
 
 /* Add a radiobox control to the dialog */
 /* controlName: internal control name */
 /* title: textedit title */
 /* defaultValue: initial state (true - checked; false - unchecked) */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddRadioBox)( const char *controlName, const char *title, bool defaultValue, int flags );
+typedef void		(*pfnEditor_Dialog_AddRadioBox)			( const char *controlName, const char *title, bool defaultValue, int flags );
 
 /* Add a checkbox control to the dialog */
 /* controlName: internal control name */
 /* title: textedit title */
 /* defaultValue: initial state (true - checked; false - unchecked) */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddCheckBox)( const char *controlName, const char *title, bool defaultValue, int flags );
+typedef void		(*pfnEditor_Dialog_AddCheckBox)			( const char *controlName, const char *title, bool defaultValue, int flags );
 
 /* Add a spinbox control to the dialog */
 /* controlName: internal control name */
@@ -221,7 +221,7 @@ typedef void		(*pfnEditor_Dialog_AddCheckBox)( const char *controlName, const ch
 /* maxValue: max value */
 /* stepCount: number of elements one step goes thru */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddSpinBox)( const char *controlName, const char *title, int defaultValue, int minValue, int maxValue, int stepCount, int flags );
+typedef void		(*pfnEditor_Dialog_AddSpinBox)			( const char *controlName, const char *title, int defaultValue, int minValue, int maxValue, int stepCount, int flags );
 
 /* Add a double spinbox control to the dialog */
 /* controlName: internal control name */
@@ -231,7 +231,7 @@ typedef void		(*pfnEditor_Dialog_AddSpinBox)( const char *controlName, const cha
 /* maxValue: max value */
 /* stepCount: number of elements one step goes thru */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddSpinBoxFloat)( const char *controlName, const char *title, float defaultValue, float minValue, float maxValue, float stepCount, int flags );
+typedef void		(*pfnEditor_Dialog_AddSpinBoxFloat)		( const char *controlName, const char *title, float defaultValue, float minValue, float maxValue, float stepCount, int flags );
 
 /* Add a fileedit control to the dialog */
 /* controlName: internal control name */
@@ -239,7 +239,7 @@ typedef void		(*pfnEditor_Dialog_AddSpinBoxFloat)( const char *controlName, cons
 /* defaultValue: initial text */
 /* extensionList: list of possible extensions split by "\n". Can be NULL */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddFileEdit)( const char *controlName, const char *title, const char *defaultValue, const char *extensionList, int flags );
+typedef void		(*pfnEditor_Dialog_AddFileEdit)			( const char *controlName, const char *title, const char *defaultValue, const char *extensionList, int flags );
 
 /* Add a filelist control to the dialog */
 /* controlName: internal control name */
@@ -247,7 +247,7 @@ typedef void		(*pfnEditor_Dialog_AddFileEdit)( const char *controlName, const ch
 /* fileList: list of strings split by "\n" */
 /* extensionList: list of possible extensions split by "\n". Can be NULL */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddFileList)( const char *controlName, const char *title, const char *fileList, const char *extensionList, int flags );
+typedef void		(*pfnEditor_Dialog_AddFileList)			( const char *controlName, const char *title, const char *fileList, const char *extensionList, int flags );
 
 /* Add a combobox control to the dialog */
 /* controlName: internal control name */
@@ -255,42 +255,42 @@ typedef void		(*pfnEditor_Dialog_AddFileList)( const char *controlName, const ch
 /* selectedIndex: will set the selected item to this index after parsing the list from optionsList */
 /* optionsList: list of combobox elements split by "\n" */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddComboBox)( const char *controlName, const char *title, int selectedIndex, const char *optionsList, int flags );
+typedef void		(*pfnEditor_Dialog_AddComboBox)			( const char *controlName, const char *title, int selectedIndex, const char *optionsList, int flags );
 
 /* Add a directoryedit control to the dialog */
 /* controlName: internal control name */
 /* title: textedit title */
 /* defaultValue: initial text */
 /* flags: type and behevaior flags */
-typedef void		(*pfnEditor_Dialog_AddDirectoryEdit)( const char *controlName, const char *title, const char *defaultValue, int flags );
+typedef void		(*pfnEditor_Dialog_AddDirectoryEdit)	( const char *controlName, const char *title, const char *defaultValue, int flags );
 
 /* Get control value (string) */
 /* controlName: internal control name */
 /* out: char buffer */
 /* n: size of char buffer */
-typedef void		(*pfnEditor_Dialog_QueryArgument)( const char *controlName, char *out, size_t n );
+typedef void		(*pfnEditor_Dialog_QueryArgument)		( const char *controlName, char *out, size_t n );
 
 /* Get control value (float) */
 /* controlName: internal control name */
 /* Returns value of controlName */
-typedef float		(*pfnEditor_Dialog_QueryArgumentFloat)( const char *controlName );
+typedef float		(*pfnEditor_Dialog_QueryArgumentFloat)	( const char *controlName );
 
 /* Get control value (int) */
 /* controlName: internal control name */
 /* Returns value of controlName */
-typedef int			(*pfnEditor_Dialog_QueryArgumentInt)( const char *controlName );
+typedef int			(*pfnEditor_Dialog_QueryArgumentInt)	( const char *controlName );
 
 /* Finish and draw the dialog */
-typedef void		(*pfnEditor_Dialog_End)();
+typedef void		(*pfnEditor_Dialog_End)					();
 
 /* Appends text to the dialog */
-typedef void		(*pfnEditor_Dialog_Printf)( const char *format, ... );
+typedef void		(*pfnEditor_Dialog_Printf)				( const char *format, ... );
 
 /* Changes current cursor to Qt::WaitCursor and increments a wait counter by 1 */
-typedef void		(*pfnEditor_Dialog_BeginWait)();
+typedef void		(*pfnEditor_Dialog_BeginWait)			();
 
 /* Restores the cursor back to normal and decrements the wait counter by 1 */
-typedef void		(*pfnEditor_Dialog_EndWait)();
+typedef void		(*pfnEditor_Dialog_EndWait)				();
 
 // clang-format on
 

@@ -12,7 +12,21 @@
 
 /*
  Plugin profiles are handled by the vpEnumProfiles exported function.
+
+ Example:
+ mapProfile_t myProfile = { NULL, ... };
+
+ DLL_EXPORT int vpEnumProfiles( pfnRegisterProfile registerProfile, void *libraryHandle )
+ {
+ 	registerProfile( &myProfile, libraryHandle );
+ 	return 1;
+ }
+ 
+ Retured value is the count of actions added by the plugin.
+ libraryHandle must be redirected into registerProfile.
 */
+
+#include "BaseTypes.h"
 
 // clang-format off
 
@@ -40,7 +54,9 @@
 
 typedef struct mapProfile_s
 {
+	// Must always be NULL in the plugin environment
 	void *libraryHandle;
+
 	int unkint1; // used by q3
 	int unkint2;
 

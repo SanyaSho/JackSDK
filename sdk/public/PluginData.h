@@ -13,7 +13,7 @@
 /*
  Data handling
 
- All of the data enumeration functions share the same function prototype:
+ All of the IO enumeration functions share the same function prototype:
 
  DLL_EXPORT int vpEnumXXX( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
  {

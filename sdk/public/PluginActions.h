@@ -26,6 +26,8 @@
  pluginManager must be redirected into registerAction.
 */
 
+#include "BaseTypes.h"
+
 #define ACTION_FLAG_HIDDEN	( 1 << 0 ) /* Completly hides the action until the level is loaded */
 #define ACTION_FLAG_INLEVEL ( 1 << 1 ) /* Action is grayed out until the level is loaded */
 
@@ -37,8 +39,7 @@ typedef struct pluginActionInfo_s
 	const char *actionTitle;		/* Action title */
 	const char *actionDescription;	/* Action description used by the status bar */
 	const char *actionCategity;		/* Action category */
-	int actionFlags;				/* Action flags */
-	int b;
+	long actionFlags;				/* Action flags */
 	void (*dispatchFunc)();			/* Function called after action interaction */
 } pluginActionInfo_t;
 
