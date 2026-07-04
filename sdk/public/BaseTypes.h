@@ -31,4 +31,6 @@ struct rgba_t
 	char r, g, b, a;
 };
 
+typedef unsigned char byte;
+
 #endif // !SDK_BASETYPES_H

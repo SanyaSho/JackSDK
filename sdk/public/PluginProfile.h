@@ -127,11 +127,12 @@ typedef struct mapProfile_s
 	int unknown_SurfaceFlagsBitMask;
 	int unknown_ContentFlagsBitMask;
 } mapProfile_t;
-
 COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == 2960 );
 
 // Prototype for the function that is used to register game profiles internally
 typedef void (*pfnRegisterProfile)( mapProfile_t *profileInfo, void *libraryHandle );
+
+typedef int (*vpEnumProfiles_t)( pfnRegisterProfile registerProfile, void *libraryHandle );
 
 // clang-format on
 

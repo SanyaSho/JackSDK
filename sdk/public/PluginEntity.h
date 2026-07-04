@@ -16,6 +16,8 @@
 
 #include "BaseTypes.h"
 
+struct qStudioData_s;
+
 typedef struct epair_s
 {
 	struct epair_s *next;
@@ -56,15 +58,15 @@ typedef struct qEntity_s
 	int spawnflags;
 	int editorFlags;
 	char gap5[4];
-	int modelType; ///< 3 - mod_studio_hl1
+	int modelType; ///< 2 - mod_sprite; 3 - mod_studio; 4 - mod_particle;
 	vec3_t origin;
 	vec3_t angles;
 	vec3_t bboxMin;
 	vec3_t bboxMax;
 	char gap6[64];
-	qEntityKeys_t entityKeys[14];
+	qEntityKeys_t entityKeys[13];
+	qStudioData_s *studioData;
 } qEntity_t;
-
 COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == 368 );
 
 // clang-format off

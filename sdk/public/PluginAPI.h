@@ -44,7 +44,11 @@ EDITORFLAGS:
 #include "BaseTypes.h"
 
 struct qEntity_s;
+struct qPath_s;
+struct qNode_s;
 struct qCamera_s;
+struct qShader_s;
+struct qTexture_s;
 
 // clang-format off
 
@@ -73,6 +77,7 @@ typedef long		(*pfnEditor_Sys_GetOption)				( int option );
 
 // Steam_SetAchievemnt
 
+/* Parser API */
 typedef char *		(*pfnEditor_SC_Token)					();
 typedef long		(*pfnEditor_SC_Line)					();
 typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
@@ -101,7 +106,7 @@ typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
 // PR[17]
 
-// FileSystem API
+/* FileSystem API */
 
 /* Get current configuration base directory */
 /* Returns true on success, false on failure */
@@ -119,7 +124,7 @@ typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
 typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
 typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *file );
 typedef bool		(*pfnEditor_Sys_FileExists)				( const char *file );
-typedef char *		(*pfnEditor_Sys_LoadFile)				( const char *file, int *readBytes );
+typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *file, int *readBytes );
 typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
 
 /* Math API */
@@ -142,8 +147,8 @@ typedef bool		(*pfnEditor_BuildPackageList)			( void *pWorld ); // TODO
 /* Entity API */
 typedef qEntity_s *	(*pfnEditor_Entity_Create)				( void *world, const char *classname, const float *rgflOrigin, int editorFlags );
 typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int editorFlags );
-typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, unsigned char *cbColorOut );
-typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const unsigned char *cbColor );
+typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, byte *cbColorOut );
+typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const byte *cbColor );
 typedef void		(*pfnEditor_Entity_AddToVisGroup)		( void *world, qEntity_s *entityDef, int visGroupId );
 typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( void *world, qEntity_s *entityDef, int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
@@ -152,12 +157,35 @@ typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( void *world, const ch
 typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( void *world, const char *classname );
 typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( void *world, const char *key, const char *value );
 
+/* Path API */
+typedef qPath_s *	(*pfnEditor_Path_Create)				( void *world );
+typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
+typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
+
+/* Node API */
+typedef qNode_s *	(*pfnEditor_Node_Insert)				( void *world, qNode_s *parentNode );
+typedef void		(*pfnEditor_Node_Append)				( void *world, qPath_s *path );
+typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *node );
+
 /* Camera API*/
 typedef qCamera_s *	(*pfnEditor_Camera_Create)				( void *world );
 typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *camera );
-typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, unsigned char *cbColorOut );
-typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const unsigned char *cbColor );
+typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, byte *cbColorOut );
+typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cbColor );
 typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
+
+/* Shader API */
+typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int );
+typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *shaderName );
+typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderHandle );
+typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderHandle, void * );
+typedef void		(*pfnEditor_Shader_RemoveStage)			( void * );
+typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderHandle );
+typedef qTexture_s *(*pfnEditor_Shader_GetWhiteTexture)		();
+typedef qTexture_s *(*pfnEditor_Shader_GetBlackTexture)		();
+typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName );
+typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
+typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
 /* Dialog API */
 
@@ -407,10 +435,14 @@ typedef struct plugin_funcs_s
 	void *overlay[2];
 
 	/* Path API */
-	void *path[3];
+	pfnEditor_Path_Create pfnPath_Create;
+	pfnEditor_Path_Destroy pfnPath_Destroy;
+	pfnEditor_Path_Build pfnPath_Build;
 
 	/* Node API */
-	void *node[3];
+	pfnEditor_Node_Insert pfnNode_Insert;
+	pfnEditor_Node_Append pfnNode_Append;
+	pfnEditor_Node_Destroy pfnNode_Destroy;
 
 	/* Group API */
 	void *group[7];
@@ -423,7 +455,17 @@ typedef struct plugin_funcs_s
 	pfnEditor_Camera_Setup pfnCamera_Setup;
 
 	/* Shader API */
-	void *shader[11];
+	pfnEditor_Shader_Create pfnShader_Create;
+	pfnEditor_Shader_Lookup pfnShader_Lookup;
+	pfnEditor_Shader_Destroy pfnShader_Destroy;
+	pfnEditor_Shader_AddStage pfnShader_AddStage;
+	pfnEditor_Shader_RemoveStage pfnShader_RemoveStage;
+	pfnEditor_Shader_Finish pfnShader_Finish;
+	pfnEditor_Shader_GetWhiteTexture pfnShader_GetWhiteTexture;
+	pfnEditor_Shader_GetBlackTexture pfnShader_GetBlackTexture;
+	pfnEditor_Shader_LookupTexture pfnShader_LookupTexture;
+	pfnEditor_Shader_UploadTexture pfnShader_UploadTexture;
+	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
 
 	/* VisGroup API */
 	void *visgroup[7];
@@ -455,11 +497,14 @@ typedef struct plugin_funcs_s
 	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
 	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
 } plugin_funcs_t;
-
 COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == 1512 );
 
 #define PLUGIN_VERSION 121
 
+typedef int (*vpMain_t)( plugin_funcs_t *editorFuncs, int editorPluginVersion );
+
+#if !defined( PLUGINFACE_H )
 #include "PluginFace.h"
+#endif // !PLUGINFACE_H
 
 #endif // !PLUGINAPI_H

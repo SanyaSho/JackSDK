@@ -7,6 +7,8 @@
 #include "PluginCamera.h"
 #include "PluginProfile.h"
 #include "PluginData.h"
+#include "PluginNodes.h"
+#include "PluginPaths.h"
 #include "PluginEntity.h"
 
 plugin_funcs_t gEditorfuncs;
@@ -167,7 +169,54 @@ void CreateCamera()
 	Camera_SetColor( pCamera, cbColor );
 }
 
-pluginActionInfo_t createCamera = { "Create Camera", "&Create Camera", "", "ExamplePlugin", 0, CreateCamera };
+pluginActionInfo_t createCamera = { "CreateCamera", "&Create Camera", "", "ExamplePlugin", 0, CreateCamera };
+
+void CreateNodes()
+{
+	void *world = Global_GetCurrentWorld();
+	if ( !world )
+		return;
+
+	float vec3_origin[3] = { 0, 0, 0 };
+
+	// TODO: How does this work?
+	qNode_t *pNode = (qNode_t *)Sys_Malloc( sizeof( qNode_t ) );
+	memset( pNode, 0, sizeof( qNode_t ) );
+
+	pNode->nodeOrigin = { 0, 0, 128 };
+	pNode->nodeAngles = { 90, 35, 0 };
+
+	Node_Insert( world, pNode );
+}
+
+pluginActionInfo_t createNodes = { "CreateNodes", "&Create Nodes", "", "ExamplePlugin", 0, CreateNodes };
+
+void CreatePaths()
+{
+	void *world = Global_GetCurrentWorld();
+	if ( !world )
+		return;
+
+	float vec3_origin[3] = { 0, 0, 0 };
+
+	// TODO: How does this work?
+	qPath_t *pPath = Path_Create( world );
+
+	pPath->pathClassname = Sys_AllocString( "path_corner" );
+	pPath->pathName = Sys_AllocString( "apiPath" );
+	pPath->pathDirection = 2;
+
+	Path_Build( pPath, 0 );
+}
+
+pluginActionInfo_t createPaths = { "CreatePaths", "&Create Paths", "", "ExamplePlugin", 0, CreatePaths };
+
+void PrintSysFloatTime()
+{
+	Sys_Printf( "Sys_FloatTime: %f\n", Sys_FloatTime() );
+}
+
+pluginActionInfo_t printSysFloatTime = { "PrintSysFloatTime", "&Sys_FloatTime", "", "ExamplePlugin", 0, PrintSysFloatTime };
 
 /*
 ===============
@@ -180,7 +229,10 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &runTests, pluginManager );
 	registerAction( &spawnEntity, pluginManager );
 	registerAction( &createCamera, pluginManager );
-	return 3;
+	registerAction( &createNodes, pluginManager );
+	registerAction( &createPaths, pluginManager );
+	registerAction( &printSysFloatTime, pluginManager );
+	return 6;
 }
 
 // clang-format off
@@ -286,9 +338,9 @@ DLL_EXPORT int vpEnumSkyFormats( pfnRegisterIOFormat registerIOFormat, void *lib
 	return registerIOFormat( 0, "TGA", ".tga", libraryHandle ) != false;
 }
 
-DLL_EXPORT int vpLoadSky( int formatIndex, const char *a, int b, const char *textureBaseName, int side )
+DLL_EXPORT int vpLoadSky( int formatIndex, byte *buf, int bufSize, byte shaderBuf[1408], int side )
 {
-	Sys_Printf( "vpLoadSky: %d %s %d %s %d\n", formatIndex, a, b, textureBaseName, side );
+	Sys_Printf( "vpLoadSky: %d 0x%p %d %s %d\n", formatIndex, buf, bufSize, shaderBuf, side );
 	return 0;
 }
 

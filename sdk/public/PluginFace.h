@@ -98,12 +98,35 @@ extern plugin_funcs_t gEditorfuncs;
 #define Entity_FindByTargetname		(gEditorfuncs.pfnEntity_FindByTargetname)
 #define Entity_FindByKeyValue		(gEditorfuncs.pfnEntity_FindByKeyValue)
 
+/* Path API */
+#define Path_Create					(gEditorfuncs.pfnPath_Create)
+#define Path_Destroy				(gEditorfuncs.pfnPath_Destroy)
+#define Path_Build					(gEditorfuncs.pfnPath_Build)
+
+/* Node API */
+#define Node_Insert					(gEditorfuncs.pfnNode_Insert)
+#define Node_Append					(gEditorfuncs.pfnNode_Append)
+#define Node_Destroy				(gEditorfuncs.pfnNode_Destroy)
+
 /* Camera API */
 #define Camera_Create				(gEditorfuncs.pfnCamera_Create)
 #define Camera_Destroy				(gEditorfuncs.pfnCamera_Destroy)
 #define Camera_GetColor				(gEditorfuncs.pfnCamera_GetColor)
 #define Camera_SetColor				(gEditorfuncs.pfnCamera_SetColor)
 #define Camera_Setup				(gEditorfuncs.pfnCamera_Setup)
+
+/* Shader API */
+#define Shader_Create				(gEditorfuncs.pfnShader_Create)
+#define Shader_Lookup				(gEditorfuncs.pfnShader_Lookup)
+#define Shader_Destroy				(gEditorfuncs.pfnShader_Destroy)
+#define Shader_AddStage				(gEditorfuncs.pfnShader_AddStage)
+#define Shader_RemoveStage			(gEditorfuncs.pfnShader_RemoveStage)
+#define Shader_Finish				(gEditorfuncs.pfnShader_Finish)
+#define Shader_GetWhiteTexture		(gEditorfuncs.pfnShader_GetWhiteTexture)
+#define Shader_GetBlackTexture		(gEditorfuncs.pfnShader_GetBlackTexture)
+#define Shader_LookupTexture		(gEditorfuncs.pfnShader_LookupTexture)
+#define Shader_UploadTexture		(gEditorfuncs.pfnShader_UploadTexture)
+#define Shader_DestroyTexture		(gEditorfuncs.pfnShader_DestroyTexture)
 
 /* Dialog API */
 #define Dialog_CheckOptions			(gEditorfuncs.pfnDialog_CheckOptions)

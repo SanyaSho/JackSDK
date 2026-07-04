@@ -32,7 +32,6 @@ typedef struct qCamera_s
 	int editorFlags;
 	char gap2[28];
 } qCamera_t;
-
 COMPILE_TIME_ASSERT( sizeof( qCamera_t ) == 72 );
 
 // clang-format on
