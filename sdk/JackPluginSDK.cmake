@@ -24,6 +24,18 @@ function( target_use_jackpluginsdk target )
 				"${JACK_SDK_DIR}/public/PluginNodes.h"
 				"${JACK_SDK_DIR}/public/PluginPaths.h"
 				"${JACK_SDK_DIR}/public/PluginProfile.h"
+				"${JACK_SDK_DIR}/public/PluginRender.h"
+			#}
+		)
+
+		SRC_GRP(
+			SUBGROUP "GLEW"
+			SOURCES
+			#{
+				"${JACK_SDK_DIR}/GLEW/include/GL/eglew.h"
+				"${JACK_SDK_DIR}/GLEW/include/GL/glew.h"
+				"${JACK_SDK_DIR}/GLEW/include/GL/glxew.h"
+				"${JACK_SDK_DIR}/GLEW/include/GL/wglew.h"
 			#}
 		)
 	END_SRC( JACK_SDK_HEADER_FILES "SDK Header Files" )
@@ -38,6 +50,7 @@ function( target_use_jackpluginsdk target )
 		${target} PRIVATE
 
 		${JACK_SDK_DIR}/public
+		${JACK_SDK_DIR}/GLEW/include
 	)
 
 	target_compile_definitions(

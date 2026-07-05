@@ -47,8 +47,9 @@ struct qEntity_s;
 struct qPath_s;
 struct qNode_s;
 struct qCamera_s;
-struct qShader_s;
 struct qTexture_s;
+struct qShader_s;
+struct qShaderStage_s;
 
 // clang-format off
 
@@ -142,7 +143,9 @@ typedef float		(*pfnEditor_Sys_GetTextureGamma)		();
 
 typedef void *		(*pfnEditor_Global_GetCurrentWorld)		();
 
-typedef bool		(*pfnEditor_BuildPackageList)			( void *pWorld ); // TODO
+/* outBuf is not an array. It's an allocated string of WADs used on this map separated by listSeparator and it must be free'd */
+/* removeVolumePrefix does not work on Linux */
+typedef bool		(*pfnEditor_BuildPackageList)			( void *world, char **outBuf, char listSeparator, int removeVolumePrefix );
 
 /* Entity API */
 typedef qEntity_s *	(*pfnEditor_Entity_Create)				( void *world, const char *classname, const float *rgflOrigin, int editorFlags );
@@ -175,11 +178,11 @@ typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cb
 typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
 
 /* Shader API */
-typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int );
+typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int shaderFlags );
 typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *shaderName );
 typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderHandle );
-typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderHandle, void * );
-typedef void		(*pfnEditor_Shader_RemoveStage)			( void * );
+typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderHandle, qShaderStage_s *shaderStage );
+typedef void		(*pfnEditor_Shader_RemoveStage)			( qShaderStage_s *shaderStage );
 typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderHandle );
 typedef qTexture_s *(*pfnEditor_Shader_GetWhiteTexture)		();
 typedef qTexture_s *(*pfnEditor_Shader_GetBlackTexture)		();
@@ -407,7 +410,7 @@ typedef struct plugin_funcs_s
 
 	pfnEditor_Global_GetCurrentWorld pfnGlobal_GetCurrentWorld;
 
-	void *BuildPackageList;
+	pfnEditor_BuildPackageList pfnBuildPackageList;
 
 	/* Entity API */
 	pfnEditor_Entity_Create pfnEntity_Create;

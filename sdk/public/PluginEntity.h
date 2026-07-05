@@ -16,14 +16,13 @@
 
 #include "BaseTypes.h"
 
-struct qStudioData_s;
-
 typedef struct epair_s
 {
 	struct epair_s *next;
 	const char *key;
 	const char *value;
 } epair_t;
+COMPILE_TIME_ASSERT( sizeof( epair_t ) == 24 );
 
 typedef struct qSplineNode_s
 {
@@ -35,6 +34,7 @@ typedef struct qSplineNode_s
 	float yaw_speed;
 	float fov;
 } qSplineNode_t;
+COMPILE_TIME_ASSERT( sizeof( qSplineNode_t ) == 144 );
 
 typedef struct qEntityKeys_s
 {
@@ -63,9 +63,11 @@ typedef struct qEntity_s
 	vec3_t angles;
 	vec3_t bboxMin;
 	vec3_t bboxMax;
-	char gap6[64];
+	char gap6[4];
+	rgba_t renderColor;
+	char gap7[56];
 	qEntityKeys_t entityKeys[13];
-	qStudioData_s *studioData;
+	struct qStudioData_s *studioData;
 } qEntity_t;
 COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == 368 );
 

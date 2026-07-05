@@ -7,8 +7,8 @@
 //
 //=====================================================================================//
 
-#if !defined( PLUGINEXPORT_H )
-#define PLUGINEXPORT_H
+#if !defined( PLUGINDATA_H )
+#define PLUGINDATA_H
 
 /*
  Data handling
@@ -53,8 +53,10 @@ typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *
 /* Iterates all of the TYP_MIPTEX files inside a WAD2/WAD3 archive and registers them with Shader_Create/Shader_Finish */
 typedef bool (*vpLoadPackage_t)( int formatIndex, const char *filePath );
 
+
 /* Used by Quake 1. You might need this only if you have a profile with PROFILE_ALLOW_CUSTOM_PALETTE flag set */
 typedef bool (*vpSetPalette_t)( struct qPalette_s *paletteData );
+
 
 /*
  Sprite data definition.
@@ -82,6 +84,7 @@ typedef struct qSpriteData_s
 	void *pfn_UnloadModel;
 } qSpriteData_t;
 COMPILE_TIME_ASSERT( sizeof( qSpriteData_t ) == 40 );
+
 
 /*
  StudioMDL data definition.
@@ -135,6 +138,7 @@ typedef struct qStudioData_s
 } qStudioData_t;
 COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == 72 );
 
+
 /*
  Particles data definition.
  Contains some basic info about a particle
@@ -142,11 +146,29 @@ COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == 72 );
 
 struct qParticlesData_s;
 
+typedef bool (*vpUnloadParticles_t)( int formatIndex, qParticlesData_s *particlesData );
+
+typedef bool (*vpLoadParticles_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qParticlesData_s *outParticlesData );
+
+typedef bool (*vpRenderParticles_t)( int formatIndex, int editorFlags, qParticlesData_s *particlesData, qEntity_s *entityInfo );
+
 typedef struct qParticlesData_s
 {
-	char gap[48];
+	int unkint1;
+	int unkint2;
+
+	/*
+	 Internal format declared by vpEnumModelFormats
+	*/
+	int m_formatIndex;
+
+	char gap2[36];
+
+	vpRenderParticles_t pfnRenderParticle;
+	vpUnloadParticles_t pfnUnloadParticle;
 } qParticlesData_t;
-COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == 48 );
+COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == 64 );
+
 
 /*
  Archive data definition.
@@ -216,4 +238,4 @@ typedef int (*vpEnumGenericFunction_t)( pfnRegisterIOFormat registerIOFormat, vo
 
 // clang-format on
 
-#endif // !PLUGINEXPORT_H
+#endif // !PLUGINDATA_H

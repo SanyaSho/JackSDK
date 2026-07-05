@@ -33,7 +33,7 @@ typedef bool (*vpLoadSky)( int formatIndex, byte *buf, unsigned int bufSize, qSh
 	qShader_s *shaderData;
 } qSpriteData_t;*/
 
-typedef bool (*vpLoadSprite)( int formatIndex, const char *shaderName, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
+typedef bool (*vpLoadSprite)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
 
 
 /* Model IO */
@@ -186,7 +186,7 @@ static void *TempBuffer_GetSpace( int buffer, size_t size )
 
 static char *Sys_AllocString( const char *src )
 {
-	Sys_Printf( "%s( %s )", __FUNCTION__, src );
+	//Sys_Printf( "%s( %s )", __FUNCTION__, src );
 	if ( !src )
 		return NULL;
 
@@ -272,12 +272,12 @@ static void Shader_Destroy( qShader_s *shaderHandle )
 	Sys_Free( shaderHandle );
 }
 
-static void Shader_AddStage( qShader_s *shaderHandle, void *shaderStage )
+static void Shader_AddStage( qShader_s *shaderHandle, qShaderStage_s *shaderStage )
 {
 	Sys_Printf( "%s( 0x%p, 0x%p )", __FUNCTION__, shaderHandle, shaderStage );
 }
 
-static void Shader_RemoveStage( void *shaderStage )
+static void Shader_RemoveStage( qShaderStage_s *shaderStage )
 {
 	Sys_Printf( "%s( 0x%p )", __FUNCTION__, shaderStage );
 }
@@ -535,6 +535,39 @@ static bool Editor_RegisterModelFormat( int formatIndex, const char *formatName,
 }
 
 
+/* Particles IO */
+static vpUnloadParticles_t s_vpUnloadParticles;
+static vpLoadParticles_t s_vpLoadParticles;
+static vpRenderParticles_t s_vpRenderParticles;
+
+static bool Editor_RegisterParticleFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
+{
+	Sys_Printf( "  %d / %s / %s", formatIndex, formatName, formatExtension );
+
+	s_vpSetPalette = (vpSetPalette_t)GetProcAddress( (HMODULE)libraryHandle, "vpSetPalette" );
+	/* Not checked */
+
+	s_vpUnloadParticles = (vpUnloadParticles_t)GetProcAddress( (HMODULE)libraryHandle, "vpUnloadParticles" );
+	/* Not checked */
+
+	s_vpLoadParticles = (vpLoadParticles_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadParticles" );
+	if ( !s_vpLoadParticles )
+	{
+		Sys_Error( "Plugin \"%s\" defines particles format \"%s\" (%s), but doesn't export \"vpLoadParticles\" function!", PLUGIN_DLL, formatName, formatExtension );
+		return false;
+	}
+
+	s_vpRenderParticles = (vpRenderParticles_t)GetProcAddress( (HMODULE)libraryHandle, "vpRenderParticles" );
+	if ( !s_vpRenderParticles )
+	{
+		Sys_Error( "Plugin \"%s\" defines particles format \"%s\" (%s), but doesn't export \"vpRenderParticles\" function!", PLUGIN_DLL, formatName, formatExtension );
+		return false;
+	}
+
+	return true;
+}
+
+
 /* Archive IO */
 static vpUnloadArchive_t s_vpUnloadArchive;
 static vpLoadArchvie_t s_vpLoadArchvie;
@@ -584,6 +617,8 @@ static bool Editor_RegisterArchiveFormat( int formatIndex, const char *formatNam
 static void Editor_RegisterAction( pluginActionInfo_t *actionInfo, void *pluginManager )
 {
 	Sys_Printf( "  %s / %s / %s / %s / %x / 0x%p", actionInfo->actionName, actionInfo->actionTitle, actionInfo->actionDescription, actionInfo->actionCategory, actionInfo->actionFlags, actionInfo->dispatchFunc );
+
+	//actionInfo->dispatchFunc();
 }
 
 static void RunPluginTests()
@@ -798,7 +833,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	vpEnumGenericFunction_t pluginEnumParticlesFormats = (vpEnumGenericFunction_t)GetProcAddress( hPluginModule, "vpEnumParticlesFormats" );
 	if ( pluginEnumParticlesFormats )
 	{
-		int ret = pluginEnumParticlesFormats( Editor_RegisterIOFormat, hPluginModule );
+		int ret = pluginEnumParticlesFormats( Editor_RegisterParticleFormat, hPluginModule );
 		if ( ret != 0 )
 			Sys_Printf( "%i sprite format(s) registered", ret );
 	}

@@ -83,7 +83,7 @@ extern plugin_funcs_t gEditorfuncs;
 
 #define Global_GetCurrentWorld		(gEditorfuncs.pfnGlobal_GetCurrentWorld)
 
-// BuildPackageList
+#define BuildPackageList			(gEditorfuncs.pfnBuildPackageList)
 
 /* Entity API */
 #define Entity_Create				(gEditorfuncs.pfnEntity_Create)

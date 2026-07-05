@@ -2,6 +2,10 @@
 #include <memory.h>
 #include <locale.h>
 
+
+#include "GL/glew.h"
+
+
 #include "PluginAPI.h"
 #include "PluginActions.h"
 #include "PluginCamera.h"
@@ -10,6 +14,14 @@
 #include "PluginNodes.h"
 #include "PluginPaths.h"
 #include "PluginEntity.h"
+#include "PluginRender.h"
+
+//#define STBI_MALLOC( sz )		 Sys_Malloc( sz )
+//#define STBI_REALLOC( p, newsz ) realloc( p, newsz )
+//#define STBI_FREE( p )			 Sys_Free( p )
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 plugin_funcs_t gEditorfuncs;
 
@@ -218,6 +230,25 @@ void PrintSysFloatTime()
 
 pluginActionInfo_t printSysFloatTime = { "PrintSysFloatTime", "&Sys_FloatTime", "", "ExamplePlugin", 0, PrintSysFloatTime };
 
+void RunBuildPackageList()
+{
+	void *world = Global_GetCurrentWorld();
+	if ( !world )
+		return;
+
+	char *buf = NULL;
+
+	// 0: packageList: C:/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/halflife.wad;C:/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/liquids.wad;C:/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/xeno.wad;C:/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/decals.wad;C:/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/zhlt.wad
+	// 1: packageList: /Program Files (x86)/Steam/steamapps/common/Half-Life/valve/halflife.wad;/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/liquids.wad;/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/xeno.wad;/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/decals.wad;/Program Files (x86)/Steam/steamapps/common/Half-Life/valve/zhlt.wad
+	bool bOK = BuildPackageList( world, &buf, ';', 0 );
+	if ( bOK )
+	{
+		Sys_Printf( "packageList: %s", buf );
+	}
+}
+
+pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", 0, RunBuildPackageList };
+
 /*
 ===============
 vpEnumActions
@@ -232,7 +263,8 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &createNodes, pluginManager );
 	registerAction( &createPaths, pluginManager );
 	registerAction( &printSysFloatTime, pluginManager );
-	return 6;
+	registerAction( &runBuildPackageList, pluginManager );
+	return 7;
 }
 
 // clang-format off
@@ -270,7 +302,7 @@ mapProfile_t profile =
 	"",
 	".wad",
 	".pak",
-	".spr",
+	".spr;.png;.gif",//".spr",
 	".mdl",
 	".wav",
 	".aur",
@@ -357,7 +389,7 @@ DLL_EXPORT int vpEnumExportFormats( pfnRegisterIOFormat registerIOFormat, void *
 
 DLL_EXPORT int vpExport( int formatIndex, const char *filePath, long seekOffset, long readLimit, void *pWorld )
 {
-	Sys_Printf( "vpImport (idx: %d / pth: %s / %d %d %p)\n", formatIndex, filePath, seekOffset, readLimit, pWorld );
+	Sys_Printf( "vpExport (idx: %d / pth: %s / %d %d %p)\n", formatIndex, filePath, seekOffset, readLimit, pWorld );
 	return 0;
 }
 
@@ -405,6 +437,162 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset,
 	}*/
 
 	return 0;
+}
+
+
+DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
+{
+	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
+}
+
+DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, long a6 )
+{
+	float bbMin[3] = { -8.f, -8.f, -8.f };
+	float bbMax[3] = { 8.f, 8.f, 8.f };
+	bboxMin = bbMin;
+	bboxMax = bbMax;
+	return true;
+}
+
+DLL_EXPORT bool vpUnloadModel( int formatIndex, qStudioData_s *studioData )
+{
+	return true;
+}
+
+DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *outStudioData )
+{
+	return true;
+}
+
+DLL_EXPORT bool vpRenderModel( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
+{
+	return true;
+}
+
+/*struct qShader_s
+{
+	char gap[72];
+	int maxWidth;
+	int maxHeight;
+	int flags;
+	char gap2[1320];
+};*/
+
+
+
+DLL_EXPORT int vpEnumSpriteFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
+{
+	registerIOFormat( 0, "Portable Network Graphics", ".png", libraryHandle );
+	registerIOFormat( 1, "Graphics Interchange Format", ".gif", libraryHandle );
+	return 2;
+}
+
+DLL_EXPORT bool vpUnloadSprite( int formatIndex, qSpriteData_s *spriteData )
+{
+	return true;
+}
+
+static bool LoadSprite_PNG( const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
+{
+	static const unsigned char s_pngSignature[8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+	if ( memcmp( buf, s_pngSignature, sizeof( s_pngSignature ) ) != 0 )
+	{
+		Sys_Printf( "Failed to load \"%s\". (Not a valid PNG)", filePath );
+		return false;
+	}
+
+	outSpriteData->m_spriteOrientation = 0;
+
+	/* Create the shader */
+	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
+
+	spriteShader->m_flags |= 0x2040;
+
+	int width, height, numchannels;
+	unsigned char *pixels = stbi_load_from_memory( buf, bufSize, &width, &height, &numchannels, 4 );
+
+	spriteShader->m_textureWidth = width;
+	spriteShader->m_textureHeight = height;
+
+	qShaderStage_t shaderStage;
+	memset( &shaderStage, 0, sizeof( qShaderStage_t ) );
+
+	shaderStage.m_framerate = 1.f;
+
+	qTexture_t *pTexture = Shader_UploadTexture( spriteShader, NULL, GL_RGBA, GL_COMPRESSED_RGBA, numchannels, width, height, true, pixels );
+	AddTextureToList( shaderStage.m_textureList, pTexture );
+
+	spriteShader->m_texture = shaderStage.m_currentTexture = shaderStage.m_textureList;
+
+	++shaderStage.m_textureList->m_refCount;
+
+	Shader_AddStage( spriteShader, &shaderStage );
+	Shader_Finish( spriteShader );
+
+	outSpriteData->m_spriteShader = spriteShader;
+
+	return true;
+}
+
+static bool LoadSprite_GIF( const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
+{
+	static const unsigned char s_gifSignature[6] = { 'G', 'I', 'F', '8', '9', 'a' };
+	if ( memcmp( buf, s_gifSignature, sizeof( s_gifSignature ) ) != 0 )
+	{
+		Sys_Printf( "Failed to load \"%s\". (Not a valid GIF)", filePath );
+		return false;
+	}
+
+	outSpriteData->m_spriteOrientation = 0;
+
+	/* Create the shader */
+	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
+
+	spriteShader->m_flags |= 0x2040;
+
+	int *numdelays = NULL;
+	int width, height, numframes, numchannels;
+	unsigned char *pixels = stbi_load_gif_from_memory( buf, bufSize, &numdelays, &width, &height, &numframes, &numchannels, 4 );
+
+	spriteShader->m_textureWidth = width;
+	spriteShader->m_textureHeight = height;
+
+	qShaderStage_t shaderStage;
+	memset( &shaderStage, 0, sizeof( qShaderStage_t ) );
+
+	shaderStage.m_framerate = 1.f;
+
+	for ( int i = 0; i < numframes; i++ )
+	{
+		unsigned char *framePixels = pixels + ( width * height * numchannels * i );
+
+		qTexture_t *pTexture = Shader_UploadTexture( spriteShader, NULL, GL_RGBA, GL_COMPRESSED_RGBA, numchannels, width, height, true, framePixels );
+		AddTextureToList( shaderStage.m_textureList, pTexture );
+	}
+
+	spriteShader->m_texture = shaderStage.m_currentTexture = shaderStage.m_textureList;
+
+	++shaderStage.m_textureList->m_refCount;
+
+	Shader_AddStage( spriteShader, &shaderStage );
+	Shader_Finish( spriteShader );
+
+	outSpriteData->m_spriteShader = spriteShader;
+
+	return true;
+}
+
+DLL_EXPORT bool vpLoadSprite( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
+{
+	switch ( formatIndex )
+	{
+	case 0:
+		return LoadSprite_PNG( filePath, buf, bufSize, outSpriteData );
+	case 1:
+		return LoadSprite_GIF( filePath, buf, bufSize, outSpriteData );
+	};
+
+	return false;
 }
 
 #if 0
