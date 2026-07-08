@@ -150,7 +150,7 @@ COMPILE_TIME_ASSERT( sizeof( targetInfo_t ) == 16 );*/
 
 typedef enum modtype_s
 {
-	mod_bad = 0, // maybe mod_brush
+	mod_brush = 0,
 	mod_sprite,
 	mod_decal,
 	mod_studio,
@@ -164,42 +164,51 @@ typedef struct qEntity_s
 {
 	void *firstPtr;
 
-	CMapEntity *pMapEntity;
+	/* Internal */
+	CMapEntity *m_mapEntity;
 
+	/* Next/Previous entity list. First element never has ->prev set and last element never has ->next set */
 	struct qEntity_s *next;
 	struct qEntity_s *prev;
 
-	char gap2_1[16];
+	/* Next/Previous selected entity list. First element never has ->selectedPrev and last element never has ->selectedNext */
+	struct qEntity_s *selectedNext;
+	struct qEntity_s *selectedPrev;
 
+	/* List of groups this entity belongs to */
 	struct qGroup_s *m_groupList;
 	struct qGroup_s *m_lastGroup;
 
+	/* List of brushes this entity has attached to it */
 	struct qBrush_s *m_brushList;
 	struct qBrush_s *m_lastBrush;
 
+	/* World this entity belongs to */
 	struct qWorld_s *m_ownerWorld;
 
+	/* Entity KeyValues */
 	struct epair_s *epairs;
 
 	struct qSplineNode_s *m_splineNode;
 
+	/* Entity ClassName */
 	char *m_className;
 
+	/* Entity TargetName */
 	char *m_targetName;
 
 	char gap4_1[4];
 	char gap4_2[4];
 
+	/* Entity SpawnFlags */
 	int m_spawnflags;
 
 	int m_editorFlags;
-
 	int m_editorId;
 
 	modtype_t m_modelType;
 
 	vec3_t m_vecOrigin;
-
 	vec3_t m_vecAngles;
 
 	vec3_t m_bboxMin;

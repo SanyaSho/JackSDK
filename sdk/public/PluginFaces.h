@@ -68,15 +68,22 @@ class CMapFace;
 
 typedef struct qFace_s
 {
-	char gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapFace *m_mapFace;
 
+	/* Next/Previous face list. First element never has ->prev set and last element never has ->next set */
 	struct qFace_s *next;
 	struct qFace_s *prev;
 
-	char gap1[24];
+	/* Next/Previous selected face list. First element never has ->selectedPrev and last element never has ->selectedNext */
+	struct qFace_s *selectedNext;
+	struct qFace_s *selectedPrev;
 
+	char gap1[8];
+
+	/* Brush this face belongs to */
 	struct qBrush_s *m_ownerBrush;
 
 	struct qShader_s *m_shaderInfo;
@@ -84,7 +91,6 @@ typedef struct qFace_s
 	char gap2[4];
 
 	int m_editorFlags;
-
 	int m_editorId;
 
 	struct qPlane_s m_plane;

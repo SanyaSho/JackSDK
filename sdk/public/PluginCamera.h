@@ -27,13 +27,16 @@ class CMapCamera;
 
 typedef struct qCamera_s
 {
-	char gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapCamera *m_mapCamera;
 
+	/* Next/Previous entity in the list. First entity never has ->prev and last entity never has ->next. */
 	struct qCamera_s *next;
 	struct qCamera_s *prev;
 
+	/* World this camera belongs to */
 	struct qWorld_s *m_ownerWorld;
 
 	int m_editorFlags;

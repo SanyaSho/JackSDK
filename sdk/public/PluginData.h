@@ -207,7 +207,7 @@ typedef bool (*vpListArchiveFiles_t)( int formatIndex, qArchiveData_s *archiveDa
 
 // clang-format on
 
-struct unknownArchvieStruct_t
+struct unknownArchiveStruct_t
 {
 	char gap[16];
 };
@@ -224,7 +224,7 @@ typedef struct qArchiveData_s
 
 	char gap_[4];
 
-	unknownArchvieStruct_t *m_unknownArchiveStruct;
+	unknownArchiveStruct_t *m_unknownArchiveStruct;
 
 	/*
 	 Pointer to an allocated memory (ex. pak_t)

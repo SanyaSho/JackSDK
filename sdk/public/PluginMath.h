@@ -16,6 +16,7 @@
 #define FLT_EPSILON 1.192092896e-07F
 #endif // !FLT_EPSILON
 
+/* 2D Vector */
 struct vec2_t
 {
 	vec_t x, y;
@@ -46,6 +47,7 @@ struct vec2_t
 	// clang-format on
 };
 
+/* 3D Vector */
 struct vec3_t
 {
 	vec_t x, y, z;

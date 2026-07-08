@@ -142,7 +142,7 @@ typedef struct qShader_s
 
 	struct qTexture_s *m_texture;
 
-	float unknownFloat1;
+	float m_framerate; // TODO: Is this actually a framerate?
 
 	char gap4[68];
 

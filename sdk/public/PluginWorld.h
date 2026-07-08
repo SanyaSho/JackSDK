@@ -65,22 +65,29 @@ class CMapBrush;
 
 typedef struct qBrush_s
 {
-	char gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapBrush *m_mapBrush;
 
+	/* Next/Previous brush list. First element never has ->prev set and last element never has ->next set */
 	struct qBrush_s *next;
 	struct qBrush_s *prev;
 
-	char gap2[16];
+	/* Next/Previous selected entity list. First element never has ->selectedPrev and last element never has ->selectedNext */
+	struct qBrush_s *selectedNext;
+	struct qBrush_s *selectedPrev;
 
+	/* List of groups this brush belongs to */
 	struct qGroup_s *m_groupList;
 	struct qGroup_s *m_lastGroup;
 
+	/* List of faces of this brush */
 	struct qFace_s *m_faceList;
 	struct qFace_s *m_lastFace;
 
-	struct qEntity_s *m_ownerEntityty;
+	/* Owner entity of this brush (ex. worldspawn) */
+	struct qEntity_s *m_ownerEntity;
 
 	struct qPatch_s *m_patch;
 
@@ -122,23 +129,34 @@ class CMapWorld;
 
 typedef struct qWorld_s
 {
-	char qWorld_s_gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapWorld *m_mapWorld;
 
 	struct qGroup_s *m_groupList;
 
+	/* List of entities this world contains */
 	struct qEntity_s *m_entityList;
 	struct qEntity_s *m_lastEntity;
 
+	/* List of paths this world contains */
 	struct qPath_s *m_pathList;
 	struct qPath_s *m_lastPath;
 
+	/* List of cameras this world contains */
 	struct qCamera_s *m_cameraList;
 	struct qCamera_s *m_lastCamera;
 
-	char qWorld_s_gap3[48];
+	/* Selection lists. NULL if nothing is selected */
+	void *qWorld_s_gap3_1;
+	void *m_selectedUnknownList;
+	struct qEntity_s *m_selEntityList;
+	struct qBrush_s *m_selBrushList;
+	struct qFace_s *m_selFaceList;
+	void *qWorld_s_gap3_6;
 
+	/* Translucency data for special entities */
 	struct qTrans_s *m_transData;
 
 	char unknown_sky_related[8];
@@ -147,6 +165,7 @@ typedef struct qWorld_s
 
 	char qWorld_s_gap5[28];
 
+	/* Sky settings */
 	struct qSkyData_s m_skyData;
 } qWorld_t;
 COMPILE_TIME_ASSERT( sizeof( qWorld_t ) == 192 );

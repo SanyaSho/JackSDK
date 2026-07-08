@@ -24,6 +24,7 @@ typedef struct qPath_s
 
 	CMapPath *m_mapPath;
 
+	/* Next/Previous path list. First element never has ->prev set and last element never has ->next set */
 	struct qPath_s *next;
 	struct qPath_s *prev;
 

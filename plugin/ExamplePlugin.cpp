@@ -203,8 +203,8 @@ void CreateNodes()
 	qNode_t *pNode = (qNode_t *)Sys_Malloc( sizeof( qNode_t ) );
 	memset( pNode, 0, sizeof( qNode_t ) );
 
-	pNode->nodeOrigin = { 0, 0, 128 };
-	pNode->nodeAngles = { 90, 35, 0 };
+	pNode->m_vecOrigin = { 0, 0, 128 };
+	pNode->m_vecAngles = { 90, 35, 0 };
 
 	Node_Insert( world, pNode );
 }
@@ -259,7 +259,7 @@ pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackage
 
 void MessageBoxTest()
 {
-	long f;
+	bool f;
 
 	f = Dialog_MessageBox( "Stop", "Stop", DIALOG_MB_ICONSTOP );
 	Sys_Printf( "f: %d", f );
@@ -290,6 +290,38 @@ void MessageBoxTest()
 }
 
 pluginActionInfo_t mbTest = { "MessageBoxTest", "&MessageBoxTest", "", "ExamplePlugin", 0, MessageBoxTest };
+
+void DebuggerBreakWithWorld()
+{
+	qWorld_t *worldDef = Global_GetCurrentWorld();
+	if ( !worldDef )
+		return;
+
+	Sys_Printf( "worldDef: 0x%p", worldDef );
+	__debugbreak();
+}
+
+pluginActionInfo_t debuggerbreakwithworld = { "DebuggerBreakWithWorld", "&DebuggerBreak with World", "Perform a __debugbreak with access to the world pointer", "ExamplePlugin", 0, DebuggerBreakWithWorld };
+
+void FindPlayerSpawn()
+{
+	qWorld_t *worldDef = Global_GetCurrentWorld();
+	if ( !worldDef )
+		return;
+
+	qEntity_t *entityDef = NULL;
+
+	entityDef = Entity_FindByClassname( worldDef->m_entityList, "info_player_start" );
+	if ( !entityDef )
+		entityDef = Entity_FindByClassname( worldDef->m_entityList, "info_player_deathmatch" );
+
+	if ( !entityDef )
+		return;
+
+	Sys_Printf( "Found %s on (%f %f %f)", entityDef->m_className, entityDef->m_vecOrigin.x, entityDef->m_vecOrigin.y, entityDef->m_vecOrigin.z );
+}
+
+pluginActionInfo_t findPlayerSpawn = { "FindPlayerSpawn", "&FindPlayerSpawn", "", "ExamplePlugin", 0, FindPlayerSpawn };
 
 
 void V_ExtractFileExtension( const char *path, char *dest, int destSize )
@@ -574,15 +606,17 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &printSysFloatTime, pluginManager );
 	registerAction( &runBuildPackageList, pluginManager );
 	registerAction( &mbTest, pluginManager );
+	registerAction( &debuggerbreakwithworld, pluginManager );
+	registerAction( &findPlayerSpawn, pluginManager );
 #if 0
 	registerAction( &doomwadtest, pluginManager );
-	return 9;
+	return 11;
 #endif
 #if 0
 	registerAction( &quakeExtractTexturesToPNGs, pluginManager );
-	return 9;
+	return 11;
 #endif
-	return 8;
+	return 10;
 }
 
 // clang-format off

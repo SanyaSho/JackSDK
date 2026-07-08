@@ -41,11 +41,11 @@ EDITORFLAGS:
 1<<0  - ?
 1<<1  - Selected
 1<<2  - Dirty
-1<<3  - ?
-1<<4  - entity is transparent
-1<<5  - worldspawn
-1<<6  - entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass)
-1<<7  - entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
+1<<3  - Hidden
+1<<4  - Entity is transparent
+1<<5  - A worldspawn
+1<<6  - Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass)
+1<<7  - Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
 1<<8  - ?
 1<<9  - "Ignore" flag (Brushes and Paths only)
 */
