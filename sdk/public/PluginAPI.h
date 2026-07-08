@@ -179,9 +179,15 @@ typedef void		(*pfnEditor_Entity_AddToVisGroup)		( qWorld_s *worldDef, qEntity_s
 typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( qWorld_s *worldDef, qEntity_s *entityDef, unsigned int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qWorld_s *worldDef, const char *classname );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qWorld_s *worldDef, const char *classname );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( qWorld_s *worldDef, const char *key, const char *value );
+
+/* Iterates thru a list of entities (worldDef->m_entityList for example) and checks for epairs */
+typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( qEntity_s *entityDef, const char *key, const char *value );
+
+/* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_className value */
+typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qEntity_s *entityDef, const char *classname );
+
+/* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_targetName value */
+typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qEntity_s *entityDef, const char *targetname );
 
 /* Brush API */
 typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
@@ -504,9 +510,9 @@ typedef struct plugin_funcs_s
 	pfnEditor_Entity_RemoveFromVisGroup pfnEntity_RemoveFromVisGroup;
 	pfnEditor_Entity_GetVisGroupIdent pfnEntity_GetVisGroupIdent;
 	pfnEditor_Entity_GetVisGroupCount pfnEntity_GetVisGroupCount;
+	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
 	pfnEditor_Entity_FindByClassname pfnEntity_FindByClassname;
 	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
-	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
 
 	/* Brush API*/
 	pfnEditor_Brush_Create pfnBrush_Create;

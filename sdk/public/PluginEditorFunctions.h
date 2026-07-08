@@ -94,9 +94,9 @@ extern plugin_funcs_t gEditorfuncs;
 #define Entity_RemoveFromVisGroup	(gEditorfuncs.pfnEntity_RemoveFromVisGroup)
 #define Entity_GetVisGroupIdent		(gEditorfuncs.pfnEntity_GetVisGroupIdent)
 #define Entity_GetVisGroupCount		(gEditorfuncs.pfnEntity_GetVisGroupCount)
+#define Entity_FindByKeyValue		(gEditorfuncs.pfnEntity_FindByKeyValue)
 #define Entity_FindByClassname		(gEditorfuncs.pfnEntity_FindByClassname)
 #define Entity_FindByTargetname		(gEditorfuncs.pfnEntity_FindByTargetname)
-#define Entity_FindByKeyValue		(gEditorfuncs.pfnEntity_FindByKeyValue)
 
 /* Brush API */
 #define Brush_Create				(gEditorfuncs.pfnBrush_Create)

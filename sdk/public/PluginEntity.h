@@ -169,25 +169,26 @@ typedef struct qEntity_s
 	struct qEntity_s *next;
 	struct qEntity_s *prev;
 
-	char gap2_1[24];
+	char gap2_1[16];
 
-	void *unk_groups;
+	struct qGroup_s *m_groupList;
+	struct qGroup_s *m_lastGroup;
 
 	struct qBrush_s *m_brushList;
-
 	struct qBrush_s *m_lastBrush;
 
-	struct qWorld_s *m_world;
+	struct qWorld_s *m_ownerWorld;
 
 	struct epair_s *epairs;
 
-	struct qSplineNode_s *splineNode;
+	struct qSplineNode_s *m_splineNode;
 
 	char *m_className;
 
 	char *m_targetName;
 
-	char gap4[8];
+	char gap4_1[4];
+	char gap4_2[4];
 
 	int m_spawnflags;
 
@@ -195,7 +196,7 @@ typedef struct qEntity_s
 
 	int m_editorId;
 
-	int m_modelType; // modtype_t
+	modtype_t m_modelType;
 
 	vec3_t m_vecOrigin;
 
