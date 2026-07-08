@@ -11,7 +11,7 @@
 #define PLUGINPATHS_H
 
 /*
- Nodes API
+ Paths API
 */
 
 #include "BaseTypes.h"
@@ -21,16 +21,24 @@ class CMapPath;
 typedef struct qPath_s
 {
 	char gap[8];
-	CMapPath *pMapPath;
-	char gap2[32];
-	void *world;
-	const char *pathName;
-	const char *pathClassname;
-	int pathDirection;
-	int editorFlags;
-	char gap3_2[4];
-	vec3_t bboxMin;
-	vec3_t bboxMax;
+
+	CMapPath *m_mapPath;
+
+	struct qPath_s *next;
+	struct qPath_s *prev;
+
+	struct qNode_s *m_nodeList;
+	struct qNode_s *m_lastNode;
+
+	struct qWorld_s *m_ownerWorld;
+
+	const char *m_pathName;
+	const char *m_pathClassname;
+	int m_pathDirection;
+	int m_editorFlags;
+	int m_editorId;
+	vec3_t m_bboxMin;
+	vec3_t m_bboxMax;
 	char gap4[4];
 } qPath_t;
 COMPILE_TIME_ASSERT( sizeof( qPath_t ) == 112 );

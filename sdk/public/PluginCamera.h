@@ -20,15 +20,28 @@
 
 #include "BaseTypes.h"
 
+struct qWorld_s;
+
+
 class CMapCamera;
 
 typedef struct qCamera_s
 {
-	char gap1[8];
-	CMapCamera *pMapCamera;
-	char gap[24];
-	int editorFlags;
-	char gap2[28];
+	char gap[8];
+
+	CMapCamera *m_mapCamera;
+
+	struct qCamera_s *next;
+	struct qCamera_s *prev;
+
+	struct qWorld_s *m_ownerWorld;
+
+	int m_editorFlags;
+
+	int m_editorId;
+
+	vec3_t m_vecOrigin;
+	vec3_t m_vecAngles;
 } qCamera_t;
 COMPILE_TIME_ASSERT( sizeof( qCamera_t ) == 72 );
 

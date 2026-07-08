@@ -16,6 +16,9 @@
 
 #include "BaseTypes.h"
 
+struct qBrush_s;
+struct qWorld_s;
+
 
 #define ENT_BLDFLG_FULLBUILD			( 1 << 0  ) // Will append bits [4, 5, 6, 7, 9, 11, 12] to the flags
 #define ENT_BLDFLG_BIT1					( 1 << 1  )
@@ -31,6 +34,7 @@
 #define ENT_BLDFLG_BIT11				( 1 << 11 )
 #define ENT_BLDFLG_BIT12				( 1 << 12 )
 #define ENT_BLDFLG_BIT13				( 1 << 13 )
+
 
 typedef struct epair_s
 {
@@ -144,6 +148,15 @@ COMPILE_TIME_ASSERT( sizeof( qEntityState_t ) == 48 );
 } targetInfo_t;
 COMPILE_TIME_ASSERT( sizeof( targetInfo_t ) == 16 );*/
 
+typedef enum modtype_s
+{
+	mod_bad = 0, // maybe mod_brush
+	mod_sprite,
+	mod_decal,
+	mod_studio,
+	mod_particles,
+	mod_unknown
+} modtype_t;
 
 class CMapEntity;
 
@@ -154,12 +167,17 @@ typedef struct qEntity_s
 	CMapEntity *pMapEntity;
 
 	struct qEntity_s *next;
+	struct qEntity_s *prev;
 
-	char gap2[4];
+	char gap2_1[24];
 
-	rgba_t color;
+	void *unk_groups;
 
-	char gap2_[56];
+	struct qBrush_s *m_brushList;
+
+	struct qBrush_s *m_lastBrush;
+
+	struct qWorld_s *m_world;
 
 	struct epair_s *epairs;
 
@@ -177,7 +195,7 @@ typedef struct qEntity_s
 
 	char gap5[4];
 
-	int m_modelType; ///< 2 - mod_sprite; 3 - mod_studio; 4 - mod_particle;
+	int m_modelType; // modtype_t
 
 	vec3_t m_vecOrigin;
 

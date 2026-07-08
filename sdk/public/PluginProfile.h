@@ -52,6 +52,8 @@
 #define PROFILE_SUPPORTS_AAS				( 1 << 19 ) // CPrefabPreviewDialogBase::updateActions
 #define PROFILE_ENABLE_FALLBACK_DIR			( 1 << 20 ) // CPreferencesDialog::updateFallbackdirEnabled
 
+// clang-format on
+
 // TODO: Better variable naming!
 
 typedef struct mapProfile_s
@@ -130,6 +132,8 @@ typedef struct mapProfile_s
 	int unknown_ContentFlagsBitMask;
 } mapProfile_t;
 COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == 2960 );
+
+// clang-format off
 
 // Prototype for the function that is used to register game profiles internally
 typedef void (*pfnRegisterProfile)( mapProfile_t *profileInfo, void *libraryHandle );

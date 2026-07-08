@@ -27,6 +27,7 @@ function( target_use_jackpluginsdk target )
 				"${JACK_SDK_DIR}/public/PluginPaths.h"
 				"${JACK_SDK_DIR}/public/PluginProfile.h"
 				"${JACK_SDK_DIR}/public/PluginRender.h"
+				"${JACK_SDK_DIR}/public/PluginWorld.h"
 			#}
 		)
 

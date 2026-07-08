@@ -15,6 +15,7 @@
 #include "PluginPaths.h"
 #include "PluginEntity.h"
 #include "PluginRender.h"
+#include "PluginWorld.h"
 
 //#define STBI_MALLOC( sz )		 Sys_Malloc( sz )
 //#define STBI_REALLOC( p, newsz ) realloc( p, newsz )
@@ -221,9 +222,9 @@ void CreatePaths()
 	// TODO: How does this work?
 	qPath_t *pPath = Path_Create( world );
 
-	pPath->pathClassname = Sys_AllocString( "path_corner" );
-	pPath->pathName = Sys_AllocString( "apiPath" );
-	pPath->pathDirection = 2;
+	pPath->m_pathClassname = Sys_AllocString( "path_corner" );
+	pPath->m_pathName = Sys_AllocString( "apiPath" );
+	pPath->m_pathDirection = 2;
 
 	Path_Build( pPath, 0 );
 }
@@ -255,6 +256,40 @@ void RunBuildPackageList()
 }
 
 pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", 0, RunBuildPackageList };
+
+void MessageBoxTest()
+{
+	long f;
+
+	f = Dialog_MessageBox( "Stop", "Stop", DIALOG_MB_ICONSTOP );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "Warning", "Warning", DIALOG_MB_ICONWARNING );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "Information", "Information", DIALOG_MB_ICONINFORMATION );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "Question", "Question", DIALOG_MB_ICONQUESTION );
+	Sys_Printf( "f: %d", f );
+
+	f = Dialog_MessageBox( "OkCancel | Stop", "Stop", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONSTOP );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "OkCancel | Warning", "Warning", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONWARNING );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "OkCancel | Information", "Information", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONINFORMATION );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "OkCancel | Question", "Question", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONQUESTION );
+	Sys_Printf( "f: %d", f );
+
+	f = Dialog_MessageBox( "YesNo | Stop", "Stop", DIALOG_MB_YESNO | DIALOG_MB_ICONSTOP );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "YesNo | Warning", "Warning", DIALOG_MB_YESNO | DIALOG_MB_ICONWARNING );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "YesNo | Information", "Information", DIALOG_MB_YESNO | DIALOG_MB_ICONINFORMATION );
+	Sys_Printf( "f: %d", f );
+	f = Dialog_MessageBox( "YesNo | Question", "Question", DIALOG_MB_YESNO | DIALOG_MB_ICONQUESTION );
+	Sys_Printf( "f: %d", f );
+}
+
+pluginActionInfo_t mbTest = { "MessageBoxTest", "&MessageBoxTest", "", "ExamplePlugin", 0, MessageBoxTest };
 
 
 void V_ExtractFileExtension( const char *path, char *dest, int destSize )
@@ -538,15 +573,16 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &createPaths, pluginManager );
 	registerAction( &printSysFloatTime, pluginManager );
 	registerAction( &runBuildPackageList, pluginManager );
+	registerAction( &mbTest, pluginManager );
 #if 0
 	registerAction( &doomwadtest, pluginManager );
-	return 8;
+	return 9;
 #endif
 #if 0
 	registerAction( &quakeExtractTexturesToPNGs, pluginManager );
-	return 8;
+	return 9;
 #endif
-	return 7;
+	return 8;
 }
 
 // clang-format off

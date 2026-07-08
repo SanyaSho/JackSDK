@@ -112,6 +112,10 @@ extern plugin_funcs_t gEditorfuncs;
 #define Face_Create					(gEditorfuncs.pfnFace_Create)
 #define Face_Destroy				(gEditorfuncs.pfnFace_Destroy)
 
+/* Overlay API */
+#define Overlay_Create				(gEditorfuncs.pfnOverlay_Create)
+#define Overlay_Destroy				(gEditorfuncs.pfnOverlay_Destroy)
+
 /* Path API */
 #define Path_Create					(gEditorfuncs.pfnPath_Create)
 #define Path_Destroy				(gEditorfuncs.pfnPath_Destroy)
@@ -141,6 +145,35 @@ extern plugin_funcs_t gEditorfuncs;
 #define Shader_LookupTexture		(gEditorfuncs.pfnShader_LookupTexture)
 #define Shader_UploadTexture		(gEditorfuncs.pfnShader_UploadTexture)
 #define Shader_DestroyTexture		(gEditorfuncs.pfnShader_DestroyTexture)
+
+/* Undo API*/
+#define Undo_Start					(gEditorfuncs.pfnUndo_Start)
+#define Undo_End					(gEditorfuncs.pfnUndo_End)
+#define Undo_AddGroup				(gEditorfuncs.pfnUndo_AddGroup)
+#define Undo_AddBrush				(gEditorfuncs.pfnUndo_AddBrush)
+#define Undo_AddPath				(gEditorfuncs.pfnUndo_AddPath)
+#define Undo_AddNode				(gEditorfuncs.pfnUndo_AddNode)
+#define Undo_AddEntity				(gEditorfuncs.pfnUndo_AddEntity)
+#define Undo_DeleteGroup			(gEditorfuncs.pfnUndo_DeleteGroup)
+#define Undo_DeleteBrush			(gEditorfuncs.pfnUndo_DeleteBrush)
+#define Undo_DeletePath				(gEditorfuncs.pfnUndo_DeletePath)
+#define Undo_DeleteNode				(gEditorfuncs.pfnUndo_DeleteNode)
+#define Undo_DeleteEntity			(gEditorfuncs.pfnUndo_DeleteEntity)
+#define Undo_StoreFace				(gEditorfuncs.pfnUndo_StoreFace)
+#define Undo_StoreBrush				(gEditorfuncs.pfnUndo_StoreBrush)
+#define Undo_StorePath				(gEditorfuncs.pfnUndo_StorePath)
+#define Undo_StoreNode				(gEditorfuncs.pfnUndo_StoreNode)
+#define Undo_StoreEntity			(gEditorfuncs.pfnUndo_StoreEntity)
+#define Undo_AddSelectedEntities	(gEditorfuncs.pfnUndo_AddSelectedEntities)
+#define Undo_AddSelectedBrushes		(gEditorfuncs.pfnUndo_AddSelectedBrushes)
+#define Undo_AddSelectedNodes		(gEditorfuncs.pfnUndo_AddSelectedNodes)
+#define Undo_DeleteSelectedEntities	(gEditorfuncs.pfnUndo_DeleteSelectedEntities)
+#define Undo_DeleteSelectedBrushes	(gEditorfuncs.pfnUndo_DeleteSelectedBrushes)
+#define Undo_StoreSelectedEntities	(gEditorfuncs.pfnUndo_StoreSelectedEntities)
+#define Undo_DeleteSelectedNodes	(gEditorfuncs.pfnUndo_DeleteSelectedNodes)
+#define Undo_StoreSelectedBrushes	(gEditorfuncs.pfnUndo_StoreSelectedBrushes)
+#define Undo_StoreSelectedNodes		(gEditorfuncs.pfnUndo_StoreSelectedNodes)
+#define Undo_StoreSelectedFaces		(gEditorfuncs.pfnUndo_StoreSelectedFaces)
 
 /* Dialog API */
 #define Dialog_CheckOptions			(gEditorfuncs.pfnDialog_CheckOptions)

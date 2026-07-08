@@ -27,6 +27,7 @@ typedef struct qPlane_s
 COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == 16 );
 
 
+/* This struct is written as a 128 byte blob to the JMF */
 typedef struct qTexDef_s
 {
 	vec3_t rightAxis;
@@ -67,35 +68,42 @@ class CMapFace;
 
 typedef struct qFace_s
 {
-	char gap_1[8];
+	char gap[8];
 
-	CMapFace *pMapFace;
+	CMapFace *m_mapFace;
 
 	struct qFace_s *next;
+	struct qFace_s *prev;
 
-	char gap[40];
+	char gap1[24];
 
-	struct qShader_s *shaderInfo;
+	struct qBrush_s *m_ownerBrush;
 
-	char gap_[4];
-
-	int faceFlags;
+	struct qShader_s *m_shaderInfo;
 
 	char gap2[4];
 
-	struct qPlane_s plane;
-	int alignedAxis;
+	int m_editorFlags;
 
-	struct qTexDef_s texDef;
+	int m_editorId;
 
-	char gap3[24];
+	struct qPlane_s m_plane;
+	int m_alignedAxis;
 
-	int vertexCount;
+	struct qTexDef_s m_texDef;
 
-	char gap4[4];
+	char gap4[24];
 
-	struct qVertex_s *vertexData;
+	int m_vertexCount;
+
+	char gap5[4];
+
+	struct qVertex_s *m_vertices;
 } qFace_t;
 COMPILE_TIME_ASSERT( sizeof( qFace_t ) == 272 );
+
+// clang-format off
+
+// clang-format on
 
 #endif // !PLUGINFACES_H

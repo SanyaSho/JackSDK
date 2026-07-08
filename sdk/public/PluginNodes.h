@@ -16,30 +16,34 @@
 
 #include "BaseTypes.h"
 
-// clang-format off
-
 class CMapNode;
 
 typedef struct qNode_s
 {
 	char gap[8];
-	CMapNode *pMapNode;
-	struct qNode_s *nextNode;
-	struct qNode_s *parentNode;
+
+	CMapNode *m_mapNode;
+
+	struct qNode_s *next;
+	struct qNode_s *prev;
+
 	char gap2[24];
+
 	struct epair_s *epairs;
+
 	const char *nameOverride;
 	const char *fireEntityOnPass;
 	char gap3[4];
-	int editorFlags;
+	int m_editorFlags;
 	char gap4_1[4];
-	char gap4_2[4];
+	int m_editorId;
 	vec3_t nodeOrigin;
 	vec3_t nodeAngles;
 	char gap5[24];
 } qNode_t;
-
 COMPILE_TIME_ASSERT( sizeof( qNode_t ) == 144 );
+
+// clang-format off
 
 // clang-format on
 

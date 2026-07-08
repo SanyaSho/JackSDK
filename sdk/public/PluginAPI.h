@@ -44,8 +44,8 @@ EDITORFLAGS:
 1<<3  - ?
 1<<4  - ?
 1<<5  - worldspawn
-1<<6  - entity "item_*" / "Item*" (CMapEntity::changeClass)
-1<<7  - entity "path_*" / "Path*" (CMapEntity::changeClass)
+1<<6  - entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass)
+1<<7  - entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
 */
 
 #include "BaseTypes.h"
@@ -54,8 +54,10 @@ struct qWorld_s;
 struct qEntity_s;
 struct qBrush_s;
 struct qFace_s;
+struct qOverlay_s;
 struct qPath_s;
 struct qNode_s;
+struct qGroup_s;
 struct qCamera_s;
 struct qTexDef_s;
 struct qTexture_s;
@@ -109,18 +111,18 @@ typedef bool		(*pfnEditor_SC_GetToken)				( bool nextLine );
 typedef bool		(*pfnEditor_SC_TokenAvailable)			();
 typedef void		(*pfnEditor_SC_UnGetToken)				();
 typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
-typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool a );
-typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, const float *rgflMatrix );
-typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, const float *rgflMatrix );
-typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, const float *rgflMatrix );
+typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool nextLine );
+typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, float *rgflMatrix );
 typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
 typedef void		(*pfnEditor_SC_EndOfParsing)			();
-typedef long		(*pfnEditor_SC_GetParseFlags)			();
-typedef void		(*pfnEditor_SC_SetParseFlags)			( long parseFlags );
+typedef int			(*pfnEditor_SC_GetParseFlags)			();
+typedef void		(*pfnEditor_SC_SetParseFlags)			( int parseFlags );
 typedef bool		(*pfnEditor_SC_ShouldQuote)				( const char *token );
 typedef char *		(*pfnEditor_SC_CopyBlock)				(); // MUST BE Sys_Free'D
 typedef void		(*pfnEditor_SC_SkipBlock)				();
-typedef void		(*pfnEditor_SC_SkipLineOrBlock)			(); // TODO: Check the return
+typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
 typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
 // PR[17]
@@ -193,6 +195,10 @@ typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
 typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s &texDef, int );
 typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
 
+/* Overlay API */
+typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
+typedef void		(*pfnEditor_Overlay_Destroy)			( qOverlay_s *overlayDef );
+
 /* Path API */
 typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
@@ -223,17 +229,46 @@ typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName
 typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
+/* Undo API */
+typedef void		(*pfnEditor_Undo_Start)					( const qWorld_s *worldDef, const char * );
+typedef void		(*pfnEditor_Undo_End)					( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_AddGroup)				( qGroup_s *groupDef );
+typedef void		(*pfnEditor_Undo_AddBrush)				( qBrush_s *brushDef );
+typedef void		(*pfnEditor_Undo_AddPath)				( qPath_s *pathDef );
+typedef void		(*pfnEditor_Undo_AddNode)				( qNode_s *nodeDef );
+typedef void		(*pfnEditor_Undo_AddEntity)				( qEntity_s *entityDef );
+typedef void		(*pfnEditor_Undo_DeleteGroup)			( qGroup_s *groupDef );
+typedef void		(*pfnEditor_Undo_DeleteBrush)			( qBrush_s *brushDef );
+typedef void		(*pfnEditor_Undo_DeletePath)			( qPath_s *pathDef );
+typedef void		(*pfnEditor_Undo_DeleteNode)			( qNode_s *nodeDef );
+typedef void		(*pfnEditor_Undo_DeleteEntity)			( qEntity_s *entityDef );
+typedef void		(*pfnEditor_Undo_StoreFace)				( qFace_s *faceDef );
+typedef void		(*pfnEditor_Undo_StoreBrush)			( qBrush_s *brushDef );
+typedef void		(*pfnEditor_Undo_StorePath)				( qPath_s *pathDef );
+typedef void		(*pfnEditor_Undo_StoreNode)				( qNode_s *nodeDef );
+typedef void		(*pfnEditor_Undo_StoreEntity)			( qEntity_s *entityDef );
+typedef void		(*pfnEditor_Undo_AddSelectedEntities)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_AddSelectedBrushes)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_AddSelectedNodes)		( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_DeleteSelectedEntities)( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_DeleteSelectedBrushes)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_StoreSelectedEntities)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_DeleteSelectedNodes)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_StoreSelectedBrushes)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_StoreSelectedNodes)	( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_Undo_StoreSelectedFaces)	( const qWorld_s *worldDef );
+
 /* Dialog API */
 
-#define DIALOG_NONE				( 1 << 0 )
-//#define DIALOG_ ( 1 << 1 )
-#define DIALOG_CRITICAL			( 1 << 2 )
-#define DIALOG_WARNING			( 1 << 3 )
-#define DIALOG_INFORMATION		( 1 << 4 )
-#define DIALOG_QUESTION			( 1 << 5 )
+#define DIALOG_MB_OKCANCEL			( 1 << 0 )
+#define DIALOG_MB_YESNO				( 1 << 1 )
+#define DIALOG_MB_ICONSTOP			( 1 << 2 )
+#define DIALOG_MB_ICONWARNING		( 1 << 3 )
+#define DIALOG_MB_ICONINFORMATION	( 1 << 4 )
+#define DIALOG_MB_ICONQUESTION		( 1 << 5 )
 
-#define DIALOG_FILE_OPEN		( 1 << 1 ) /* Will make a dialog open files instead of saving them */
-#define DIALOG_FILE_CONNECT		( 1 << 2 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
+#define DIALOG_FILE_OPEN			( 1 << 1 ) /* Will make a dialog open files instead of saving them */
+#define DIALOG_FILE_CONNECT			( 1 << 2 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
 
 /* Check for custom options */
 /* title: dialog title */
@@ -246,7 +281,8 @@ typedef long		(*pfnEditor_Dialog_CheckOptions)		( const char *title, const char 
 /* title: dialog title */
 /* text: dialog text */
 /* flags: type and behavior flags */
-typedef long		(*pfnEditor_Dialog_MessageBox)			( const char *title, const char *text, int flags );
+/* If the dialog was created without DIALOG_MB_OKCANCEL or DIALOG_MB_YESNO flags it will always return true upon closing */
+typedef bool		(*pfnEditor_Dialog_MessageBox)			( const char *title, const char *text, int flags );
 
 /* Allocates a CPluginDialog instance (NOTE: Only one plugin dialog can be active) */
 /* title: dialog title */
@@ -479,7 +515,8 @@ typedef struct plugin_funcs_s
 	void *patch[7];
 
 	/* Overlay API */
-	void *overlay[2];
+	pfnEditor_Overlay_Create pfnOverlay_Create;
+	pfnEditor_Overlay_Destroy pfnOverlay_Destroy;
 
 	/* Path API */
 	pfnEditor_Path_Create pfnPath_Create;
@@ -518,7 +555,33 @@ typedef struct plugin_funcs_s
 	void *visgroup[7];
 
 	/* Undo API */
-	void *undo[27];
+	pfnEditor_Undo_Start pfnUndo_Start;
+	pfnEditor_Undo_End pfnUndo_End;
+	pfnEditor_Undo_AddGroup pfnUndo_AddGroup;
+	pfnEditor_Undo_AddBrush pfnUndo_AddBrush;
+	pfnEditor_Undo_AddPath pfnUndo_AddPath;
+	pfnEditor_Undo_AddNode pfnUndo_AddNode;
+	pfnEditor_Undo_AddEntity pfnUndo_AddEntity;
+	pfnEditor_Undo_DeleteGroup pfnUndo_DeleteGroup;
+	pfnEditor_Undo_DeleteBrush pfnUndo_DeleteBrush;
+	pfnEditor_Undo_DeletePath pfnUndo_DeletePath;
+	pfnEditor_Undo_DeleteNode pfnUndo_DeleteNode;
+	pfnEditor_Undo_DeleteEntity pfnUndo_DeleteEntity;
+	pfnEditor_Undo_StoreFace pfnUndo_StoreFace;
+	pfnEditor_Undo_StoreBrush pfnUndo_StoreBrush;
+	pfnEditor_Undo_StorePath pfnUndo_StorePath;
+	pfnEditor_Undo_StoreNode pfnUndo_StoreNode;
+	pfnEditor_Undo_StoreEntity pfnUndo_StoreEntity;
+	pfnEditor_Undo_AddSelectedEntities pfnUndo_AddSelectedEntities;
+	pfnEditor_Undo_AddSelectedBrushes pfnUndo_AddSelectedBrushes;
+	pfnEditor_Undo_AddSelectedNodes pfnUndo_AddSelectedNodes;
+	pfnEditor_Undo_DeleteSelectedEntities pfnUndo_DeleteSelectedEntities;
+	pfnEditor_Undo_DeleteSelectedBrushes pfnUndo_DeleteSelectedBrushes;
+	pfnEditor_Undo_StoreSelectedEntities pfnUndo_StoreSelectedEntities;
+	pfnEditor_Undo_DeleteSelectedNodes pfnUndo_DeleteSelectedNodes;
+	pfnEditor_Undo_StoreSelectedBrushes pfnUndo_StoreSelectedBrushes;
+	pfnEditor_Undo_StoreSelectedNodes pfnUndo_StoreSelectedNodes;
+	pfnEditor_Undo_StoreSelectedFaces pfnUndo_StoreSelectedFaces;
 
 	/* Dialog API */
 	pfnEditor_Dialog_CheckOptions pfnDialog_CheckOptions;
