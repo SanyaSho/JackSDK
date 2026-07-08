@@ -42,10 +42,12 @@ EDITORFLAGS:
 1<<1  - Selected
 1<<2  - Dirty
 1<<3  - ?
-1<<4  - ?
+1<<4  - entity is transparent
 1<<5  - worldspawn
 1<<6  - entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass)
 1<<7  - entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
+1<<8  - ?
+1<<9  - "Ignore" flag (Brushes and Paths only)
 */
 
 #include "BaseTypes.h"
@@ -208,6 +210,15 @@ typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
 typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
 typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
 typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *node );
+
+/* Group API */
+typedef qGroup_s *	(*pfnEditor_Group_Create)				( qWorld_s *worldDef );
+typedef void		(*pfnEditor_Group_Destroy)				( qWorld_s *worldDef, qGroup_s *groupDef );
+typedef void		(*pfnEditor_Group_AddGroup)				( qGroup_s *rootGroupDef, qGroup_s *groupDef );
+typedef void		(*pfnEditor_Group_AddBrush)				( qGroup_s *rootGroupDef, qBrush_s *brushDef );
+typedef void		(*pfnEditor_Group_AddEntity)			( qGroup_s *rootGroupDef, qEntity_s *entityDef );
+typedef void		(*pfnEditor_Group_GetColor)				( qGroup_s *groupDef, byte *cbColorOut );
+typedef void		(*pfnEditor_Group_SetColor)				( qGroup_s *groupDef, const byte *cbColor );
 
 /* Camera API*/
 typedef qCamera_s *	(*pfnEditor_Camera_Create)				( qWorld_s *worldDef );
@@ -529,7 +540,13 @@ typedef struct plugin_funcs_s
 	pfnEditor_Node_Destroy pfnNode_Destroy;
 
 	/* Group API */
-	void *group[7];
+	pfnEditor_Group_Create pfnGroup_Create;
+	pfnEditor_Group_Destroy pfnGroup_Destroy;
+	pfnEditor_Group_AddGroup pfnGroup_AddGroup;
+	pfnEditor_Group_AddBrush pfnGroup_AddBrush;
+	pfnEditor_Group_AddEntity pfnGroup_AddEntity;
+	pfnEditor_Group_GetColor pfnGroup_GetColor;
+	pfnEditor_Group_SetColor pfnGroup_SetColor;
 
 	/* Camera API */
 	pfnEditor_Camera_Create pfnCamera_Create;

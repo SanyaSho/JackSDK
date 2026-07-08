@@ -17,6 +17,25 @@
 #include "BaseTypes.h"
 
 
+class CFrustum;
+class CGLState;
+
+typedef struct renditionInfo_s
+{
+	char gap[8];
+	int m_renditionFlags;
+	char gap2[96];
+	vec3_t m_unknownVector1;
+	vec3_t m_unknownVector2;
+	vec3_t m_unknownVector3;
+	vec3_t m_unknownVector4;
+	char gap3[28];
+	CFrustum *m_frustum;
+	CGLState *m_glState;
+} renditionInfo_t;
+//COMPILE_TIME_ASSERT( sizeof( renditionInfo_t ) == ??? );
+
+
 /* Does not register/unregister this texture from internal hash map (CTextureManager::destroyTexture) */
 /* Automatically set if Shader_UploadTexture was called without a shaderName set (CTextureManager::createTexture) */
 #define TEXTURE_FLAG_UNREGISTERED			( 1 << 0 )

@@ -36,7 +36,8 @@ typedef struct qOverlay_s
 	char gap2[8];
 	int m_editorFlags;
 	char data_20bytes[20];
-	char gap4[248];
+	qTexDef_s m_texDef;
+	char gap4[120];
 } qOverlay_t;
 COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == 304 );
 
@@ -65,43 +66,90 @@ class CMapBrush;
 typedef struct qBrush_s
 {
 	char gap[8];
+
 	CMapBrush *m_mapBrush;
+
 	struct qBrush_s *next;
 	struct qBrush_s *prev;
+
 	char gap2[16];
+
 	struct qGroup_s *m_groupList;
 	struct qGroup_s *m_lastGroup;
+
 	struct qFace_s *m_faceList;
 	struct qFace_s *m_lastFace;
-	struct qEntity_s *m_entim_ownerEntityty;
+
+	struct qEntity_s *m_ownerEntityty;
+
 	struct qPatch_s *m_patch;
+
 	struct qOverlay_s *m_overlay;
+
 	char gap4[12];
+
 	int m_editorFlags;
 	int m_editorId;
+
 	int m_patchCount;
+
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 } qBrush_t;
 COMPILE_TIME_ASSERT( sizeof( qBrush_t ) == 152 );
 
 
+typedef struct qSkyData_s
+{
+	struct qShader_s *m_skyShader;
+	vec3_t m_skyAxis;
+	float m_skyRotate;
+} qSkyData_t;
+COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == 24 );
+
+
+typedef struct qTrans_s
+{
+	struct qTrans_s *next;
+	char gap[4];
+	float m_unknownFloat;
+	struct qEntity_s *m_ownerEntity;
+} qTrans_t;
+COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == 24 );
+
+
 class CMapWorld;
 
 typedef struct qWorld_s
 {
-	char gap[8];
+	char qWorld_s_gap[8];
+
 	CMapWorld *m_mapWorld;
-	char gap2[8];
+
+	struct qGroup_s *m_groupList;
+
 	struct qEntity_s *m_entityList;
 	struct qEntity_s *m_lastEntity;
+
 	struct qPath_s *m_pathList;
 	struct qPath_s *m_lastPath;
+
 	struct qCamera_s *m_cameraList;
 	struct qCamera_s *m_lastCamera;
-	char gap3[1024];
+
+	char qWorld_s_gap3[48];
+
+	struct qTrans_s *m_transData;
+
+	char unknown_sky_related[8];
+
+	int m_editorFlags;
+
+	char qWorld_s_gap5[28];
+
+	struct qSkyData_s m_skyData;
 } qWorld_t;
-//COMPILE_TIME_ASSERT( sizeof( qWorld_t ) == ??? );
+COMPILE_TIME_ASSERT( sizeof( qWorld_t ) == 192 );
 
 // clang-format off
 

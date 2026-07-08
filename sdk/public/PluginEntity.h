@@ -193,7 +193,7 @@ typedef struct qEntity_s
 
 	int m_editorFlags;
 
-	char gap5[4];
+	int m_editorId;
 
 	int m_modelType; // modtype_t
 

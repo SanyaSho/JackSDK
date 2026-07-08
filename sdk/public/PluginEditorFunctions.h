@@ -126,6 +126,15 @@ extern plugin_funcs_t gEditorfuncs;
 #define Node_Append					(gEditorfuncs.pfnNode_Append)
 #define Node_Destroy				(gEditorfuncs.pfnNode_Destroy)
 
+/* Group API */
+#define Group_Create				(gEditorfuncs.pfnGroup_Create)
+#define Group_Destroy				(gEditorfuncs.pfnGroup_Destroy)
+#define Group_AddGroup				(gEditorfuncs.pfnGroup_AddGroup)
+#define Group_AddBrush				(gEditorfuncs.pfnGroup_AddBrush)
+#define Group_AddEntity				(gEditorfuncs.pfnGroup_AddEntity)
+#define Group_GetColor				(gEditorfuncs.pfnGroup_GetColor)
+#define Group_SetColor				(gEditorfuncs.pfnGroup_SetColor)
+
 /* Camera API */
 #define Camera_Create				(gEditorfuncs.pfnCamera_Create)
 #define Camera_Destroy				(gEditorfuncs.pfnCamera_Destroy)
