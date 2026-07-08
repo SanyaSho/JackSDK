@@ -4,7 +4,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define PLUGINFACE_H
+#define PLUGINEDITORFUNCTIONS_H
 #include "PluginAPI.h"
 #include "PluginProfile.h"
 #include "PluginData.h"

@@ -13,7 +13,11 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			#"DoomWadLoader.cpp"
+
 			"ExamplePlugin.cpp"
+
+			"MapReader.cpp"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
@@ -23,6 +27,9 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			#"DoomWadLoader.h"
+
+			"MapReader.h"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )

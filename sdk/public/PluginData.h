@@ -45,6 +45,8 @@ struct qShader_s;
  vpEnumArchiveFormats requires vpUnloadArchive, vpLoadArchive, vpFindArchiveFile, vpLoadArchiveFile, and vpListArchiveFiles
 */
 
+// clang-format off
+
 /* filePath - path to a file */
 /* numMipTex - count of TYP_MIPTEX inside a WAD2/WAD3 */
 typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *numMipTex );
@@ -57,6 +59,7 @@ typedef bool (*vpLoadPackage_t)( int formatIndex, const char *filePath );
 /* Used by Quake 1. You might need this only if you have a profile with PROFILE_ALLOW_CUSTOM_PALETTE flag set */
 typedef bool (*vpSetPalette_t)( struct qPalette_s *paletteData );
 
+// clang-format on
 
 /*
  Sprite data definition.
@@ -93,15 +96,19 @@ COMPILE_TIME_ASSERT( sizeof( qSpriteData_t ) == 40 );
 
 struct qStudioData_s;
 
+// clang-format off
+
 typedef bool (*vpGetModelFormatFlags_t)( int );
 
-typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, long a6 );
+typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 typedef bool (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
 typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *outStudioData );
 
 typedef bool (*vpRenderModel_t)( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
+
+// clang-format on
 
 typedef struct qStudioData_s
 {
@@ -146,11 +153,15 @@ COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == 72 );
 
 struct qParticlesData_s;
 
+// clang-format off
+
 typedef bool (*vpUnloadParticles_t)( int formatIndex, qParticlesData_s *particlesData );
 
 typedef bool (*vpLoadParticles_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qParticlesData_s *outParticlesData );
 
 typedef bool (*vpRenderParticles_t)( int formatIndex, int editorFlags, qParticlesData_s *particlesData, qEntity_s *entityInfo );
+
+// clang-format on
 
 typedef struct qParticlesData_s
 {
@@ -177,6 +188,8 @@ COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == 64 );
 
 struct qArchiveData_s;
 
+// clang-format off
+
 typedef void (*vpUnloadArchive_t)( int formatIndex, qArchiveData_s *archiveData );
 
 /* filePath must be a full path to an archive */
@@ -191,6 +204,8 @@ typedef long (*vpLoadArchiveFile_t)( int formatIndex, qArchiveData_s *archiveDat
 
 /* Each value (including **outFiles) in ***outFiles must be allocated using Sys_Malloc and freed using Sys_Free when not needed */
 typedef bool (*vpListArchiveFiles_t)( int formatIndex, qArchiveData_s *archiveData, const char *fileFilter, char ***outFiles );
+
+// clang-format on
 
 struct unknownArchvieStruct_t
 {

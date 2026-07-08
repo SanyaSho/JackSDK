@@ -38,31 +38,49 @@
 /*
 EDITORFLAGS:
 
-2 - Selected
+1<<0  - ?
+1<<1  - Selected
+1<<2  - Dirty
+1<<3  - ?
+1<<4  - ?
+1<<5  - worldspawn
+1<<6  - entity "item_*" / "Item*" (CMapEntity::changeClass)
+1<<7  - entity "path_*" / "Path*" (CMapEntity::changeClass)
 */
 
 #include "BaseTypes.h"
 
+struct qWorld_s;
 struct qEntity_s;
+struct qBrush_s;
+struct qFace_s;
 struct qPath_s;
 struct qNode_s;
 struct qCamera_s;
+struct qTexDef_s;
 struct qTexture_s;
 struct qShader_s;
 struct qShaderStage_s;
 
 // clang-format off
 
+/* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_Printf)					( const char *format, ... );
+
+/* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_DPrintf)				( const char *format, ... );
+
+/* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_Warning)				( const char *format, ... );
+
+/* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_Error)					( const char *format, ... );
 
 typedef void		(*pfnEditor_Sys_Free)					( void *ptr );
 typedef void *		(*pfnEditor_Sys_Malloc)					( size_t size );
 
 typedef void *		(*pfnEditor_TempBuffer_GetSpace)		( int buffer, size_t size );
-typedef char *		(*pfnEditor_Sys_AllocString)			( const char *src );
+typedef char *		(*pfnEditor_Sys_AllocString)			( const char *src ); // MUST BE Sys_Free'D
 
 typedef float		(*pfnEditor_Sys_FloatTime)				();
 
@@ -86,15 +104,15 @@ typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int offset, 
 typedef bool		(*pfnEditor_SC_CheckError)				();
 typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
 typedef void		(*pfnEditor_SC_ResetError)				();
-typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool a );
-typedef bool		(*pfnEditor_SC_GetToken)				( bool a );
+typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool nextLine );
+typedef bool		(*pfnEditor_SC_GetToken)				( bool nextLine );
 typedef bool		(*pfnEditor_SC_TokenAvailable)			();
 typedef void		(*pfnEditor_SC_UnGetToken)				();
 typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
 typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool a );
-// SC_Parse3DMatrix
-// SC_Parse2DMatrix
-// SC_Parse1DMatrix
+typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, const float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, const float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, const float *rgflMatrix );
 typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
 typedef void		(*pfnEditor_SC_EndOfParsing)			();
 typedef long		(*pfnEditor_SC_GetParseFlags)			();
@@ -123,9 +141,9 @@ typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
 
 typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
-typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *file );
-typedef bool		(*pfnEditor_Sys_FileExists)				( const char *file );
-typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *file, int *readBytes );
+typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
+typedef bool		(*pfnEditor_Sys_FileExists)				( const char *filePath );
+typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *filePath, int *readBytes );
 typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
 
 /* Math API */
@@ -137,41 +155,56 @@ typedef void		(*pfnEditor_Sys_SnapAxis)				( int num, float *rgflAxis );
 typedef void		(*pfnEditor_Sys_SnapVertexToGrid)		( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapMapVertex)			( float *rgflVertex );
 
+/* Returns the current version string (J.A.C.K. 1.2.4603) */
 typedef char *		(*pfnEditor_V_VersionString)			();
 
 typedef float		(*pfnEditor_Sys_GetTextureGamma)		();
 
-typedef void *		(*pfnEditor_Global_GetCurrentWorld)		();
+typedef qWorld_s *	(*pfnEditor_Global_GetCurrentWorld)		();
 
 /* outBuf is not an array. It's an allocated string of WADs used on this map separated by listSeparator and it must be free'd */
 /* removeVolumePrefix does not work on Linux */
-typedef bool		(*pfnEditor_BuildPackageList)			( void *world, char **outBuf, char listSeparator, int removeVolumePrefix );
+typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, char listSeparator, int removeVolumePrefix );
 
 /* Entity API */
-typedef qEntity_s *	(*pfnEditor_Entity_Create)				( void *world, const char *classname, const float *rgflOrigin, int editorFlags );
-typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int editorFlags );
+typedef qEntity_s *	(*pfnEditor_Entity_Create)				( qWorld_s *worldDef, const char *classname, const float *rgflOrigin, int editorFlags );
+typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int entityBuildFlags );
 typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, byte *cbColorOut );
 typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const byte *cbColor );
-typedef void		(*pfnEditor_Entity_AddToVisGroup)		( void *world, qEntity_s *entityDef, int visGroupId );
-typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( void *world, qEntity_s *entityDef, int visGroupId );
+typedef void		(*pfnEditor_Entity_AddToVisGroup)		( qWorld_s *worldDef, qEntity_s *entityDef, unsigned int visGroupId );
+typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( qWorld_s *worldDef, qEntity_s *entityDef, unsigned int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( void *world, const char *classname );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( void *world, const char *classname );
-typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( void *world, const char *key, const char *value );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qWorld_s *worldDef, const char *classname );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qWorld_s *worldDef, const char *classname );
+typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( qWorld_s *worldDef, const char *key, const char *value );
+
+/* Brush API */
+typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
+typedef void		(*pfnEditor_Brush_Destroy)				( qWorld_s *worldDef, qBrush_s *brushDef );
+typedef void		(*pfnEditor_Brush_GetColor)				( qBrush_s *brushDef, byte *cbColorOut );
+typedef void		(*pfnEditor_Brush_SetColor)				( qBrush_s *brushDef, const byte *cbColor );
+typedef void		(*pfnEditor_Brush_AddToVisGroup)		( qWorld_s *worldDef, qBrush_s *brushDef, unsigned int visGroupId );
+typedef void		(*pfnEditor_Brush_RemoveFromVisGroup)	( qWorld_s *worldDef, qBrush_s *brushDef, unsigned int visGroupId );
+typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int visGroupId );
+typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
+
+/* Face API */
+typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s &texDef, int );
+typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
 
 /* Path API */
-typedef qPath_s *	(*pfnEditor_Path_Create)				( void *world );
+typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
 typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
 
 /* Node API */
-typedef qNode_s *	(*pfnEditor_Node_Insert)				( void *world, qNode_s *parentNode );
-typedef void		(*pfnEditor_Node_Append)				( void *world, qPath_s *path );
+typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
+typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
 typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *node );
 
 /* Camera API*/
-typedef qCamera_s *	(*pfnEditor_Camera_Create)				( void *world );
+typedef qCamera_s *	(*pfnEditor_Camera_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *camera );
 typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, byte *cbColorOut );
 typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cbColor );
@@ -292,7 +325,7 @@ typedef void		(*pfnEditor_Dialog_AddFileList)			( const char *controlName, const
 /* controlName: internal control name */
 /* title: textedit title */
 /* selectedIndex: will set the selected item to this index after parsing the list from optionsList */
-/* optionsList: list of combobox elements split by "\n" */
+/* optionsList: list of elements split by "\n" in format NAME\nVALUE (OPT1\n1\nOPT2\n2\nOPT3\n3) */
 /* flags: type and behevaior flags */
 typedef void		(*pfnEditor_Dialog_AddComboBox)			( const char *controlName, const char *title, int selectedIndex, const char *optionsList, int flags );
 
@@ -323,9 +356,10 @@ typedef int			(*pfnEditor_Dialog_QueryArgumentInt)	( const char *controlName );
 typedef void		(*pfnEditor_Dialog_End)					();
 
 /* Appends text to the dialog */
+/* String must not contain an ending newline */
 typedef void		(*pfnEditor_Dialog_Printf)				( const char *format, ... );
 
-/* Changes current cursor to Qt::WaitCursor and increments a wait counter by 1 */
+/* Changes current cursor to Qt::WaitCursor and increments the wait counter by 1 */
 typedef void		(*pfnEditor_Dialog_BeginWait)			();
 
 /* Restores the cursor back to normal and decrements the wait counter by 1 */
@@ -371,7 +405,9 @@ typedef struct plugin_funcs_s
 	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
 	pfnEditor_SC_MatchToken pfnSC_MatchToken;
 	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
-	void *SC_Matrix[3];
+	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
+	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
+	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
 	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
 	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
 	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
@@ -426,10 +462,18 @@ typedef struct plugin_funcs_s
 	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
 
 	/* Brush API*/
-	void *brush[8];
+	pfnEditor_Brush_Create pfnBrush_Create;
+	pfnEditor_Brush_Destroy pfnBrush_Destroy;
+	pfnEditor_Brush_GetColor pfnBrush_GetColor;
+	pfnEditor_Brush_SetColor pfnBrush_SetColor;
+	pfnEditor_Brush_AddToVisGroup pfnBrush_AddToVisGroup;
+	pfnEditor_Brush_RemoveFromVisGroup pfnBrush_RemoveFromVisGroup;
+	pfnEditor_Brush_GetVisGroupIdent pfnBrush_GetVisGroupIdent;
+	pfnEditor_Brush_GetVisGroupCount pfnBrush_GetVisGroupCount;
 
 	/* Face API */
-	void *face[2];
+	pfnEditor_Face_Create pfnFace_Create;
+	pfnEditor_Face_Destroy pfnFace_Destroy;
 
 	/* Patch API */
 	void *patch[7];
@@ -504,10 +548,14 @@ COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == 1512 );
 
 #define PLUGIN_VERSION 121
 
+// clang-format off
+
 typedef int (*vpMain_t)( plugin_funcs_t *editorFuncs, int editorPluginVersion );
 
-#if !defined( PLUGINFACE_H )
-#include "PluginFace.h"
-#endif // !PLUGINFACE_H
+// clang-format on
+
+#if !defined( PLUGINEDITORFUNCTIONS_H )
+#include "PluginEditorFunctions.h"
+#endif // !PLUGINEDITORFUNCTIONS_H
 
 #endif // !PLUGINAPI_H

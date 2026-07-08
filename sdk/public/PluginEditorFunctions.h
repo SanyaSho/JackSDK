@@ -7,8 +7,8 @@
 //
 //=====================================================================================//
 
-#if !defined( PLUGINFACE_H )
-#define PLUGINFACE_H
+#if !defined( PLUGINEDITORFUNCTIONS_H )
+#define PLUGINEDITORFUNCTIONS_H
 
 extern plugin_funcs_t gEditorfuncs;
 
@@ -43,9 +43,9 @@ extern plugin_funcs_t gEditorfuncs;
 #define SC_UnGetToken				(gEditorfuncs.pfnSC_UnGetToken)
 #define SC_MatchToken				(gEditorfuncs.pfnSC_MatchToken)
 #define SC_SafeMatchToken			(gEditorfuncs.pfnSC_SafeMatchToken)
-// SC_Parse3DMatrix
-// SC_Parse2DMatrix
-// SC_Parse1DMatrix
+#define SC_Parse3DMatrix			(gEditorfuncs.pfnSC_Parse3DMatrix)
+#define SC_Parse2DMatrix			(gEditorfuncs.pfnSC_Parse2DMatrix)
+#define SC_Parse1DMatrix			(gEditorfuncs.pfnSC_Parse1DMatrix)
 #define SC_SkipRestOfLine			(gEditorfuncs.pfnSC_SkipRestOfLine)
 #define SC_EndOfParsing				(gEditorfuncs.pfnSC_EndOfParsing)
 #define SC_GetParseFlags			(gEditorfuncs.pfnSC_GetParseFlags)
@@ -97,6 +97,20 @@ extern plugin_funcs_t gEditorfuncs;
 #define Entity_FindByClassname		(gEditorfuncs.pfnEntity_FindByClassname)
 #define Entity_FindByTargetname		(gEditorfuncs.pfnEntity_FindByTargetname)
 #define Entity_FindByKeyValue		(gEditorfuncs.pfnEntity_FindByKeyValue)
+
+/* Brush API */
+#define Brush_Create				(gEditorfuncs.pfnBrush_Create)
+#define Brush_Destroy				(gEditorfuncs.pfnBrush_Destroy)
+#define Brush_GetColor				(gEditorfuncs.pfnBrush_GetColor)
+#define Brush_SetColor				(gEditorfuncs.pfnBrush_SetColor)
+#define Brush_AddToVisGroup			(gEditorfuncs.pfnBrush_AddToVisGroup)
+#define Brush_RemoveFromVisGroup	(gEditorfuncs.pfnBrush_RemoveFromVisGroup)
+#define Brush_GetVisGroupIdent		(gEditorfuncs.pfnBrush_GetVisGroupIdent)
+#define Brush_GetVisGroupCount		(gEditorfuncs.pfnBrush_GetVisGroupCount)
+
+/* Face API */
+#define Face_Create					(gEditorfuncs.pfnFace_Create)
+#define Face_Destroy				(gEditorfuncs.pfnFace_Destroy)
 
 /* Path API */
 #define Path_Create					(gEditorfuncs.pfnPath_Create)
@@ -154,4 +168,4 @@ extern plugin_funcs_t gEditorfuncs;
 
 // clang-format on
 
-#endif // !PLUGINFACE_H
+#endif // !PLUGINEDITORFUNCTIONS_H

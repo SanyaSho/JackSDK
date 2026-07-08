@@ -20,8 +20,6 @@
 
 #include "BaseTypes.h"
 
-// clang-format off
-
 class CMapCamera;
 
 typedef struct qCamera_s
@@ -33,6 +31,8 @@ typedef struct qCamera_s
 	char gap2[28];
 } qCamera_t;
 COMPILE_TIME_ASSERT( sizeof( qCamera_t ) == 72 );
+
+// clang-format off
 
 // clang-format on
 

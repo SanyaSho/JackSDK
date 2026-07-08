@@ -14,7 +14,7 @@
  Plugin actions are handled by the vpEnumActions exported function.
 
  Example:
- pluginActionInfo_t firstAction = { "ActionName", "ActionTitle", "ActionDescription", "ActionCategory", 0, 0, []() { Sys_Printf( "ActionDispatch\n" ); } };
+ pluginActionInfo_t firstAction = { "ActionName", "ActionTitle", "ActionDescription", "ActionCategory", 0, 0, []() { Sys_Printf( "ActionDispatch" ); } };
 
  DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginManager )
  {

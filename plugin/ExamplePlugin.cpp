@@ -23,6 +23,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+#include "MapReader.h"
+
+//#include "DoomWadLoader.h"
+
 plugin_funcs_t gEditorfuncs;
 
 /*
@@ -54,7 +61,7 @@ void InternalCommand()
 
 	int nValue = Dialog_QueryArgumentInt( "QueryArgumentIntTest" );
 
-	Dialog_Printf( "QueryArgumentTest: %s\nQueryArgumentFloatTest: %f\nQueryArgumentIntTest: %d\n", szText, flValue, nValue );
+	Dialog_Printf( "QueryArgumentTest: %s\nQueryArgumentFloatTest: %f\nQueryArgumentIntTest: %d", szText, flValue, nValue );
 }
 
 void RunTests()
@@ -124,7 +131,7 @@ void RunTests()
 
 		Dialog_AddDirectoryEdit( "DirectoryEdit", "test", "C:\\JACK_10155", DIALOG_FILE_OPEN );
 
-		Dialog_AddComboBox( "ComboBox", "My Combo Box", 0, "opt1\nopt2\nopt3\nopt4\nopt5", 0 );
+		Dialog_AddComboBox( "ComboBox", "My Combo Box", 0, "OPT1\n1\nOPT2\n2\nOPT3\n3", 0 );
 
 		// SpinBox with values [0-15], step count 1 and initial value 1
 		Dialog_AddSpinBox( "SpinBox", "My SpinBox", 1, 0, 15, 1, 0 );
@@ -132,7 +139,7 @@ void RunTests()
 		// SpinBox with values [0-15], step count 1 and initial value 1
 		Dialog_AddSpinBoxFloat( "SpinBoxFloat", "My SpinBox", 1.f, 0.f, 100.f, 2.5f, 0 );
 
-		Dialog_InitExternalCommand( "buttonTextExternal", "test" );
+		//Dialog_InitExternalCommand( "buttonTextExternal", "test" );
 		Dialog_InitInternalCommand( "buttonTextInternal", InternalCommand );
 
 		Dialog_Printf( "Dialog_Printf test" );
@@ -144,7 +151,7 @@ pluginActionInfo_t runTests = { "Run tests", "&Run tests", "Call RunTests()", "E
 
 void SpawnEntity()
 {
-	void *world = Global_GetCurrentWorld();
+	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
 		return;
 
@@ -166,7 +173,7 @@ pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "Example
 
 void CreateCamera()
 {
-	void *world = Global_GetCurrentWorld();
+	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
 		return;
 
@@ -185,7 +192,7 @@ pluginActionInfo_t createCamera = { "CreateCamera", "&Create Camera", "", "Examp
 
 void CreateNodes()
 {
-	void *world = Global_GetCurrentWorld();
+	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
 		return;
 
@@ -205,7 +212,7 @@ pluginActionInfo_t createNodes = { "CreateNodes", "&Create Nodes", "", "ExampleP
 
 void CreatePaths()
 {
-	void *world = Global_GetCurrentWorld();
+	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
 		return;
 
@@ -232,7 +239,7 @@ pluginActionInfo_t printSysFloatTime = { "PrintSysFloatTime", "&Sys_FloatTime", 
 
 void RunBuildPackageList()
 {
-	void *world = Global_GetCurrentWorld();
+	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
 		return;
 
@@ -249,6 +256,273 @@ void RunBuildPackageList()
 
 pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", 0, RunBuildPackageList };
 
+
+void V_ExtractFileExtension( const char *path, char *dest, int destSize )
+{
+	const char *src = path + strlen( path ) - 1;
+
+	while ( src != path && *( src - 1 ) != '.' )
+		src--;
+
+	if ( src == path )
+	{
+		*dest = '\0';
+		return;
+	}
+
+	src--;
+
+	strncpy( dest, src, destSize );
+	dest[destSize - 1] = '\0';
+}
+
+#if 0
+#define BSPVERSION	29
+
+typedef struct
+{
+	int		fileofs, filelen;
+} lump_t;
+
+#define	LUMP_ENTITIES	0
+#define	LUMP_PLANES		1
+#define	LUMP_TEXTURES	2
+#define	LUMP_VERTEXES	3
+#define	LUMP_VISIBILITY	4
+#define	LUMP_NODES		5
+#define	LUMP_TEXINFO	6
+#define	LUMP_FACES		7
+#define	LUMP_LIGHTING	8
+#define	LUMP_CLIPNODES	9
+#define	LUMP_LEAFS		10
+#define	LUMP_MARKSURFACES 11
+#define	LUMP_EDGES		12
+#define	LUMP_SURFEDGES	13
+#define	LUMP_MODELS		14
+
+#define	HEADER_LUMPS	15
+
+typedef struct
+{
+	int			version;	
+	lump_t		lumps[HEADER_LUMPS];
+} dheader_t;
+
+// LUMP_TEXTURES
+typedef struct
+{
+	int			nummiptex;
+	int			dataofs[4];		// [nummiptex]
+} dmiptexlump_t;
+
+#define	MIPLEVELS	4
+typedef struct miptex_s
+{
+	char		name[16];
+	unsigned	width, height;
+	unsigned	offsets[MIPLEVELS];		// four mip maps stored
+} miptex_t;
+
+void QuakeExtractTexturesToPNGs_LoadBSP( const char *filePath, const char *outDir )
+{
+	const char *file = Sys_MakeLocalFileName( SC_Token() );
+	FILE *f = fopen( file, "rb" );
+	if ( !f )
+	{
+		Dialog_Printf( "Failed to open \"%s\"", file );
+		return;
+	}
+
+	dheader_t header;
+
+	if ( fread( &header, 1, sizeof( dheader_t ), f ) != sizeof( dheader_t ) )
+	{
+		Dialog_Printf( "Error reading BSP file header" );
+		fclose( f );
+		return;
+	}
+
+	if ( header.version != BSPVERSION )
+	{
+		Dialog_Printf( "Bad BSP file version (%i should be %i)", header.version, BSPVERSION );
+		fclose( f );
+		return;
+	}
+
+	const lump_t &lumpTextures = header.lumps[LUMP_TEXTURES];
+
+	if ( !lumpTextures.filelen )
+	{
+		Dialog_Printf( "BSP file contains no textures" );
+		fclose( f );
+		return;
+	}
+
+	fseek( f, lumpTextures.fileofs - 124, SEEK_CUR );
+
+	int v3 = ftell( f );
+
+	int nummiptex = 0;
+	if ( fread( &nummiptex, 1, 4, f ) != 4 )
+	{
+		Dialog_Printf( "Error reading BSP file" );
+		fclose( f );
+		return;
+	}
+
+	if ( !nummiptex )
+	{
+		Dialog_Printf( "BSP file contains no textures" );
+		fclose( f );
+		return;
+	}
+
+	int imgBufSize = nummiptex * 4;
+	int *imgBuf = (int *)Sys_Malloc( imgBufSize );
+
+	if ( fread( imgBuf, 1, imgBufSize, f ) != imgBufSize )
+	{
+		Dialog_Printf( "Error reading BSP file textures" );
+		Sys_Free( imgBuf );
+		fclose( f );
+		return;
+	}
+
+	for ( int i = 0; i < nummiptex && imgBuf != NULL; i++, imgBuf++ )
+	{
+		fseek( f, *imgBuf + v3, SEEK_SET );
+
+		miptex_t mipTex;
+		if ( fread( &mipTex, 1, sizeof( miptex_t ), f ) != sizeof( miptex_t ) )
+		{
+			Dialog_Printf( "Error reading file" );
+			continue;
+		}
+
+		if ( mipTex.offsets[0] == 0 )
+		{
+			continue;
+		}
+
+		/*if ( ( mipTex.width & 0xF ) == 0 || ( mipTex.height & 0xF ) == 0 )
+		{
+			Dialog_Printf( "Texture '%s' is not 16 aligned", mipTex.name );
+			continue;
+		}*/
+
+		int bufSize = ( 85 * mipTex.width * mipTex.height ) >> 6;
+		byte *buf = (byte *)Sys_Malloc( bufSize );
+		if ( !buf )
+		{
+			Dialog_Printf( "Memory allocation failure" );
+			continue;
+		}
+
+		if ( mipTex.offsets[0] != 40 )
+		{
+			fseek( f, v3 + mipTex.offsets[0] + *imgBuf, SEEK_SET );
+		}
+
+		if ( fread( buf, 1, bufSize, f ) != bufSize )
+		{
+			Dialog_Printf( "Error reading file" );
+			Sys_Free( buf );
+			continue;
+		}
+
+		char fileName[MAX_PATH] = { 0 };
+		snprintf( fileName, sizeof( fileName ), "%s/%s.bmp", outDir, mipTex.name );
+		fileName[sizeof( fileName ) - 1] = '\0';
+		stbi_write_bmp( fileName, mipTex.width, mipTex.height, 1, buf );
+		Dialog_Printf( "Writting %s", fileName );
+	}
+
+	Sys_Free( imgBuf );
+	fclose( f );
+}
+
+void QuakeExtractTexturesToPNGs_Command()
+{
+	Dialog_Printf( "Extracting Quake textures..." );
+
+	static float startTime = Sys_FloatTime();
+
+	{
+		char fileList[8192] = { 0 };
+		Dialog_QueryArgument( "src", fileList, sizeof( fileList ) );
+
+		char outDir[MAX_PATH] = { 0 };
+		Dialog_QueryArgument( "dir", outDir, sizeof( outDir ) );
+
+		SC_ParseFromMemory( fileList, strlen( fileList ), 0 );
+
+		while ( SC_GetToken( true ) )
+		{
+			char fileExtension[32] = { 0 };
+			V_ExtractFileExtension( SC_Token(), fileExtension, sizeof( fileExtension ) );
+
+			if ( !strcmp( fileExtension, ".bsp" ) )
+			{
+				Dialog_Printf( "Loading: \"%s\"", SC_Token() );
+
+				QuakeExtractTexturesToPNGs_LoadBSP( SC_Token(), outDir );
+			}
+		}
+	}
+
+	static float endTime = Sys_FloatTime();
+	Dialog_Printf( "%.2f seconds elapsed", endTime - startTime );
+}
+
+void QuakeExtractTexturesToPNGs()
+{
+	Dialog_Begin( "Extract Quake Textures" );
+	Dialog_InitInternalCommand( "E&xtract", QuakeExtractTexturesToPNGs_Command );
+	Dialog_AddFileList( "src", "Source Files", NULL, "BSP and PAK Files (*.bsp *.pak)", 3 );
+	Dialog_AddDirectoryEdit( "dir", "Output Directory", "quake/", 1 );
+	Dialog_End();
+}
+
+pluginActionInfo_t quakeExtractTexturesToPNGs = { "QuakeExtractTexturesToPNGs", "&Extract textures...", "Extract Quake textures from BSP/PAK files", "ExamplePlugin", 0, QuakeExtractTexturesToPNGs };
+#endif
+
+#if 0
+void DoomWadTest()
+{
+	Dialog_Begin( "Extract DOOM Textures" );
+	Dialog_InitInternalCommand( "E&xtract",
+		[]()
+		{
+			char fileList[8192] = { 0 };
+			Dialog_QueryArgument( "src", fileList, sizeof( fileList ) );
+
+			SC_ParseFromMemory( fileList, strlen( fileList ), 0 );
+			
+			while ( SC_GetToken( true ) )
+			{
+				char fileExtension[32] = { 0 };
+				V_ExtractFileExtension( SC_Token(), fileExtension, sizeof( fileExtension ) );
+
+				if ( strcmp( fileExtension, ".wad" ) )
+				{
+					Dialog_Printf( "Loading: \"%s\"", SC_Token() );
+
+					DoomWadReader wadReader;
+					if ( wadReader.LoadFile( SC_Token() ) )
+					{
+						wadReader.Read();
+					}
+				}
+			}
+		}
+	);
+	Dialog_AddFileList( "src", "Source Files", NULL, "DOOM IWAD Files (*.wad)", 3 );
+	Dialog_End();
+}
+
+pluginActionInfo_t doomwadtest = { "DoomWadTest", "&Extract textures...", "Extract DOOM textures from IWAD files", "ExamplePlugin", 0, DoomWadTest };
+#endif
+
 /*
 ===============
 vpEnumActions
@@ -264,6 +538,14 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &createPaths, pluginManager );
 	registerAction( &printSysFloatTime, pluginManager );
 	registerAction( &runBuildPackageList, pluginManager );
+#if 0
+	registerAction( &doomwadtest, pluginManager );
+	return 8;
+#endif
+#if 0
+	registerAction( &quakeExtractTexturesToPNGs, pluginManager );
+	return 8;
+#endif
 	return 7;
 }
 
@@ -359,6 +641,7 @@ vpEnumProfiles
 Game Profiles
 ===============
 */
+#if 0
 DLL_EXPORT int vpEnumProfiles( pfnRegisterProfile registerProfile, void *libraryHandle )
 {
 	registerProfile( &profile, libraryHandle );
@@ -375,6 +658,7 @@ DLL_EXPORT int vpLoadSky( int formatIndex, byte *buf, int bufSize, byte shaderBu
 	Sys_Printf( "vpLoadSky: %d 0x%p %d %s %d\n", formatIndex, buf, bufSize, shaderBuf, side );
 	return 0;
 }
+#endif
 
 /*
 ===============
@@ -404,9 +688,13 @@ DLL_EXPORT int vpEnumImportFormats( pfnRegisterIOFormat registerIOFormat, void *
 	return registerIOFormat( 0, "Plain Text", ".txt", libraryHandle ) != false;
 }
 
-DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset, long readLimit, void *pWorld )
+DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef )
 {
-	Sys_Printf( "vpImport (idx: %d / pth: %s / %d %d %p)\n", formatIndex, filePath, seekOffset, readLimit, pWorld );
+	Sys_Printf( "vpImport (idx: %d / pth: %s / seekoff: %d / readlim: %d / world: %p)\n", formatIndex, filePath, seekOffset, readLimit, worldDef );
+
+	MapReader mapReader( filePath, seekOffset, readLimit, worldDef );
+
+	return mapReader.LoadMap();
 
 	/*struct CMapWorld
 	{
@@ -436,13 +724,14 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset,
 		Sys_Printf( "token: %s\n", token );
 	}*/
 
-	return 0;
+	//return 0;
 }
 
 
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
-	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
+	//return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
+	return 0;
 }
 
 DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, long a6 )

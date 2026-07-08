@@ -52,6 +52,8 @@
 #define PROFILE_SUPPORTS_AAS				( 1 << 19 ) // CPrefabPreviewDialogBase::updateActions
 #define PROFILE_ENABLE_FALLBACK_DIR			( 1 << 20 ) // CPreferencesDialog::updateFallbackdirEnabled
 
+// TODO: Better variable naming!
+
 typedef struct mapProfile_s
 {
 	// Must always be NULL in the plugin environment
