@@ -1,6 +1,8 @@
 #include "Windows.h"
 #include "stdio.h"
 
+#include "GL/glew.h"
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
@@ -9,6 +11,8 @@
 #include "PluginProfile.h"
 #include "PluginData.h"
 #include "PluginActions.h"
+#include "PluginRender.h"
+#include "PluginWorld.h"
 
 #define PLUGIN_DLL "vpHalfLifex64.dll"
 //#define PLUGIN_DLL "vpQuakex64.dll"
@@ -22,7 +26,7 @@
 
 
 /* Sky IO */
-typedef bool (*vpLoadSky)( int formatIndex, byte *buf, unsigned int bufSize, qShader_s *skyInfo, unsigned int side );
+//typedef bool (*vpLoadSky)( int formatIndex, byte *buf, unsigned int bufSize, qShader_s *skyInfo, unsigned int side );
 
 
 /* Sprite IO */
@@ -33,7 +37,7 @@ typedef bool (*vpLoadSky)( int formatIndex, byte *buf, unsigned int bufSize, qSh
 	qShader_s *shaderData;
 } qSpriteData_t;*/
 
-typedef bool (*vpLoadSprite)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
+//typedef bool (*vpLoadSprite)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
 
 
 /* Model IO */
@@ -242,7 +246,7 @@ static byte *Sys_LoadFile( const char *filePath, int *numBytesRead )
 	return NULL;
 }
 
-struct qShader_s
+/*struct qShader_s
 {
 	char gap[1408];
 };
@@ -250,11 +254,12 @@ struct qShader_s
 struct qTexture_s
 {
 	char gap[48];
-};
+};*/
 
 static qShader_s *Shader_Create( const char *shaderName, const char *textureName, int a )
 {
 	void *ptr = Sys_Malloc( sizeof( qShader_s ) );
+	memset( ptr, 0, sizeof( qShader_s ) );
 	Sys_Printf( "%s( %s, %s, %d ) -> 0x%p", __FUNCTION__, shaderName, textureName, a, ptr );
 	return (qShader_s *)ptr;
 }
@@ -262,6 +267,7 @@ static qShader_s *Shader_Create( const char *shaderName, const char *textureName
 static qShader_s *Shader_Lookup( const char *shaderName )
 {
 	void *ptr = Sys_Malloc( sizeof( qShader_s ) );
+	memset( ptr, 0, sizeof( qShader_s ) );
 	Sys_Printf( "%s( %s ) -> 0x%p", __FUNCTION__, shaderName, ptr );
 	return (qShader_s *)ptr;
 }
@@ -458,13 +464,13 @@ static bool Editor_RegisterPackageFormat( int formatIndex, const char *formatNam
 
 
 /* Sky IO */
-static vpLoadSky s_vpLoadSky;
+static vpLoadSky_t s_vpLoadSky;
 
 static bool Editor_RegisterSkyFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
 {
 	Sys_Printf( "  %d / %s / %s", formatIndex, formatName, formatExtension );
 
-	s_vpLoadSky = (vpLoadSky)GetProcAddress( (HMODULE)libraryHandle, "vpLoadSky" );
+	s_vpLoadSky = (vpLoadSky_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadSky" );
 	if ( !s_vpLoadSky )
 	{
 		Sys_Error( "Plugin \"%s\" defines sky format \"%s\" (%s), but doesn't export \"vpLoadSky\" function!", PLUGIN_DLL, formatName, formatExtension );
@@ -476,7 +482,7 @@ static bool Editor_RegisterSkyFormat( int formatIndex, const char *formatName, c
 
 
 /* Sprite IO */
-static vpLoadSprite s_vpLoadSprite;
+static vpLoadSprite_t s_vpLoadSprite;
 
 static bool Editor_RegisterSpriteFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
 {
@@ -486,7 +492,7 @@ static bool Editor_RegisterSpriteFormat( int formatIndex, const char *formatName
 
 	// vpUnloadSprite
 
-	s_vpLoadSprite = (vpLoadSprite)GetProcAddress( (HMODULE)libraryHandle, "vpLoadSprite" );
+	s_vpLoadSprite = (vpLoadSprite_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadSprite" );
 	if ( !s_vpLoadSprite )
 	{
 		Sys_Error( "Plugin \"%s\" defines sprite format \"%s\" (%s), but doesn't export \"vpLoadSprite\" function!", PLUGIN_DLL, formatName, formatExtension );
@@ -570,7 +576,7 @@ static bool Editor_RegisterParticleFormat( int formatIndex, const char *formatNa
 
 /* Archive IO */
 static vpUnloadArchive_t s_vpUnloadArchive;
-static vpLoadArchvie_t s_vpLoadArchvie;
+static vpLoadArchive_t s_vpLoadArchvie;
 static vpFindArchiveFile_t s_vpFindArchiveFile;
 static vpLoadArchiveFile_t s_vpLoadArchiveFile;
 static vpListArchiveFiles_t s_vpListArchiveFiles;
@@ -582,7 +588,7 @@ static bool Editor_RegisterArchiveFormat( int formatIndex, const char *formatNam
 	s_vpUnloadArchive = (vpUnloadArchive_t)GetProcAddress( (HMODULE)libraryHandle, "vpUnloadArchive" );
 	/* Not checked */
 
-	s_vpLoadArchvie = (vpLoadArchvie_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadArchive" );
+	s_vpLoadArchvie = (vpLoadArchive_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadArchive" );
 	if ( !s_vpLoadArchvie )
 	{
 		Sys_Error( "Plugin \"%s\" defines archive format \"%s\" (%s), but doesn't export \"vpLoadArchive\" function!", PLUGIN_DLL, formatName, formatExtension );
@@ -621,23 +627,63 @@ static void Editor_RegisterAction( pluginActionInfo_t *actionInfo, void *pluginM
 	//actionInfo->dispatchFunc();
 }
 
+static qTexture_t *s_whiteTexture;
+static void CreateWhiteTexture()
+{
+	if ( !s_whiteTexture )
+	{
+		//char buf[256];
+		//memset( buf, 0xFF, sizeof( buf ) );
+
+		s_whiteTexture = (qTexture_t *)Sys_Malloc( sizeof( qTexture_t ) );
+		s_whiteTexture->m_flags = 2;
+		s_whiteTexture->m_width = 8;
+		s_whiteTexture->m_height = 8;
+		s_whiteTexture->m_numChannels = 4;
+		s_whiteTexture->m_glPixelFormat = GL_RGBA;
+		s_whiteTexture->m_glTextureFormat = GL_RGBA;
+	}
+}
+
+static void DestroyWhiteTexture()
+{
+	if ( s_whiteTexture )
+	{
+		Sys_Free( s_whiteTexture );
+	}
+}
+
 static void RunPluginTests()
 {
+	CreateWhiteTexture();
+
 	/* Sky IO */
-	if ( 0 )
+	if ( 1 && s_vpLoadSky )
 	{
 		int numBytes = 0;
 		byte *buf = Sys_LoadFile( "valve/gfx/env/cityft.tga", &numBytes );
 
-		bool bOK = s_vpLoadSky( 0, buf, numBytes, NULL, 0 );
+		qShader_t *skyShader = (qShader_t *)Sys_Malloc( sizeof( qShader_t ) );
+		memset( skyShader, 0, sizeof( qShader_t ) );
+
+		skyShader->m_refCount = 1;
+		skyShader->m_framerate = 1.f;
+		skyShader->m_unknownIntSetTo512 = 512;
+
+		strncpy( skyShader->m_name, "city", sizeof( skyShader->m_name ) );
+		skyShader->m_name[sizeof( skyShader->m_name ) - 1] = '\0';
+
+		bool bOK = s_vpLoadSky( 0, buf, numBytes, skyShader, 0 );
 		if ( bOK )
 		{
 			Sys_Printf( "vpLoadSky: %d", bOK );
 		}
+
+		Sys_Free( skyShader );
 	}
 
 	/* Package IO */
-	if ( 1 )
+	if ( 0 && s_vpGetPackageInfo )
 	{
 		int numMipTex;
 		bool bOK = s_vpGetPackageInfo( 0, "quake106/ID1/quake.wad", &numMipTex );
@@ -648,7 +694,7 @@ static void RunPluginTests()
 	}
 
 	/* Sprite IO */
-	if ( 0 )
+	if ( 0 && s_vpLoadSprite )
 	{
 		byte *buf = Sys_LoadFile( "valve/sprites/explode1.spr", NULL );
 
@@ -663,7 +709,7 @@ static void RunPluginTests()
 	}
 
 	/* Model IO */
-	if ( 0 )
+	if ( 0 && s_vpLoadModel && s_vpUnloadModel )
 	{
 		byte *buf = Sys_LoadFile( "valve/player.mdl", NULL );
 
@@ -680,7 +726,7 @@ static void RunPluginTests()
 	}
 
 	/* Archive IO */
-	if ( 0 )
+	if ( 0 && s_vpLoadArchvie && s_vpFindArchiveFile && s_vpLoadArchiveFile && s_vpListArchiveFiles && s_vpUnloadArchive )
 	{
 		qArchiveData_t archiveData;
 
@@ -719,6 +765,8 @@ static void RunPluginTests()
 			s_vpUnloadArchive( 0, &archiveData );
 		}
 	}
+
+	DestroyWhiteTexture();
 }
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )

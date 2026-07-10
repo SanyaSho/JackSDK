@@ -20,8 +20,9 @@ class CMapNode;
 
 typedef struct qNode_s
 {
-	char gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapNode *m_mapNode;
 
 	/* Next/Previous node list. First element never has ->prev set and last element never has ->next set */

@@ -20,8 +20,9 @@ class CMapPath;
 
 typedef struct qPath_s
 {
-	char gap[8];
+	void *firstPtr;
 
+	/* Internal */
 	CMapPath *m_mapPath;
 
 	/* Next/Previous path list. First element never has ->prev set and last element never has ->next set */
@@ -31,6 +32,7 @@ typedef struct qPath_s
 	struct qNode_s *m_nodeList;
 	struct qNode_s *m_lastNode;
 
+	/* World this entity belongs to */
 	struct qWorld_s *m_ownerWorld;
 
 	const char *m_pathName;

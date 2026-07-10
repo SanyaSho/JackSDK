@@ -155,6 +155,15 @@ extern plugin_funcs_t gEditorfuncs;
 #define Shader_UploadTexture		(gEditorfuncs.pfnShader_UploadTexture)
 #define Shader_DestroyTexture		(gEditorfuncs.pfnShader_DestroyTexture)
 
+/* VisGroup API */
+#define VisGroup_Add				(gEditorfuncs.pfnVisGroup_Add)
+#define VisGroup_Remove				(gEditorfuncs.pfnVisGroup_Remove)
+#define VisGroup_Modify				(gEditorfuncs.pfnVisGroup_Modify)
+#define VisGroup_GetCount			(gEditorfuncs.pfnVisGroup_GetCount)
+#define VisGroup_GetIndex			(gEditorfuncs.pfnVisGroup_GetIndex)
+#define VisGroup_GetData			(gEditorfuncs.pfnVisGroup_GetData)
+#define VisGroup_RebuildIdents		(gEditorfuncs.pfnVisGroup_RebuildIdents)
+
 /* Undo API*/
 #define Undo_Start					(gEditorfuncs.pfnUndo_Start)
 #define Undo_End					(gEditorfuncs.pfnUndo_End)

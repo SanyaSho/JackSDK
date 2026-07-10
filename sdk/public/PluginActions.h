@@ -23,7 +23,7 @@
  }
 
  Retured value is the count of actions added by the plugin. Returned value is not checked by the editor.
- pluginManager must be redirected into registerAction.
+ pluginManager must be redirected into registerAction call.
 */
 
 #include "BaseTypes.h"
@@ -34,9 +34,9 @@
 typedef struct pluginActionInfo_s
 {
 	const char *actionName;		   /* Action name. Used internally */
-	const char *actionTitle;	   /* Action title. Contains actualy action name that can be translated */
+	const char *actionTitle;	   /* Action title. Contains actual action name that can be translated */
 	const char *actionDescription; /* Action description. Used by the status bar */
-	const char *actionCategory;	   /* Action category */
+	const char *actionCategory;	   /* Action category (ex. Quake) */
 	long actionFlags;			   /* Action flags */
 	void (*dispatchFunc)();		   /* Function called after action interaction */
 } pluginActionInfo_t;

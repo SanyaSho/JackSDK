@@ -24,39 +24,73 @@ struct qBrush_s;
 struct qShader_s;
 //struct qTexDef_s;
 struct qEntity_s;
+struct qNode_s;
 
 
 class CMapOverlay;
 
 typedef struct qOverlay_s
 {
-	char gap[8];
+	void *firstPtr;
+
+	/* Internal */
 	CMapOverlay *m_mapOverlay;
+
 	struct qBrush_s *m_ownerBrush;
-	char gap2[8];
+
+	struct qShader_s *m_shaderInfo;
+
 	int m_editorFlags;
-	char data_20bytes[20];
-	qTexDef_s m_texDef;
-	char gap4[120];
+
+	struct qPlane_s m_plane;
+
+	struct qTexDef_s m_texDef;
+
+	vec3_t m_bboxMin;
+	vec3_t m_bboxMax;
+
+	char gap4[24];
+	char gap5[72];
 } qOverlay_t;
 COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == 304 );
+
+
+typedef struct qDecalFragment_s
+{
+	struct qDecalFragment_s *next;
+	struct qDecalFragment_s *prev; // is this ->next?
+	struct qDecal_s *m_decalList;
+	struct qBrush_s *m_brushOwner;
+} qDecalFragment_t;
+COMPILE_TIME_ASSERT( sizeof( qDecalFragment_t ) == 32 );
 
 
 class CMapPatch;
 
 typedef struct qPatch_s
 {
-	char gap[8];
+	void *firstPtr;
+
+	/* Internal */
 	CMapPatch *m_mapPatch;
+
 	struct qBrush_s *m_ownerBrush;
+
 	struct qShader_s *m_shaderInfo;
+
 	struct qTexDef_s m_texDef;
-	char gap3[24];
+
+	vec3_t m_bboxMin;
+	vec3_t m_bboxMax;
+
 	int unkint1;
 	int unkint2;
 	char data_36864bytes[36864];
 	int m_editorFlags;
-	char gap4[68];
+	char gap5[4];
+	unsigned int m_glBackGeometryCount;
+	char gap6[20];
+	char gap7[40];
 } qPatch_t;
 COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == 37128 );
 
@@ -93,11 +127,14 @@ typedef struct qBrush_s
 
 	struct qOverlay_s *m_overlay;
 
-	char gap4[12];
+	struct qDecalFragment_s *m_decalFragmentList;
+
+	char gap4[4];
 
 	int m_editorFlags;
 	int m_editorId;
 
+	/* Number of qPatch_t attached to this brush */
 	int m_patchCount;
 
 	vec3_t m_bboxMin;
@@ -117,10 +154,7 @@ COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == 24 );
 
 typedef struct qTrans_s
 {
-	struct qTrans_s *next;
-	char gap[4];
-	float m_unknownFloat;
-	struct qEntity_s *m_ownerEntity;
+	char gap[24];
 } qTrans_t;
 COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == 24 );
 
@@ -149,12 +183,12 @@ typedef struct qWorld_s
 	struct qCamera_s *m_lastCamera;
 
 	/* Selection lists. NULL if nothing is selected */
-	void *qWorld_s_gap3_1;
-	void *m_selectedUnknownList;
+	struct qCamera_s *m_selCamera;
+	struct qGroup_s *m_selGroupList;
 	struct qEntity_s *m_selEntityList;
 	struct qBrush_s *m_selBrushList;
 	struct qFace_s *m_selFaceList;
-	void *qWorld_s_gap3_6;
+	struct qNode_s *m_selNodeList;
 
 	/* Translucency data for special entities */
 	struct qTrans_s *m_transData;
@@ -163,7 +197,10 @@ typedef struct qWorld_s
 
 	int m_editorFlags;
 
-	char qWorld_s_gap5[28];
+	vec3_t m_vecCordonMin;
+	vec3_t m_vecCordonMax;
+
+	char qWorld_s_gap5[4];
 
 	/* Sky settings */
 	struct qSkyData_s m_skyData;

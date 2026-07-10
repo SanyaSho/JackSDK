@@ -30,6 +30,11 @@ typedef unsigned char byte;
 struct rgba_t
 {
 	byte r, g, b, a;
+
+	// clang-format off
+	inline byte *data() { return (byte *)this; }
+	inline const byte *data() const { return (const byte *)this; }
+	// clang-format on
 };
 
 #if !defined( MAX_PATH )

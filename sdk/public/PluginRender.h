@@ -103,7 +103,15 @@ typedef struct qShaderStage_s
 
 	float m_framerate;
 
-	char gap4[284];
+	char gap4[92];
+
+	int m_unknownInt1;
+
+	char gap5[20];
+
+	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake
+
+	char gap6[164];
 } qShaderStage_t;
 COMPILE_TIME_ASSERT( sizeof( qShaderStage_t ) == 384 );
 
@@ -134,7 +142,15 @@ typedef struct qShader_s
 
 	int m_flags;
 
-	char gap2[28];
+	char gap2[12];
+
+	int unknown_OverlayValue;
+
+	int surfaceFlags;
+
+	int m_unknownIntSetTo512; // new flags?
+
+	int valueQuakeII;
 
 	int unknownInt1;
 
@@ -144,11 +160,15 @@ typedef struct qShader_s
 
 	float m_framerate; // TODO: Is this actually a framerate?
 
-	char gap4[68];
+	char gap5[12];
+
+	struct qTexture_s *m_skyTextureList[6];
+
+	char gap7[8];
 
 	struct qShaderStage_s *m_stage;
 
-	char gap5[432];
+	char gap8[432];
 } qShader_t;
 #if defined( WIN32 )
 COMPILE_TIME_ASSERT( sizeof( qShader_t ) == 640 );

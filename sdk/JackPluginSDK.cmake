@@ -22,6 +22,7 @@ function( target_use_jackpluginsdk target )
 				"${JACK_SDK_DIR}/public/PluginEditorFunctions.h"
 				"${JACK_SDK_DIR}/public/PluginEntity.h"
 				"${JACK_SDK_DIR}/public/PluginFaces.h"
+				"${JACK_SDK_DIR}/public/PluginGroups.h"
 				"${JACK_SDK_DIR}/public/PluginMath.h"
 				"${JACK_SDK_DIR}/public/PluginNodes.h"
 				"${JACK_SDK_DIR}/public/PluginPaths.h"

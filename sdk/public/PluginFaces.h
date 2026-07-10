@@ -19,38 +19,43 @@
 struct qShader_s;
 
 
+/* This struct is written as a 20 byte blob into the JMF */
 typedef struct qPlane_s
 {
 	vec3_t normal;
 	float dist;
+	int alignedAxis;
 } qPlane_t;
-COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == 16 );
+COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == 20 );
 
+
+#define TEXALIGN_NONE			(      0 )
+#define TEXALIGN_WORLD			( 1 << 0 )
+#define TEXALIGN_FACE			( 1 << 1 )
+#define TEXALIGN_QUAKE			( 1 << 2 )
 
 /* This struct is written as a 128 byte blob to the JMF */
 typedef struct qTexDef_s
 {
-	vec3_t rightAxis;
+	vec3_t m_UAxis;
+	float m_xShift;
 
-	float xShift;
+	vec3_t m_VAxis;
+	float m_yShift;
 
-	vec3_t bottomAxis;
+	vec2_t m_scale;
 
-	float yShift;
+	float m_rotate;
 
-	vec2_t scale;
+	/* See TEXALIGN_ defines above */
+	int m_textureAlignment;
 
-	float angle;
+	int m_valueQuakeII;
+	int m_lightmapScale;
+	int m_unknown_OverlayValue;
+	int m_surfaceFlags;
 
-	int textureAlignment;
-
-	int valueQuakeII;
-	int lightmapScale;
-	int unknown_OverlayValue;
-
-	int surfaceFlags;
-
-	char textureName[64];
+	char m_textureName[64];
 } qTexDef_t;
 COMPILE_TIME_ASSERT( sizeof( qTexDef_t ) == 128 );
 
@@ -94,11 +99,11 @@ typedef struct qFace_s
 	int m_editorId;
 
 	struct qPlane_s m_plane;
-	int m_alignedAxis;
 
 	struct qTexDef_s m_texDef;
 
-	char gap4[24];
+	vec3_t m_bboxMin;
+	vec3_t m_bboxMax;
 
 	int m_vertexCount;
 

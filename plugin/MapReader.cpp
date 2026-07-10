@@ -359,18 +359,16 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 	CrossProduct( p0 - p1, p2 - p0, plane.normal );
 	VectorNormalize( plane.normal );
 
-	int alignedAxis = 0;
+	plane.dist = DotProduct( plane.normal, p0 );
 
 	if ( fabs( plane.normal.x ) == 1.0f )
-		alignedAxis = 0;
+		plane.alignedAxis = 0;
 	else if ( fabs( plane.normal.y ) == 1.0f )
-		alignedAxis = 1;
+		plane.alignedAxis = 1;
 	else if ( fabs( plane.normal.z ) == 1.0f )
-		alignedAxis = 2;
+		plane.alignedAxis = 2;
 	else
-		alignedAxis = 3;
-
-	plane.dist = DotProduct( plane.normal, p0 );
+		plane.alignedAxis = 3;
 
 	qTexDef_t texDef;
 	memset( &texDef, 0, sizeof( qTexDef_t ) );
@@ -379,12 +377,12 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 	SC_SetParseFlags( flags | 1 );
 
 	SC_GetToken( false );
-	strncat( texDef.textureName, SC_Token(), sizeof( texDef.textureName ) );
-	texDef.textureName[sizeof( texDef.textureName ) - 1] = '\0';
+	strncpy( texDef.m_textureName, SC_Token(), sizeof( texDef.m_textureName ) );
+	texDef.m_textureName[sizeof( texDef.m_textureName ) - 1] = '\0';
 
 	SC_SetParseFlags( flags );
 
-	for ( char *p = texDef.textureName; *p; ++p )
+	for ( char *p = texDef.m_textureName; *p; ++p )
 		*p = (char)toupper( *p );
 
 	/*const char *block = SC_CopyBlock();
@@ -406,15 +404,15 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 		{
 			SC_UnGetToken();
 
-			texDef.xShift = ReadFloat();
-			texDef.yShift = ReadFloat();
+			texDef.m_xShift = ReadFloat();
+			texDef.m_yShift = ReadFloat();
 
-			texDef.angle = -ReadFloat();
+			texDef.m_rotate = -ReadFloat();
 
-			texDef.scale.x = ReadFloat();
-			texDef.scale.y = ReadFloat();
+			texDef.m_scale.x = ReadFloat();
+			texDef.m_scale.y = ReadFloat();
 
-			texDef.textureAlignment = 4;
+			texDef.m_textureAlignment = 4;
 		}
 	}
 
@@ -432,9 +430,8 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 			SC_UnGetToken();
 		}
 
-		texDef.rightAxis = ReadVector3D();
-
-		texDef.xShift = ReadFloat();
+		texDef.m_UAxis = ReadVector3D();
+		texDef.m_xShift = ReadFloat();
 
 		SC_MatchToken( "]" );
 		if ( SC_CheckError() )
@@ -444,32 +441,31 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 		if ( SC_CheckError() )
 			return false;
 
-		texDef.bottomAxis = ReadVector3D();
-
-		texDef.yShift = ReadFloat();
+		texDef.m_VAxis = ReadVector3D();
+		texDef.m_yShift = ReadFloat();
 
 		SC_MatchToken( "]" );
 		if ( SC_CheckError() )
 			return false;
 
-		texDef.angle = ReadFloat();
+		texDef.m_rotate = ReadFloat();
 
-		texDef.scale = ReadVector2D();
+		texDef.m_scale = ReadVector2D();
 
-		texDef.textureAlignment = 2;
+		texDef.m_textureAlignment = 2;
 	}
 
-	while ( texDef.angle < 0.0f )
-		texDef.angle += 360.0f;
+	while ( texDef.m_rotate < 0.0f )
+		texDef.m_rotate += 360.0f;
 
-	while ( texDef.angle >= 360.0f )
-		texDef.angle -= 360.0f;
+	while ( texDef.m_rotate >= 360.0f )
+		texDef.m_rotate -= 360.0f;
 
-	if ( texDef.scale.x == 0.0f )
-		texDef.scale.x = 1.0f;
+	if ( texDef.m_scale.x == 0.0f )
+		texDef.m_scale.x = 1.0f;
 
-	if ( texDef.scale.y == 0.0f )
-		texDef.scale.y = 1.0f;
+	if ( texDef.m_scale.y == 0.0f )
+		texDef.m_scale.y = 1.0f;
 
 	// Skip everything else
 	while ( SC_TokenAvailable() )
@@ -480,8 +476,7 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 	if ( !face )
 		return false;
 
-	face->plane = plane;
-	face->alignedAxis = alignedAxis;
+	face->m_plane = plane;
 
 	return true;
 }

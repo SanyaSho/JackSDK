@@ -47,6 +47,14 @@ struct qShader_s;
 
 // clang-format off
 
+/* vpExport and vpImport are used in pair with vpEnumExportFormats and vpEnumImportFormats */
+/* filePath - path to a file */
+/* seekOffset/readLimit is always set to 0 in the editor */
+typedef int (*vpExport_t)( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef );
+typedef int (*vpImport_t)( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef );
+
+
+
 /* filePath - path to a file */
 /* numMipTex - count of TYP_MIPTEX inside a WAD2/WAD3 */
 typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *numMipTex );
@@ -56,15 +64,37 @@ typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *
 typedef bool (*vpLoadPackage_t)( int formatIndex, const char *filePath );
 
 
+/* Must maintain the m_skyTextureList[side] list inside the skyShader */
+typedef bool (*vpLoadSky_t)( int formatIndex, byte *buf, unsigned int bufSize, qShader_s *skyShader, unsigned int side );
+
+
+typedef struct qPalette_s
+{
+	byte data[768];
+} qPalette_t;
+//COMPILE_TIME_ASSERT( sizeof( qPalette_t ) == ??? );
+
 /* Used by Quake 1. You might need this only if you have a profile with PROFILE_ALLOW_CUSTOM_PALETTE flag set */
-typedef bool (*vpSetPalette_t)( struct qPalette_s *paletteData );
+typedef bool (*vpSetPalette_t)( qPalette_s *paletteData );
 
 // clang-format on
+
 
 /*
  Sprite data definition.
  Contains some basic info about a sprite image
 */
+
+struct qSpriteData_s;
+
+// clang-format off
+
+// TODO: vpUnloadSprite_t
+
+typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
+
+// clang-format on
+
 typedef struct qSpriteData_s
 {
 	int unkint1;
@@ -193,7 +223,7 @@ struct qArchiveData_s;
 typedef void (*vpUnloadArchive_t)( int formatIndex, qArchiveData_s *archiveData );
 
 /* filePath must be a full path to an archive */
-typedef bool (*vpLoadArchvie_t)( int formatIndex, const char *filePath, qArchiveData_s *outArchiveData );
+typedef bool (*vpLoadArchive_t)( int formatIndex, const char *filePath, qArchiveData_s *outArchiveData );
 
 /* filePath accepts a full path to the file inside an archive */
 typedef bool (*vpFindArchiveFile_t)( int formatIndex, qArchiveData_s *archiveData, const char *filePath );
@@ -238,7 +268,7 @@ typedef struct qArchiveData_s
 	 vpFindArchiveFile, vpLoadArchvie, vpListArchiveFiles, vpUnloadArchive
 	*/
 	vpFindArchiveFile_t pfnFindArchiveFile;
-	vpLoadArchvie_t pfnLoadArchive;
+	vpLoadArchive_t pfnLoadArchive;
 	vpListArchiveFiles_t pfnListArchvieFiles;
 	vpUnloadArchive_t pfnUnloadArchive;
 } qArchiveData_t;

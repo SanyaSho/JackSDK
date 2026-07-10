@@ -20,20 +20,21 @@ struct qBrush_s;
 struct qWorld_s;
 
 
-#define ENT_BLDFLG_FULLBUILD			( 1 << 0  ) // Will append bits [4, 5, 6, 7, 9, 11, 12] to the flags
-#define ENT_BLDFLG_BIT1					( 1 << 1  )
-#define ENT_BLDFLG_BIT2					( 1 << 2  )
-#define ENT_BLDFLG_BIT3					( 1 << 3  )
-#define ENT_BLDFLG_BIT4					( 1 << 4  ) // 0x10
-#define ENT_BLDFLG_PARSE_RENDERMODE		( 1 << 5  )
-#define ENT_BLDFLG_PARSE_ENTITYSTATE	( 1 << 6  )
-#define ENT_BLDFLG_UPDATE_SKY_PARAMS	( 1 << 7  ) // Will work only if entity's editorFlags has 0x20
-#define ENT_BLDFLG_REBUILD_USERDATA		( 1 << 8  )
-#define ENT_BLDFLG_UPDATE_CLASSINFO		( 1 << 9  ) // Will update the entity class info (only if FULLBUILD is not set) and will link the targets
-#define ENT_BLDFLG_BIT10				( 1 << 10 )
-#define ENT_BLDFLG_BIT11				( 1 << 11 )
-#define ENT_BLDFLG_BIT12				( 1 << 12 )
-#define ENT_BLDFLG_BIT13				( 1 << 13 )
+#define ENT_BLDFLG_FULLBUILD				( 1 << 0  ) // Will append bits [4, 5, 6, 7, 9, 11, 12] to the flags
+#define ENT_BLDFLG_BIT1						( 1 << 1  )
+#define ENT_BLDFLG_BRUSH_FACESNADOVERLAYS	( 1 << 2  ) // Will build Faces and Overlays for brushes inside an entity
+#define ENT_BLDFLG_BIT3						( 1 << 3  )
+#define ENT_BLDFLG_BIT4						( 1 << 4  ) // 0x10
+#define ENT_BLDFLG_PARSE_RENDERMODE			( 1 << 5  )
+#define ENT_BLDFLG_PARSE_ENTITYSTATE		( 1 << 6  )
+#define ENT_BLDFLG_UPDATE_SKY_PARAMS		( 1 << 7  ) // Will work only if entity's editorFlags has 0x20
+#define ENT_BLDFLG_REBUILD_USERDATA			( 1 << 8  )
+#define ENT_BLDFLG_UPDATE_CLASSINFO			( 1 << 9  ) // Will update the entity class info (only if FULLBUILD is not set) and will link the targets
+#define ENT_BLDFLG_BRUSH_DONTSORTFACES		( 1 << 10 ) // If not set, will sort the faces that brushes has
+#define ENT_BLDFLG_PATCH_CALCANDOPTIMIZE	( 1 << 11 ) // Will calculate the points and optimize patches applied to brushes
+#define ENT_BLDFLG_BIT12					( 1 << 12 )
+#define ENT_BLDFLG_BIT13					( 1 << 13 )
+#define ENT_BLDFLG_BRUSH_UPDATESHADER		( 1 << 14 ) // Will rebuild the shader used by patches and overlays
 
 
 typedef struct epair_s

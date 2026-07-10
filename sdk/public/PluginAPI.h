@@ -48,6 +48,7 @@ EDITORFLAGS:
 1<<7  - Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
 1<<8  - ?
 1<<9  - "Ignore" flag (Brushes and Paths only)
+1<<23 - Used by map serializer and map parser inside some of the plugins. Disables some Sys_Printf calls if set
 */
 
 #include "BaseTypes.h"
@@ -243,8 +244,17 @@ typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderHandle );
 typedef qTexture_s *(*pfnEditor_Shader_GetWhiteTexture)		();
 typedef qTexture_s *(*pfnEditor_Shader_GetBlackTexture)		();
 typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName );
-typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
+typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *textureName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
+
+/* VisGroup API */
+typedef unsigned int(*pfnEditor_VisGroup_Add)				( const qWorld_s *worldDef );
+typedef void		(*pfnEditor_VisGroup_Remove)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
+typedef void		(*pfnEditor_VisGroup_Modify)			( const qWorld_s *worldDef, unsigned int visGroupIndex, const char *visGroupName, unsigned int alterVisGroupIndex, const byte *cbColor );
+typedef int			(*pfnEditor_VisGroup_GetCount)			( const qWorld_s *worldDef );
+typedef int			(*pfnEditor_VisGroup_GetIndex)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
+typedef void		(*pfnEditor_VisGroup_GetData)			( const qWorld_s *worldDef, int visGroupIndex, char *visGroupNameOut, int visGroupNameOutSize, unsigned int *, int *, byte *cbColorOut );
+typedef void		(*pfnEditor_VisGroup_RebuildIdents)		( const qWorld_s *worldDef );
 
 /* Undo API */
 typedef void		(*pfnEditor_Undo_Start)					( const qWorld_s *worldDef, const char * );
@@ -279,7 +289,7 @@ typedef void		(*pfnEditor_Undo_StoreSelectedFaces)	( const qWorld_s *worldDef );
 
 #define DIALOG_MB_OKCANCEL			( 1 << 0 )
 #define DIALOG_MB_YESNO				( 1 << 1 )
-#define DIALOG_MB_ICONSTOP			( 1 << 2 )
+#define DIALOG_MB_ICONERROR			( 1 << 2 )
 #define DIALOG_MB_ICONWARNING		( 1 << 3 )
 #define DIALOG_MB_ICONINFORMATION	( 1 << 4 )
 #define DIALOG_MB_ICONQUESTION		( 1 << 5 )
@@ -575,7 +585,13 @@ typedef struct plugin_funcs_s
 	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
 
 	/* VisGroup API */
-	void *visgroup[7];
+	pfnEditor_VisGroup_Add pfnVisGroup_Add;
+	pfnEditor_VisGroup_Remove pfnVisGroup_Remove;
+	pfnEditor_VisGroup_Modify pfnVisGroup_Modify;
+	pfnEditor_VisGroup_GetCount pfnVisGroup_GetCount;
+	pfnEditor_VisGroup_GetIndex pfnVisGroup_GetIndex;
+	pfnEditor_VisGroup_GetData pfnVisGroup_GetData;
+	pfnEditor_VisGroup_RebuildIdents pfnVisGroup_RebuildIdents;
 
 	/* Undo API */
 	pfnEditor_Undo_Start pfnUndo_Start;

@@ -16,6 +16,7 @@
 #include "PluginEntity.h"
 #include "PluginRender.h"
 #include "PluginWorld.h"
+#include "PluginGroups.h"
 
 //#define STBI_MALLOC( sz )		 Sys_Malloc( sz )
 //#define STBI_REALLOC( p, newsz ) realloc( p, newsz )
@@ -170,7 +171,7 @@ void SpawnEntity()
 	fclose( f );
 }
 
-pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "ExamplePlugin", 0, SpawnEntity };
+pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, SpawnEntity };
 
 void CreateCamera()
 {
@@ -189,7 +190,7 @@ void CreateCamera()
 	Camera_SetColor( pCamera, cbColor );
 }
 
-pluginActionInfo_t createCamera = { "CreateCamera", "&Create Camera", "", "ExamplePlugin", 0, CreateCamera };
+pluginActionInfo_t createCamera = { "CreateCamera", "&Create Camera", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreateCamera };
 
 void CreateNodes()
 {
@@ -209,7 +210,7 @@ void CreateNodes()
 	Node_Insert( world, pNode );
 }
 
-pluginActionInfo_t createNodes = { "CreateNodes", "&Create Nodes", "", "ExamplePlugin", 0, CreateNodes };
+pluginActionInfo_t createNodes = { "CreateNodes", "&Create Nodes", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreateNodes };
 
 void CreatePaths()
 {
@@ -229,7 +230,7 @@ void CreatePaths()
 	Path_Build( pPath, 0 );
 }
 
-pluginActionInfo_t createPaths = { "CreatePaths", "&Create Paths", "", "ExamplePlugin", 0, CreatePaths };
+pluginActionInfo_t createPaths = { "CreatePaths", "&Create Paths", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreatePaths };
 
 void PrintSysFloatTime()
 {
@@ -255,13 +256,13 @@ void RunBuildPackageList()
 	}
 }
 
-pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", 0, RunBuildPackageList };
+pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, RunBuildPackageList };
 
 void MessageBoxTest()
 {
 	bool f;
 
-	f = Dialog_MessageBox( "Stop", "Stop", DIALOG_MB_ICONSTOP );
+	f = Dialog_MessageBox( "Error", "Error", DIALOG_MB_ICONERROR );
 	Sys_Printf( "f: %d", f );
 	f = Dialog_MessageBox( "Warning", "Warning", DIALOG_MB_ICONWARNING );
 	Sys_Printf( "f: %d", f );
@@ -270,7 +271,7 @@ void MessageBoxTest()
 	f = Dialog_MessageBox( "Question", "Question", DIALOG_MB_ICONQUESTION );
 	Sys_Printf( "f: %d", f );
 
-	f = Dialog_MessageBox( "OkCancel | Stop", "Stop", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONSTOP );
+	f = Dialog_MessageBox( "OkCancel | Error", "Error", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONERROR );
 	Sys_Printf( "f: %d", f );
 	f = Dialog_MessageBox( "OkCancel | Warning", "Warning", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONWARNING );
 	Sys_Printf( "f: %d", f );
@@ -279,7 +280,7 @@ void MessageBoxTest()
 	f = Dialog_MessageBox( "OkCancel | Question", "Question", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONQUESTION );
 	Sys_Printf( "f: %d", f );
 
-	f = Dialog_MessageBox( "YesNo | Stop", "Stop", DIALOG_MB_YESNO | DIALOG_MB_ICONSTOP );
+	f = Dialog_MessageBox( "YesNo | Error", "Error", DIALOG_MB_YESNO | DIALOG_MB_ICONERROR );
 	Sys_Printf( "f: %d", f );
 	f = Dialog_MessageBox( "YesNo | Warning", "Warning", DIALOG_MB_YESNO | DIALOG_MB_ICONWARNING );
 	Sys_Printf( "f: %d", f );
@@ -301,7 +302,7 @@ void DebuggerBreakWithWorld()
 	__debugbreak();
 }
 
-pluginActionInfo_t debuggerbreakwithworld = { "DebuggerBreakWithWorld", "&DebuggerBreak with World", "Perform a __debugbreak with access to the world pointer", "ExamplePlugin", 0, DebuggerBreakWithWorld };
+pluginActionInfo_t debuggerbreakwithworld = { "DebuggerBreakWithWorld", "&DebuggerBreak with World", "Perform a __debugbreak with access to the world pointer", "ExamplePlugin", ACTION_FLAG_INLEVEL, DebuggerBreakWithWorld };
 
 void FindPlayerSpawn()
 {
@@ -321,7 +322,7 @@ void FindPlayerSpawn()
 	Sys_Printf( "Found %s on (%f %f %f)", entityDef->m_className, entityDef->m_vecOrigin.x, entityDef->m_vecOrigin.y, entityDef->m_vecOrigin.z );
 }
 
-pluginActionInfo_t findPlayerSpawn = { "FindPlayerSpawn", "&FindPlayerSpawn", "", "ExamplePlugin", 0, FindPlayerSpawn };
+pluginActionInfo_t findPlayerSpawn = { "FindPlayerSpawn", "&FindPlayerSpawn", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, FindPlayerSpawn };
 
 
 void V_ExtractFileExtension( const char *path, char *dest, int destSize )
@@ -723,9 +724,9 @@ DLL_EXPORT int vpEnumSkyFormats( pfnRegisterIOFormat registerIOFormat, void *lib
 	return registerIOFormat( 0, "TGA", ".tga", libraryHandle ) != false;
 }
 
-DLL_EXPORT int vpLoadSky( int formatIndex, byte *buf, int bufSize, byte shaderBuf[1408], int side )
+DLL_EXPORT int vpLoadSky( int formatIndex, byte *buf, int bufSize, qShader_s *skyShader, int side )
 {
-	Sys_Printf( "vpLoadSky: %d 0x%p %d %s %d\n", formatIndex, buf, bufSize, shaderBuf, side );
+	Sys_Printf( "vpLoadSky: %d 0x%p %d %s %d\n", formatIndex, buf, bufSize, skyShader->m_name, side );
 	return 0;
 }
 #endif
