@@ -84,7 +84,7 @@ bool Jack_Primitive_CreateBlock( const stPRIMITIVECREATESTRUCT *primCreate )
 
 	for ( int i = 0; i < 6; i++ )
 	{
-		qFace_s *faceDef = Face_Create( primCreate->m_world, brushDef, primCreate->m_texDef, 4 );
+		qFace_s *faceDef = Face_Create( primCreate->m_world, brushDef, &primCreate->m_texDef, 4 );
 		if ( !faceDef )
 			return false;
 

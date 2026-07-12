@@ -57,6 +57,7 @@ struct qWorld_s;
 struct qEntity_s;
 struct qBrush_s;
 struct qFace_s;
+struct qPatch_s;
 struct qOverlay_s;
 struct qPath_s;
 struct qNode_s;
@@ -98,6 +99,8 @@ typedef float		(*pfnEditor_Sys_FloatTime)				();
 
 typedef void		(*pfnEditor_Sys_SetOption)				( int option, int value );
 typedef long		(*pfnEditor_Sys_GetOption)				( int option );
+
+typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 
 // Steam_SetAchievemnt
 
@@ -201,8 +204,72 @@ typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int vis
 typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
 
 /* Face API */
-typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s &texDef, int vertexCount );
+typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s *texDef, int vertexCount );
 typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
+
+/* Patch API */
+typedef enum
+{
+	/*
+	 Creates a 3×3 cap. The first two rows are collapsed into a single point.
+
+	 AAA
+	 AAA
+	 BCD
+	*/
+	PATCHCAP_POINT = 0,
+
+	/*
+	 Creates a 3×3 cap. The last two rows are collapsed into the middle control point.
+
+	 ABC
+	 BBB
+	 BBB
+	*/
+	PATCHCAP_INVERTED_POINT,
+
+	/*
+	 Creates a 3×3 cap. Computes the midpoint between the first and last control points and inserts it into the middle row.
+
+	 ABC
+	 MCC
+	 DEF
+
+	 M = (A + D) / 2
+	*/
+	PATCHCAP_BEVEL,
+
+	/*
+	 Creates a 5×3 rounded cap. The edge is expanded into a five-column patch.
+
+	 A -> B -> C -> D -> E
+	*/
+	PATCHCAP_ROUND,
+
+	/*
+	 Creates a 3×N bridge patch, where N is half the source edge length. Opposing control points are averaged to form the center column.
+	*/
+	PATCHCAP_BRIDGE,
+
+	/*
+	 Same as PATCHCAP_ROUND, but only samples the first four control points from the source edge before constructing the cap.
+	*/
+	PATCHCAP_ROUND_SHORT
+} PatchCapType_e;
+
+typedef enum
+{
+	PATCHCAP_END = 0,
+	PATCHCAP_START
+} PatchCapLocation_e;
+
+typedef qPatch_s *	(*pfnEditor_Patch_Create)				( qWorld_s *worldDef, const qTexDef_s *texDef, int numColumns, int numRows );
+typedef qPatch_s *	(*pfnEditor_Patch_CreateCap)			( qBrush_s *brushDef, const qPatch_s *patchDef, PatchCapType_e capType, PatchCapLocation_e capLocation, int );
+typedef void		(*pfnEditor_Patch_Destroy)				( qPatch_s *patchDef );
+typedef void		(*pfnEditor_Patch_NaturalizeTexture)	( qPatch_s *patchDef );
+typedef void		(*pfnEditor_Patch_CapTexture)			( qPatch_s *patchDef, const float *rgflCap );
+typedef void		(*pfnEditor_Patch_FitTexture)			( qPatch_s *patchDef, float x, float y, int flags );
+typedef void		(*pfnEditor_Patch_InterpolateExteriorPoints)( qPatch_s *patchDef );
 
 /* Overlay API */
 typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
@@ -216,7 +283,7 @@ typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
 /* Node API */
 typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
 typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
-typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *node );
+typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *nodeDef );
 
 /* Group API */
 typedef qGroup_s *	(*pfnEditor_Group_Create)				( qWorld_s *worldDef );
@@ -452,7 +519,7 @@ typedef struct plugin_funcs_s
 	pfnEditor_Sys_SetOption pfnSys_SetOption;
 	pfnEditor_Sys_GetOption pfnSys_GetOption;
 
-	void *Steam_SetAchievemnt;
+	pfnEditor_Steam_SetAchievemnt pfnSteam_SetAchievemnt;
 
 	/* Parser API */
 	pfnEditor_SC_Token pfnSC_Token;
@@ -539,7 +606,13 @@ typedef struct plugin_funcs_s
 	pfnEditor_Face_Destroy pfnFace_Destroy;
 
 	/* Patch API */
-	void *patch[7];
+	pfnEditor_Patch_Create pfnPatch_Create;
+	pfnEditor_Patch_CreateCap pfnPatch_CreateCap;
+	pfnEditor_Patch_Destroy pfnPatch_Destroy;
+	pfnEditor_Patch_NaturalizeTexture pfnPatch_NaturalizeTexture;
+	pfnEditor_Patch_CapTexture pfnPatch_CapTexture;
+	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
+	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
 
 	/* Overlay API */
 	pfnEditor_Overlay_Create pfnOverlay_Create;

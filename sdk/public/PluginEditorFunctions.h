@@ -30,6 +30,8 @@ extern plugin_funcs_t gEditorfuncs;
 #define Sys_SetOption				(gEditorfuncs.pfnSys_SetOption)
 #define Sys_GetOption				(gEditorfuncs.pfnSys_GetOption)
 
+#define Steam_SetAchievemnt			(gEditorfuncs.pfnSteam_SetAchievemnt)
+
 #define SC_Token					(gEditorfuncs.pfnSC_Token)
 #define SC_Line						(gEditorfuncs.pfnSC_Line)
 #define SC_ParseFromFile			(gEditorfuncs.pfnSC_ParseFromFile)
@@ -111,6 +113,15 @@ extern plugin_funcs_t gEditorfuncs;
 /* Face API */
 #define Face_Create					(gEditorfuncs.pfnFace_Create)
 #define Face_Destroy				(gEditorfuncs.pfnFace_Destroy)
+
+/* Patch API */
+#define Patch_Create				(gEditorfuncs.pfnPatch_Create)
+#define Patch_CreateCap				(gEditorfuncs.pfnPatch_CreateCap)
+#define Patch_Destroy				(gEditorfuncs.pfnPatch_Destroy)
+#define Patch_NaturalizeTexture		(gEditorfuncs.pfnPatch_NaturalizeTexture)
+#define Patch_CapTexture			(gEditorfuncs.pfnPatch_CapTexture)
+#define Patch_FitTexture			(gEditorfuncs.pfnPatch_FitTexture)
+#define Patch_InterpolateExteriorPoints (gEditorfuncs.pfnPatch_InterpolateExteriorPoints)
 
 /* Overlay API */
 #define Overlay_Create				(gEditorfuncs.pfnOverlay_Create)

@@ -471,7 +471,7 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 	while ( SC_TokenAvailable() )
 		SC_GetToken( false );
 
-	qFace_s *face = Face_Create( m_world, brushOwner, texDef, 0 );
+	qFace_s *face = Face_Create( m_world, brushOwner, &texDef, 0 );
 
 	if ( !face )
 		return false;

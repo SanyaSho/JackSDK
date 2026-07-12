@@ -358,7 +358,7 @@ void InitializeEditorFuncs()
 	gEditorfuncs.pfnSys_SetOption = NULL;
 	gEditorfuncs.pfnSys_GetOption = NULL;
 
-	gEditorfuncs.Steam_SetAchievemnt = NULL;
+	gEditorfuncs.pfnSteam_SetAchievemnt = NULL;
 
 	gEditorfuncs.pfnSC_Token = NULL;
 	gEditorfuncs.pfnSC_Line = NULL;
