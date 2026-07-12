@@ -19,21 +19,33 @@
 
  DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
  {
- 	if ( editorFuncs->nIntefaceVersion < sizeof( plugin_funcs_t ) )
+ 	if ( editorFuncs->m_intefaceVersion < sizeof( plugin_funcs_t ) )
  		return -1;
 
  	if ( editorPluginVersion != PLUGIN_VERSION )
  		return PLUGIN_VERSION;
 
- 	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->nIntefaceVersion );
+ 	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->m_intefaceVersion );
  	setlocale( LC_ALL, "C" );
  	return 0;
  }
 
  editorFuncs is the pointer to a table of shared functions inside the editor which must be copied and used within the plugin.
- editorFuncs->nIntefaceVersion is set to size of plugin_funcs_t in the editor and must be checked to be sure that we can load this plugin safely.
+ editorFuncs->m_intefaceVersion is set to size of plugin_funcs_t in the editor and must be checked to be sure that we can load this plugin safely.
  editorPluginVersion is set to current API level in the editor.
 */
+
+// 1 << 0
+#define FL_SELECTED					( 1 << 1 ) /* Object is selected. This flag cannot be set manually when creating/building entities */
+#define FL_DIRTY					( 1 << 2 ) /* Object was modified */
+#define FL_HIDDEN					( 1 << 3 ) /* Object is hidden */
+#define FL_TRANSPARENT				( 1 << 4 ) /* Entity is transparent */
+#define FL_WORLDSPAWN				( 1 << 5 ) /* A worldspawn */
+#define FL_INVENTORYITEM			( 1 << 6 ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
+#define FL_PATHWAY					( 1 << 7 ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
+// 1 << 8
+#define FL_IGNORE					( 1 << 9 ) /* "Ignore" flag (Brushes and Paths only) */
+// 1 << 23
 
 /*
 EDITORFLAGS:
@@ -53,6 +65,7 @@ EDITORFLAGS:
 
 #include "BaseTypes.h"
 
+struct viewInfo_s;
 struct qWorld_s;
 struct qEntity_s;
 struct qBrush_s;
@@ -69,6 +82,8 @@ struct qShader_s;
 struct qShaderStage_s;
 
 // clang-format off
+
+/* Misc API */
 
 /* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_Printf)					( const char *format, ... );
@@ -102,8 +117,6 @@ typedef long		(*pfnEditor_Sys_GetOption)				( int option );
 
 typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 
-// Steam_SetAchievemnt
-
 /* Parser API */
 typedef char *		(*pfnEditor_SC_Token)					();
 typedef long		(*pfnEditor_SC_Line)					();
@@ -131,7 +144,34 @@ typedef void		(*pfnEditor_SC_SkipBlock)				();
 typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
 typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
-// PR[17]
+/* Rendering API */
+typedef enum
+{
+	PRIMTYPE_POINTS = 0,		/* GL_POINTS */
+	PRIMTYPE_LINES,				/* GL_LINES */
+	PRIMTYPE_TRIANGLES,			/* GL_TRIANGLES */
+	PRIMTYPE_POLYGON,			/* GL_POLYGON */
+	PRIMTYPE_TRIANGLE_STRIP,	/* GL_TRIANGLE_STRIP */
+	PRIMTYPE_TRIANGLE_FAN,		/* GL_TRIANGLE_FAN */
+} primType_e;
+
+typedef void		(*pfnEditor_PR_BindTexture)				( qTexture_s *textureDef );
+typedef void		(*pfnEditor_PR_BindShader)				( qShader_s *shaderDef );
+typedef void		(*pfnEditor_PR_LineWidth)				( float width );
+typedef void		(*pfnEditor_PR_PointSize)				( float size );
+typedef void		(*pfnEditor_PR_Begin)					( primType_e primType );
+typedef void		(*pfnEditor_PR_Color4ub)				( byte r, byte g, byte b, byte a );
+typedef void		(*pfnEditor_PR_Color4ubv)				( const byte *cbColor );
+typedef void		(*pfnEditor_PR_Normal3fv)				( const float *rgflNormal );
+typedef void		(*pfnEditor_PR_TexCoord2f)				( float x, float y );
+typedef void		(*pfnEditor_PR_TexCoord2fv)				( const float *rgflTexCoord );
+typedef void		(*pfnEditor_PR_Vertex3fv)				( const float *rgflVertex );
+typedef void		(*pfnEditor_PR_End)						();
+typedef unsigned int(*pfnEditor_PR_GetState)				();
+typedef void		(*pfnEditor_PR_SetState)				( unsigned int glState );
+typedef void		(*pfnEditor_PR_GetViewInfo)				( viewInfo_s *viewInfo );
+typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgfl ); // ???
+typedef float		(*pfnEditor_PR_GetMinAlpha)				();
 
 /* FileSystem API */
 
@@ -498,11 +538,12 @@ typedef void		(*pfnEditor_Dialog_EndWait)				();
 // clang-format on
 
 /* J.A.C.K. Plugin Interface */
-/* nInterfaceVersion is a sizeof( plugin_funcs_t ) */
+/* m_intefaceVersion is a sizeof( plugin_funcs_t ) */
 typedef struct plugin_funcs_s
 {
-	int nIntefaceVersion;
+	size_t m_intefaceVersion;
 
+	/* Misc API */
 	pfnEditor_Sys_Printf pfnSys_Printf;
 	pfnEditor_Sys_DPrintf pfnSys_DPrintf;
 	pfnEditor_Sys_Warning pfnSys_Warning;
@@ -549,7 +590,23 @@ typedef struct plugin_funcs_s
 	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
 
 	/* Rendering API */
-	void *PR[17];
+	pfnEditor_PR_BindTexture pfnPR_BindTexture;
+	pfnEditor_PR_BindShader pfnPR_BindShader;
+	pfnEditor_PR_LineWidth pfnPR_LineWidth;
+	pfnEditor_PR_PointSize pfnPR_PointSize;
+	pfnEditor_PR_Begin pfnPR_Begin;
+	pfnEditor_PR_Color4ub pfnPR_Color4ub;
+	pfnEditor_PR_Color4ubv pfnPR_Color4ubv;
+	pfnEditor_PR_Normal3fv pfnPR_Normal3fv;
+	pfnEditor_PR_TexCoord2f pfnPR_TexCoord2f;
+	pfnEditor_PR_TexCoord2fv pfnPR_TexCoord2fv;
+	pfnEditor_PR_Vertex3fv pfnPR_Vertex3fv;
+	pfnEditor_PR_End pfnPR_End;
+	pfnEditor_PR_GetState pfnPR_GetState;
+	pfnEditor_PR_SetState pfnPR_SetState;
+	pfnEditor_PR_GetViewInfo pfnPR_GetViewInfo;
+	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
+	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
 
 	/* FileSystem API */
 	pfnEditor_Sys_GetBaseDirectory pfnSys_GetBaseDirectory;

@@ -43,13 +43,13 @@ Application Entrypoint
 */
 DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
 {
-	if ( editorFuncs->nIntefaceVersion < sizeof( plugin_funcs_t ) )
+	if ( editorFuncs->m_intefaceVersion < sizeof( plugin_funcs_t ) )
 		return -1;
 
 	if ( editorPluginVersion != PLUGIN_VERSION )
 		return PLUGIN_VERSION;
 
-	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->nIntefaceVersion );
+	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->m_intefaceVersion );
 	setlocale( LC_ALL, "C" );
 	return 0;
 }

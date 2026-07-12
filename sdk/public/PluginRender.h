@@ -36,6 +36,18 @@ typedef struct renditionInfo_s
 //COMPILE_TIME_ASSERT( sizeof( renditionInfo_t ) == ??? );
 
 
+typedef struct viewInfo_s
+{
+	void *a;
+	void *b;
+	void *c;
+	void *d;
+	void *e;
+	void *f;
+} viewInfo_t;
+//COMPILE_TIME_ASSERT( sizeof( viewInfo_t ) == ??? );
+
+
 /* Does not register/unregister this texture from internal hash map (CTextureManager::destroyTexture) */
 /* Automatically set if Shader_UploadTexture was called without a shaderName set (CTextureManager::createTexture) */
 #define TEXTURE_FLAG_UNREGISTERED			( 1 << 0 )

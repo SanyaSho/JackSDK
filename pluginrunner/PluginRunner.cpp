@@ -340,7 +340,7 @@ void InitializeEditorFuncs()
 {
 	memset( &gEditorfuncs, 0, sizeof( plugin_funcs_t ) );
 
-	gEditorfuncs.nIntefaceVersion = sizeof( plugin_funcs_t );
+	gEditorfuncs.m_intefaceVersion = sizeof( plugin_funcs_t );
 
 	gEditorfuncs.pfnSys_Printf = Sys_Printf;
 	gEditorfuncs.pfnSys_DPrintf = Sys_Printf;

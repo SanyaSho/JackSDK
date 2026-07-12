@@ -14,6 +14,7 @@ extern plugin_funcs_t gEditorfuncs;
 
 // clang-format off
 
+/* Misc API */
 #define Sys_Printf					(gEditorfuncs.pfnSys_Printf)
 #define Sys_DPrintf					(gEditorfuncs.pfnSys_DPrintf)
 #define Sys_Warning					(gEditorfuncs.pfnSys_Warning)
@@ -32,6 +33,7 @@ extern plugin_funcs_t gEditorfuncs;
 
 #define Steam_SetAchievemnt			(gEditorfuncs.pfnSteam_SetAchievemnt)
 
+/* Parser API */
 #define SC_Token					(gEditorfuncs.pfnSC_Token)
 #define SC_Line						(gEditorfuncs.pfnSC_Line)
 #define SC_ParseFromFile			(gEditorfuncs.pfnSC_ParseFromFile)
@@ -58,7 +60,24 @@ extern plugin_funcs_t gEditorfuncs;
 #define SC_SkipLineOrBlock			(gEditorfuncs.pfnSC_SkipLineOrBlock)
 #define SC_GetBlockSize				(gEditorfuncs.pfnSC_GetBlockSize)
 
-// PR[17]
+/* Rendering API*/
+#define PR_BindTexture				(gEditorfuncs.pfnPR_BindTexture)
+#define PR_BindShader				(gEditorfuncs.pfnPR_BindShader)
+#define PR_LineWidth				(gEditorfuncs.pfnPR_LineWidth)
+#define PR_PointSize				(gEditorfuncs.pfnPR_PointSize)
+#define PR_Begin					(gEditorfuncs.pfnPR_Begin)
+#define PR_Color4ub					(gEditorfuncs.pfnPR_Color4ub)
+#define PR_Color4ubv				(gEditorfuncs.pfnPR_Color4ubv)
+#define PR_Normal3fv				(gEditorfuncs.pfnPR_Normal3fv)
+#define PR_TexCoord2f				(gEditorfuncs.pfnPR_TexCoord2f)
+#define PR_TexCoord2fv				(gEditorfuncs.pfnPR_TexCoord2fv)
+#define PR_Vertex3fv				(gEditorfuncs.pfnPR_Vertex3fv)
+#define PR_End						(gEditorfuncs.pfnPR_End)
+#define PR_GetState					(gEditorfuncs.pfnPR_GetState)
+#define PR_SetState					(gEditorfuncs.pfnPR_SetState)
+#define PR_GetViewInfo				(gEditorfuncs.pfnPR_GetViewInfo)
+#define PR_CalcLighting				(gEditorfuncs.pfnPR_CalcLighting)
+#define PR_GetMinAlpha				(gEditorfuncs.pfnPR_GetMinAlpha)
 
 /* FileSystem API */
 #define Sys_GetBaseDirectory		(gEditorfuncs.pfnSys_GetBaseDirectory)
