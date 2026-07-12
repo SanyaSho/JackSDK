@@ -54,19 +54,6 @@ DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
 	return 0;
 }
 
-void InternalCommand()
-{
-	char szText[256] = { 0 };
-	Dialog_QueryArgument( "QueryArgumentTest", szText, sizeof( szText ) );
-
-	float flValue = Dialog_QueryArgumentFloat( "QueryArgumentFloatTest" );
-	Dialog_SetProgress( flValue, 1.f );
-
-	int nValue = Dialog_QueryArgumentInt( "QueryArgumentIntTest" );
-
-	Dialog_Printf( "QueryArgumentTest: %s\nQueryArgumentFloatTest: %f\nQueryArgumentIntTest: %d", szText, flValue, nValue );
-}
-
 void RunTests()
 {
 	/*float vec3[3] = { 0, 0, 0, };
@@ -113,41 +100,6 @@ void RunTests()
 
 	Sys_Warning( "Sys_PrintValue: %s\n", Sys_PrintValue( 3.7f ) );
 	Sys_Warning( "Sys_PrintValue: %s\n", Sys_PrintValue( 2.4f ) );
-
-	long bitmask = Dialog_CheckOptions( NULL, NULL, "MYOPTION1|TestOption2|TestOption3|CustomOption4" );
-	Sys_Printf( "CheckOptions: %d\n", bitmask );
-
-	//Dialog_MessageBox( "test1testtesttesttesttesttest", "test2testtesttesttesttesttesttesttest", DIALOG_TYPE_QUESTION );
-
-	Dialog_Begin( "MyDialog" );
-	{
-		Dialog_AddTextEdit( "QueryArgumentTest", "Text", "TestText", 0 );
-		Dialog_AddTextEdit( "QueryArgumentFloatTest", "Progress", "1.0", 0 );
-
-		Dialog_AddRadioBox( "QueryArgumentIntTest", "RadioBox", false, 0 );
-
-		Dialog_AddCheckBox( "CheckBoxTest", "CheckBox", true, 0 );
-
-		Dialog_AddFileEdit( "FileEdit", "Select Map", "mapsrc", "*.jmf\n*.rmf\n*.*", DIALOG_FILE_OPEN );
-
-		Dialog_AddFileList( "FileList", "test", "file1\nfile2\nfile3\nfile4", NULL, DIALOG_FILE_OPEN );
-
-		Dialog_AddDirectoryEdit( "DirectoryEdit", "test", "C:\\JACK_10155", DIALOG_FILE_OPEN );
-
-		Dialog_AddComboBox( "ComboBox", "My Combo Box", 0, "OPT1\n1\nOPT2\n2\nOPT3\n3", 0 );
-
-		// SpinBox with values [0-15], step count 1 and initial value 1
-		Dialog_AddSpinBox( "SpinBox", "My SpinBox", 1, 0, 15, 1, 0 );
-
-		// SpinBox with values [0-15], step count 1 and initial value 1
-		Dialog_AddSpinBoxFloat( "SpinBoxFloat", "My SpinBox", 1.f, 0.f, 100.f, 2.5f, 0 );
-
-		//Dialog_InitExternalCommand( "buttonTextExternal", "test" );
-		Dialog_InitInternalCommand( "buttonTextInternal", InternalCommand );
-
-		Dialog_Printf( "Dialog_Printf test" );
-	}
-	Dialog_End();
 }
 
 pluginActionInfo_t runTests = { "Run tests", "&Run tests", "Call RunTests()", "ExamplePlugin", 0, RunTests };
@@ -259,38 +211,7 @@ void RunBuildPackageList()
 
 pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, RunBuildPackageList };
 
-void MessageBoxTest()
-{
-	bool f;
-
-	f = Dialog_MessageBox( "Error", "Error", DIALOG_MB_ICONERROR );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "Warning", "Warning", DIALOG_MB_ICONWARNING );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "Information", "Information", DIALOG_MB_ICONINFORMATION );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "Question", "Question", DIALOG_MB_ICONQUESTION );
-	Sys_Printf( "f: %d", f );
-
-	f = Dialog_MessageBox( "OkCancel | Error", "Error", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONERROR );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "OkCancel | Warning", "Warning", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONWARNING );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "OkCancel | Information", "Information", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONINFORMATION );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "OkCancel | Question", "Question", DIALOG_MB_OKCANCEL | DIALOG_MB_ICONQUESTION );
-	Sys_Printf( "f: %d", f );
-
-	f = Dialog_MessageBox( "YesNo | Error", "Error", DIALOG_MB_YESNO | DIALOG_MB_ICONERROR );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "YesNo | Warning", "Warning", DIALOG_MB_YESNO | DIALOG_MB_ICONWARNING );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "YesNo | Information", "Information", DIALOG_MB_YESNO | DIALOG_MB_ICONINFORMATION );
-	Sys_Printf( "f: %d", f );
-	f = Dialog_MessageBox( "YesNo | Question", "Question", DIALOG_MB_YESNO | DIALOG_MB_ICONQUESTION );
-	Sys_Printf( "f: %d", f );
-}
-
+extern void MessageBoxTest();
 pluginActionInfo_t mbTest = { "MessageBoxTest", "&MessageBoxTest", "", "ExamplePlugin", 0, MessageBoxTest };
 
 void DebuggerBreakWithWorld()
