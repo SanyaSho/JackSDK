@@ -16,6 +16,10 @@
 #define FLT_EPSILON 1.192092896e-07F
 #endif // !FLT_EPSILON
 
+#if !defined( M_PI )
+#define M_PI 3.14159265358979323846
+#endif // !M_PI
+
 /* 2D Vector */
 struct vec2_t
 {
@@ -25,6 +29,9 @@ struct vec2_t
 	vec2_t( vec_t x, vec_t y ) { this->x = x; this->y = y; }
 
 	// clang-format off
+	inline vec_t *Base() { return (vec_t *)this; }
+	inline const vec_t *Base() const { return (vec_t *)this; }
+
 	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
 	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
 
@@ -38,8 +45,8 @@ struct vec2_t
 	inline vec2_t &operator*=( float fl ) { x*=fl; y*=fl; return *this; }
 	inline vec2_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; return *this; }
 
-	inline vec2_t  operator+ ( const vec2_t &v ) { vec2_t res; res.x = x + v.x; res.y = y + v.y; return res; }
-	inline vec2_t  operator- ( const vec2_t &v ) { vec2_t res; res.x = x - v.x; res.y = y - v.y; return res; }
+	inline vec2_t  operator+ ( const vec2_t &v ) const { vec2_t res; res.x = x + v.x; res.y = y + v.y; return res; }
+	inline vec2_t  operator- ( const vec2_t &v ) const { vec2_t res; res.x = x - v.x; res.y = y - v.y; return res; }
 
 	inline vec2_t &operator= ( const vec2_t &v ) { x = v.x; y = v.y; return *this; }
 
@@ -56,6 +63,9 @@ struct vec3_t
 	vec3_t( vec_t x, vec_t y, vec_t z ) { this->x = x; this->y = y; this->z = z; }
 
 	// clang-format off
+	inline vec_t *Base() { return (vec_t *)this; }
+	inline const vec_t *Base() const { return (vec_t *)this; }
+
 	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
 	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
 
@@ -69,8 +79,8 @@ struct vec3_t
 	inline vec3_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; return *this; }
 	inline vec3_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; return *this; }
 
-	inline vec3_t  operator+ ( const vec3_t &v ) { vec3_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; return res; }
-	inline vec3_t  operator- ( const vec3_t &v ) { vec3_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; return res; }
+	inline vec3_t  operator+ ( const vec3_t &v ) const { vec3_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; return res; }
+	inline vec3_t  operator- ( const vec3_t &v ) const { vec3_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; return res; }
 
 	inline vec3_t &operator= ( const vec3_t &v ) { x = v.x; y = v.y; z = v.z; return *this; }
 

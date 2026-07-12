@@ -17,6 +17,7 @@
 #include "PluginRender.h"
 #include "PluginWorld.h"
 #include "PluginGroups.h"
+#include "PluginPrimitives.h"
 
 //#define STBI_MALLOC( sz )		 Sys_Malloc( sz )
 //#define STBI_REALLOC( p, newsz ) realloc( p, newsz )
@@ -646,7 +647,7 @@ mapProfile_t profile =
 	0b10000000000001001001
 	[0, 3, 6, 19]
 	*/
-	PROFILE_DECALTOOL_USE_HL1_DECALS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
+	( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_HL1_DECALS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
 
 	"vpHalfLife",
 	"Half-Life / TFC (Custom)",
@@ -719,6 +720,7 @@ DLL_EXPORT int vpEnumProfiles( pfnRegisterProfile registerProfile, void *library
 	return 1;
 }
 
+#if 0
 DLL_EXPORT int vpEnumSkyFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
 	return registerIOFormat( 0, "TGA", ".tga", libraryHandle ) != false;
@@ -729,6 +731,7 @@ DLL_EXPORT int vpLoadSky( int formatIndex, byte *buf, int bufSize, qShader_s *sk
 	Sys_Printf( "vpLoadSky: %d 0x%p %d %s %d\n", formatIndex, buf, bufSize, skyShader->m_name, side );
 	return 0;
 }
+#endif
 #endif
 
 /*
@@ -953,6 +956,18 @@ DLL_EXPORT bool vpLoadSprite( int formatIndex, const char *filePath, byte *buf, 
 	};
 
 	return false;
+}
+
+DLL_EXPORT int vpEnumSurfaceFlags( pfnRegisterFlags reg, void *libraryHandle )
+{
+	reg( "vpHalfLife", "MySurfaceFlag", 1, libraryHandle );
+	return 1;
+}
+
+DLL_EXPORT int vpEnumContentFlags( pfnRegisterFlags reg, void *libraryHandle )
+{
+	reg( "vpHalfLife", "MyContentFlag", 1, libraryHandle );
+	return 1;
 }
 
 #if 0

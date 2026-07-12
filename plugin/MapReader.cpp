@@ -350,9 +350,9 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 
 	vec3_t p0, p1, p2;
 
-	SC_Parse1DMatrix( 3, (float *)&p0 );
-	SC_Parse1DMatrix( 3, (float *)&p1 );
-	SC_Parse1DMatrix( 3, (float *)&p2 );
+	SC_Parse1DMatrix( 3, p0.Base() );
+	SC_Parse1DMatrix( 3, p1.Base() );
+	SC_Parse1DMatrix( 3, p2.Base() );
 
 	qPlane_t plane;
 	//CrossProduct( p2 - p1, p0 - p1, plane.normal ); // winbspc

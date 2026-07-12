@@ -32,12 +32,12 @@
 
 //#define PROFILE_BIT0						( 1 << 0  )
 #define PROFILE_ALLOW_CUSTOM_PALETTE		( 1 << 1  ) // CPreferencesDialog::exec_on_mapProfileChanged
-#define PROFILE_BIT2						( 1 << 2  ) // CFacePropertiesDialog::measureAndSetupFlags
-#define PROFILE_BIT3						( 1 << 3  ) // CFacePropertiesDialog::measureAndSetupFlags
-#define PROFILE_FACE_QUAKE2_VALUE			( 1 << 4  ) // CFacePropertiesDialog::updateSelection
+#define PROFILE_FACE_HAS_SURFACEFLAGS		( 1 << 2  ) // CFacePropertiesDialog::measureAndSetupFlags
+#define PROFILE_FACE_HAS_CONTENTFLAGS		( 1 << 3  ) // CFacePropertiesDialog::measureAndSetupFlags
+#define PROFILE_FACE_HAS_QUAKE2_VALUE		( 1 << 4  ) // CFacePropertiesDialog::updateSelection
 #define PROFILE_DECALTOOL_USE_HL1_DECALS	( 1 << 5  ) // CDecalTool::onCreateObjects // entity_InfoDecal key must be set in order to use this flag
-//#define PROFILE_BIT6						( 1 << 6  ) // Used by Q3
-#define PROFILE_DECALTOOL_USE_Q3_OPERLAYS	( 1 << 7  ) // CDecalTool::onCreateObjects
+#define PROFILE_SUPPORT_CURVES				( 1 << 6  ) // CMainWindow::fillPrimitiveGroupList
+#define PROFILE_DECALTOOL_USE_Q3_OVERLAYS	( 1 << 7  ) // CDecalTool::onCreateObjects
 #define PROFILE_ENTITY_HL1_RENDERPROPS		( 1 << 8  ) // CMapEntity::updateRenderMode
 #define PROFILE_ENTITY_HAS_ALPHA			( 1 << 9  ) // CMapEntity::updateRenderMode
 //#define PROFILE_BIT10						( 1 << 10 ) // Used by HL1, Q1, Q2

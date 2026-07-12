@@ -23,6 +23,10 @@
 // This macro predates universal static_assert support in our toolchains
 #define COMPILE_TIME_ASSERT( pred ) static_assert( pred, "Compile time assert constraint is not true: " #pred )
 
+#if !defined( ARRAYSIZE )
+#define ARRAYSIZE( p ) ( sizeof( p ) / sizeof( p[0] ) )
+#endif // !ARRAYSIZE
+
 typedef float vec_t;
 
 typedef unsigned char byte;

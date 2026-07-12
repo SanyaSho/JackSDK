@@ -50,10 +50,10 @@ typedef struct qTexDef_s
 	/* See TEXALIGN_ defines above */
 	int m_textureAlignment;
 
-	int m_valueQuakeII;
-	int m_lightmapScale;
-	int m_unknown_OverlayValue;
-	int m_surfaceFlags;
+	int m_value; // Quake II "Value"
+	int m_lightmapScale; // HL2 addition
+	int m_surfaceFlags; // Quake II SurfaceFlags
+	int m_contentFlags; // Quake II ContentFlags
 
 	char m_textureName[64];
 } qTexDef_t;

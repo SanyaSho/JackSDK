@@ -28,15 +28,15 @@ typedef struct qGroup_s
 	/* Internal */
 	CMapGroup *m_mapGroup;
 
-	/* Next/Previous face list. First element never has ->prev set and last element never has ->next set */
+	/* Next/Previous group list. First element never has ->prev set and last element never has ->next set */
 	struct qGroup_s *next;
 	struct qGroup_s *prev;
 
-	/* Next/Previous selected face list. First element never has ->selectedPrev and last element never has ->selectedNext */
+	/* Next/Previous selected group list. First element never has ->selectedPrev and last element never has ->selectedNext */
 	struct qGroup_s *selectedNext;
 	struct qGroup_s *selectedPrev;
 
-	char gap2[8];
+	struct qGroup_s *m_parent;
 
 	/* World this entity belongs to */
 	struct qWorld_s *m_ownerWorld;

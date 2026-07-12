@@ -20,8 +20,20 @@
  	return 0;
  }
 
+ Quake II/Quake III uses custom fields for face's surface and content flags
+ New flags can be registered using vpEnumSurfaceFlags and vpEnumContentFlags functions.
+ Max count of surface flags: 19
+ Max count of content flags: 31
+
+ Example:
+ DLL_EXPORT int vpEnumSurfaceFlags( pfnRegisterFlags registerFlags, void *libraryHandle )
+ {
+ 	registerFlags( "vpQuake3", "Detail", 27, libraryHandle );
+ 	return 1;
+ }
+
  Returned value is the count of successfully registered data types
- pluginManager must be redirected into registerIOFormat.
+ libraryHandle must be redirected into registerFlags. However, it's not used inside the editor so technically can be set to NULL.
 */
 
 #include "BaseTypes.h"
@@ -107,7 +119,7 @@ typedef struct qSpriteData_s
 
 	int m_spriteOrientation;
 
-	qShader_s *m_spriteShader;
+	struct qShader_s *m_spriteShader;
 
 	char gap2[8];
 
@@ -280,6 +292,12 @@ COMPILE_TIME_ASSERT( sizeof( qArchiveData_t ) == 64 );
 typedef bool (*pfnRegisterIOFormat)( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle );
 
 typedef int (*vpEnumGenericFunction_t)( pfnRegisterIOFormat registerIOFormat, void *libraryHandle );
+
+
+// Prototype for the function that is used to register surface/content flags internally
+typedef void (*pfnRegisterFlags)( const char *pluginName, const char *surfaceFlagName, unsigned int bitIndex, void *libraryHandle );
+
+typedef int (*vpEnumGenericFlags_t)( pfnRegisterFlags registerFlags, void *libraryHandle );
 
 // clang-format on
 

@@ -33,12 +33,23 @@
 
 typedef struct pluginActionInfo_s
 {
-	const char *actionName;		   /* Action name. Used internally */
-	const char *actionTitle;	   /* Action title. Contains actual action name that can be translated */
-	const char *actionDescription; /* Action description. Used by the status bar */
-	const char *actionCategory;	   /* Action category (ex. Quake) */
-	long actionFlags;			   /* Action flags */
-	void (*dispatchFunc)();		   /* Function called after action interaction */
+	/* Action name. Used internally */
+	const char *m_actionName;
+
+	/* Action title. Contains actual action name that can be translated */
+	const char *m_actionTitle;
+
+	/* Action description. Used by the status bar */
+	const char *m_actionDescription;
+
+	/* Action category (ex. Quake) */
+	const char *m_actionCategory;
+
+	/* Action flags (see defines above) */
+	int m_actionFlags;
+
+	/* Function called after action interaction */
+	void (*m_dispatchFunc)();
 } pluginActionInfo_t;
 COMPILE_TIME_ASSERT( sizeof( pluginActionInfo_t ) == 48 );
 

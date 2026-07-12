@@ -622,7 +622,7 @@ static bool Editor_RegisterArchiveFormat( int formatIndex, const char *formatNam
 
 static void Editor_RegisterAction( pluginActionInfo_t *actionInfo, void *pluginManager )
 {
-	Sys_Printf( "  %s / %s / %s / %s / %x / 0x%p", actionInfo->actionName, actionInfo->actionTitle, actionInfo->actionDescription, actionInfo->actionCategory, actionInfo->actionFlags, actionInfo->dispatchFunc );
+	Sys_Printf( "  %s / %s / %s / %s / %x / 0x%p", actionInfo->m_actionName, actionInfo->m_actionTitle, actionInfo->m_actionDescription, actionInfo->m_actionCategory, actionInfo->m_actionFlags, actionInfo->m_dispatchFunc );
 
 	//actionInfo->dispatchFunc();
 }

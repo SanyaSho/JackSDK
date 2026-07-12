@@ -29,7 +29,11 @@ typedef struct qNode_s
 	struct qNode_s *next;
 	struct qNode_s *prev;
 
-	char gap2[24];
+	/* Next/Previous selected node list. First element never has ->selectedPrev and last element never has ->selectedNext */
+	struct qNode_s *selectedNext;
+	struct qNode_s *selectedPrev;
+
+	char gap2[8];
 
 	struct epair_s *epairs;
 

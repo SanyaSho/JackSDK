@@ -16,6 +16,7 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 			#"DoomWadLoader.cpp"
 
 			"ExamplePlugin.cpp"
+			"PrimitivesExample.cpp"
 
 			"MapReader.cpp"
 		#}

@@ -168,7 +168,11 @@ typedef struct qShader_s
 
 	struct qShaderStage_s *m_stage;
 
+#if defined( WIN32 )
 	char gap8[432];
+#else
+	char gap8[1200];
+#endif // WIN32
 } qShader_t;
 #if defined( WIN32 )
 COMPILE_TIME_ASSERT( sizeof( qShader_t ) == 640 );

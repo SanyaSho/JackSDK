@@ -29,6 +29,22 @@ struct qNode_s;
 
 class CMapOverlay;
 
+/* This struct is written as a 96 byte blob into the JMF */
+typedef struct qOverlayData_s
+{
+	char gap1[12];
+	float m_unkFlt1;
+	char gap2[8];
+	char gap3[40];
+	float m_unkFlt2;
+	char gap4[12];
+	char gap5[4];
+	float m_unkFlt3;
+	float m_unkFlt4;
+	char gap6[4];
+} qOverlayData_t;
+COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == 96 );
+
 typedef struct qOverlay_s
 {
 	void *firstPtr;
@@ -49,8 +65,7 @@ typedef struct qOverlay_s
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 
-	char gap4[24];
-	char gap5[72];
+	struct qOverlayData_s m_data;
 } qOverlay_t;
 COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == 304 );
 
@@ -66,6 +81,17 @@ COMPILE_TIME_ASSERT( sizeof( qDecalFragment_t ) == 32 );
 
 
 class CMapPatch;
+
+typedef struct qPatchData_s
+{
+	// This looks like embedded qVertex_t
+
+	vec3_t position;
+	vec3_t normal;
+	vec2_t uv;
+	int unkint1;
+} qPatchData_t;
+COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == 36 ); // NOTE: The size is unknown
 
 typedef struct qPatch_s
 {
@@ -83,14 +109,21 @@ typedef struct qPatch_s
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 
-	int unkint1;
-	int unkint2;
-	char data_36864bytes[36864];
+	// cylinder (9x3) -> m_numColumns = 9; m_numRows = 3
+	int m_numColumns;
+	int m_numRows;
+	qPatchData_t m_data[32 /*column*/][32 /*row*/];
+
 	int m_editorFlags;
+
+	/* Internal data used to draw the patch */
 	char gap5[4];
 	unsigned int m_glBackGeometryCount;
-	char gap6[20];
-	char gap7[40];
+	unsigned int m_glPointsCount;
+	char gap6[16];
+	const void *m_glBackGeometryIndices;
+	const void *m_glPointsIndices;
+	char gap7[24];
 } qPatch_t;
 COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == 37128 );
 

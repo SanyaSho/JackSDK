@@ -201,7 +201,7 @@ typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int vis
 typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
 
 /* Face API */
-typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s &texDef, int );
+typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s &texDef, int vertexCount );
 typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
 
 /* Overlay API */
