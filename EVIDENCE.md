@@ -1,7 +1,7 @@
 ## Usage of the leaked Valve's code/licensing issues inside of the Steam version of J.A.C.K.
 - All findings were done on the latest actual J.A.C.K. version 1.2.4603
 
-### (Jack) CMapFace::calcTextureAxes -> CMapFace::InitializeTextureAxes
+### (Jack) CMapFace::InitializeTextureAxes -> CMapFace::calcTextureAxes
 - Direct copy of leaked code.
 - Almost 1 to 1 copy of texture axes calculation function.
 ![Leaked code inside Jack executable](.github/evidence/1_jack.png)
@@ -11,4 +11,10 @@
 - Licensing issue.
 - Function has the same behavior and uses the same gamma table calculation formula.
 ![GPL-licensed code inside vpHalfLife plugin code](.github/evidence/2_jack.png)
-![Quake 1 code from IdSoftware's GitHub](.github/evidence/2_quake.png)
+![Quake 1 source code from IdSoftware's GitHub](.github/evidence/2_quake.png)
+
+### (Jack) Almost identical copy of build_number function from QuakeWorld
+- Licensing issue.
+- Function uses the same constants, the same month table but it does not include build time.
+![GPL-licensed code inside J.A.C.K.'s build_number function (original function name is unknown)](.github/evidence/3_jack.png)
+![QuakeWorld source code from IdSoftware's GitHub](.github/evidence/3_quakeworld.png)
