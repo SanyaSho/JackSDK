@@ -36,7 +36,7 @@ typedef struct qGroup_s
 	struct qGroup_s *selectedNext;
 	struct qGroup_s *selectedPrev;
 
-	struct qGroup_s *m_parent;
+	struct qGroup_s *m_parent; // TODO: Recheck
 
 	/* World this entity belongs to */
 	struct qWorld_s *m_ownerWorld;

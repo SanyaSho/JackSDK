@@ -127,9 +127,9 @@ typedef struct mapProfile_s
 
 	char gvn2[64]; // CMapEntity::assignTargetInfo
 
-	int unknown_ShaderMask;
-	int unknown_SurfaceFlagsBitMask;
 	int unknown_ContentFlagsBitMask;
+	int unknown_SurfaceFlagsBitMask;
+	int unknown_ShaderMask;
 } mapProfile_t;
 COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == 2960 );
 

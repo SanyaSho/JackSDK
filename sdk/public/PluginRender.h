@@ -99,14 +99,15 @@ typedef struct qShaderStage_s
 {
 	struct qShaderStage_s *next;
 
-	/* Initial texture used by this stage */
+	/* Currently used texture */
 	struct qTexture_s *m_currentTexture;
 
 	char gap2[56];
 
+	/* Texture list (used if texture has multiple frames) */
 	struct qTexture_s *m_textureList;
 
-	int m_numColors;
+	int m_numColors; // TODO: this is not a number of colors
 
 	/* Stage flags (see above) */
 	int m_shaderStageFlags;
@@ -147,7 +148,7 @@ typedef struct qShader_s
 
 	int m_refCount;
 
-	char gap[4];
+	char gap[4]; // m_refCount2
 
 	int m_textureWidth;
 	int m_textureHeight;
@@ -156,14 +157,10 @@ typedef struct qShader_s
 
 	char gap2[12];
 
-	int unknown_OverlayValue;
-
-	int surfaceFlags;
-
-	int m_unknownIntSetTo512; // new flags?
-
-	int valueQuakeII;
-
+	int m_surfaceFlags;
+	int m_contentFlags;
+	int m_materialType;
+	int m_value;
 	int unknownInt1;
 
 	char gap3[4];

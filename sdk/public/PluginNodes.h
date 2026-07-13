@@ -33,14 +33,14 @@ typedef struct qNode_s
 	struct qNode_s *selectedNext;
 	struct qNode_s *selectedPrev;
 
-	char gap2[8];
+	struct qNode_s *m_parent; // TODO: Recheck
 
 	struct epair_s *epairs;
 
 	const char *m_nameOverride;
 	const char *m_fireEntityOnPass;
 
-	char gap3[4];
+	int render_unkint;
 
 	int m_editorFlags;
 

@@ -29,21 +29,13 @@ struct qNode_s;
 
 class CMapOverlay;
 
-/* This struct is written as a 96 byte blob into the JMF */
 typedef struct qOverlayData_s
 {
-	char gap1[12];
-	float m_unkFlt1;
-	char gap2[8];
-	char gap3[40];
-	float m_unkFlt2;
-	char gap4[12];
-	char gap5[4];
-	float m_unkFlt3;
-	float m_unkFlt4;
-	char gap6[4];
+	vec3_t position;
+	vec2_t uv;
+	char gap[4];
 } qOverlayData_t;
-COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == 96 );
+COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == 24 );
 
 typedef struct qOverlay_s
 {
@@ -52,8 +44,10 @@ typedef struct qOverlay_s
 	/* Internal */
 	CMapOverlay *m_mapOverlay;
 
+	/* Owner of this overlay */
 	struct qBrush_s *m_ownerBrush;
 
+	/* Shader used to render this overlay */
 	struct qShader_s *m_shaderInfo;
 
 	int m_editorFlags;
@@ -65,7 +59,8 @@ typedef struct qOverlay_s
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 
-	struct qOverlayData_s m_data;
+	/* This field is written as a 96 byte blob into the JMF */
+	struct qOverlayData_s m_data[4];
 } qOverlay_t;
 COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == 304 );
 
@@ -100,8 +95,10 @@ typedef struct qPatch_s
 	/* Internal */
 	CMapPatch *m_mapPatch;
 
+	/* Owner of this patch */
 	struct qBrush_s *m_ownerBrush;
 
+	/* Shader used to render this patch */
 	struct qShader_s *m_shaderInfo;
 
 	struct qTexDef_s m_texDef;
@@ -162,7 +159,7 @@ typedef struct qBrush_s
 
 	struct qDecalFragment_s *m_decalFragmentList;
 
-	char gap4[4];
+	int render_unkint;
 
 	int m_editorFlags;
 	int m_editorId;
@@ -176,6 +173,13 @@ typedef struct qBrush_s
 COMPILE_TIME_ASSERT( sizeof( qBrush_t ) == 152 );
 
 
+typedef struct qTrans_s
+{
+	char gap[24];
+} qTrans_t;
+COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == 24 );
+
+
 typedef struct qSkyData_s
 {
 	struct qShader_s *m_skyShader;
@@ -183,13 +187,6 @@ typedef struct qSkyData_s
 	float m_skyRotate;
 } qSkyData_t;
 COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == 24 );
-
-
-typedef struct qTrans_s
-{
-	char gap[24];
-} qTrans_t;
-COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == 24 );
 
 
 class CMapWorld;

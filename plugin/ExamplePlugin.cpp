@@ -568,7 +568,7 @@ mapProfile_t profile =
 	0b10000000000001001001
 	[0, 3, 6, 19]
 	*/
-	( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_HL1_DECALS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
+	( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_Q3_OVERLAYS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
 
 	"vpHalfLife",
 	"Half-Life / TFC (Custom)",
@@ -634,7 +634,7 @@ vpEnumProfiles
 Game Profiles
 ===============
 */
-#if 0
+#if 1
 DLL_EXPORT int vpEnumProfiles( pfnRegisterProfile registerProfile, void *libraryHandle )
 {
 	registerProfile( &profile, libraryHandle );
@@ -785,7 +785,7 @@ static bool LoadSprite_PNG( const char *filePath, byte *buf, int bufSize, qSprit
 		return false;
 	}
 
-	outSpriteData->m_spriteOrientation = 0;
+	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
 
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
@@ -827,7 +827,7 @@ static bool LoadSprite_GIF( const char *filePath, byte *buf, int bufSize, qSprit
 		return false;
 	}
 
-	outSpriteData->m_spriteOrientation = 0;
+	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
 
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );

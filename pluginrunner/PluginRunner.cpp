@@ -668,7 +668,7 @@ static void RunPluginTests()
 
 		skyShader->m_refCount = 1;
 		skyShader->m_framerate = 1.f;
-		skyShader->m_unknownIntSetTo512 = 512;
+		skyShader->m_materialType = 512; // TODO: bitmask
 
 		strncpy( skyShader->m_name, "city", sizeof( skyShader->m_name ) );
 		skyShader->m_name[sizeof( skyShader->m_name ) - 1] = '\0';

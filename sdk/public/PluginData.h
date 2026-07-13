@@ -107,6 +107,13 @@ typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf
 
 // clang-format on
 
+/* Sprite orientation (Quake/Half-Life) */
+#define SPR_ORIENTED				0
+#define SPR_VP_PARALLEL				1
+#define SPR_VP_PARALLEL_UPRIGHT		2
+#define SPR_FACING_UPRIGHT			3
+#define SPR_VP_PARALLEL_ORIENTED	4
+
 typedef struct qSpriteData_s
 {
 	int unkint1;
