@@ -39,7 +39,9 @@ COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == SIZEOF_QOVERLAYDATA_S /* Always
 
 typedef struct qOverlay_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapOverlay *m_mapOverlay;
@@ -90,7 +92,9 @@ COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == SIZEOF_QPATCHDATA_S ); // NOTE: T
 
 typedef struct qPatch_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapPatch *m_mapPatch;
@@ -133,7 +137,9 @@ class CMapBrush;
 
 typedef struct qBrush_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapBrush *m_mapBrush;
@@ -209,7 +215,9 @@ class CMapWorld;
 
 typedef struct qWorld_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapWorld *m_mapWorld;

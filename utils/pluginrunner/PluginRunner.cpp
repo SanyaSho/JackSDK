@@ -399,7 +399,9 @@ void InitializeEditorFuncs()
 
 	gEditorfuncs.filesystemfuncs.pfnSys_GetBaseDirectory = NULL;
 	gEditorfuncs.filesystemfuncs.pfnSys_GetModDirectory = NULL;
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	gEditorfuncs.filesystemfuncs.pfnSys_GetFallbackDirectory = NULL;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	gEditorfuncs.filesystemfuncs.pfnSys_ExpandFileName = NULL;
 	gEditorfuncs.filesystemfuncs.pfnSys_MakeLocalFileName = Sys_MakeLocalFileName;
 	gEditorfuncs.filesystemfuncs.pfnSys_FileExists = NULL;
@@ -632,9 +634,15 @@ static bool Editor_RegisterArchiveFormat( int formatIndex, const char *formatNam
 }
 
 
-static void Editor_RegisterAction( pluginActionInfo_t *actionInfo, void *pluginManager )
+static void Editor_RegisterAction( pluginActionDesc_t *actionInfo, void *pluginManager )
 {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	Sys_Printf( "  %s / %s / %s / %s / %x / 0x%p", actionInfo->m_actionName, actionInfo->m_actionTitle, actionInfo->m_actionDescription, actionInfo->m_actionCategory, actionInfo->m_actionFlags, actionInfo->m_dispatchFunc );
+#elif JACK_API_VERSION <= 100
+	Sys_Printf( "  %s / %s / %s / %d / %x / 0x%p", actionInfo->m_actionTitle, actionInfo->m_actionDescription, actionInfo->m_actionCategory, actionInfo->m_unknown, actionInfo->m_actionFlags, actionInfo->m_dispatchFunc );
+#else
+#error
+#endif
 }
 
 

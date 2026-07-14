@@ -20,7 +20,9 @@ class CMapPath;
 
 typedef struct qPath_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapPath *m_mapPath;

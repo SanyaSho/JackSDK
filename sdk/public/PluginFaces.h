@@ -73,7 +73,9 @@ class CMapFace;
 
 typedef struct qFace_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapFace *m_mapFace;

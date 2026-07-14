@@ -14,7 +14,7 @@
  Plugin actions are handled by the vpEnumActions exported function.
 
  Example:
- pluginActionInfo_t firstAction = { "ActionName", "ActionTitle", "ActionDescription", "ActionCategory", 0, 0, []() { Sys_Printf( "ActionDispatch" ); } };
+ pluginActionDesc_t firstAction = { "ActionName", "ActionTitle", "ActionDescription", "ActionCategory", 0, 0, []() { Sys_Printf( "ActionDispatch" ); } };
 
  DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginManager )
  {
@@ -31,10 +31,12 @@
 #define ACTION_FLAG_HIDDEN	( 1 << 0 ) /* Completly hides the action until the level is loaded */
 #define ACTION_FLAG_INLEVEL ( 1 << 1 ) /* Action is grayed out until the level is loaded */
 
-typedef struct pluginActionInfo_s
+typedef struct pluginActionDesc_s
 {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	/* Action name. Used internally */
 	const char *m_actionName;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	/* Action title. Contains actual action name that can be translated */
 	const char *m_actionTitle;
@@ -45,18 +47,22 @@ typedef struct pluginActionInfo_s
 	/* Action category (ex. Quake) */
 	const char *m_actionCategory;
 
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	int m_unknown;
+#endif // JACK_API_VERSION <= 100
+
 	/* Action flags (see defines above) */
 	uint64 m_actionFlags;
 
 	/* Function called after action interaction */
 	void (*m_dispatchFunc)();
-} pluginActionInfo_t;
-COMPILE_TIME_ASSERT( sizeof( pluginActionInfo_t ) == SIZEOF_PLUGINACTIONINFO_T );
+} pluginActionDesc_t;
+COMPILE_TIME_ASSERT( sizeof( pluginActionDesc_t ) == SIZEOF_PLUGINACTIONDESC_T );
 
 // clang-format off
 
 // Prototype for the function that is used to register actions internally
-typedef void (*pfnRegisterAction)( pluginActionInfo_t *actionInfo, void *pluginManager );
+typedef void (*pfnRegisterAction)( pluginActionDesc_t *actionInfo, void *pluginManager );
 
 typedef int (*vpEnumActions_t)( pfnRegisterAction registerAction, void *pluginManager );
 

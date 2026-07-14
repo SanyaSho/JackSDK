@@ -82,7 +82,9 @@ extern plugin_funcs_t gEditorfuncs;
 /* FileSystem API */
 #define Sys_GetBaseDirectory		(gEditorfuncs.filesystemfuncs.pfnSys_GetBaseDirectory)
 #define Sys_GetModDirectory			(gEditorfuncs.filesystemfuncs.pfnSys_GetModDirectory)
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Sys_GetFallbackDirectory	(gEditorfuncs.filesystemfuncs.pfnSys_GetFallbackDirectory)
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Sys_ExpandFileName			(gEditorfuncs.filesystemfuncs.pfnSys_ExpandFileName)
 #define Sys_MakeLocalFileName		(gEditorfuncs.filesystemfuncs.pfnSys_MakeLocalFileName)
 #define Sys_FileExists				(gEditorfuncs.filesystemfuncs.pfnSys_FileExists)
@@ -90,9 +92,11 @@ extern plugin_funcs_t gEditorfuncs;
 #define Sys_CreatePath				(gEditorfuncs.filesystemfuncs.pfnSys_CreatePath)
 
 /* Math API */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Sys_PrintValue				(gEditorfuncs.mathfuncs.pfnSys_PrintValue)
 #define Sys_PrintMapCoord			(gEditorfuncs.mathfuncs.pfnSys_PrintMapCoord)
 #define Sys_PrintAxis				(gEditorfuncs.mathfuncs.pfnSys_PrintAxis)
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Sys_SnapVertex				(gEditorfuncs.mathfuncs.pfnSys_SnapVertex)
 #define Sys_SnapAxis				(gEditorfuncs.mathfuncs.pfnSys_SnapAxis)
 #define Sys_SnapVertexToGrid		(gEditorfuncs.mathfuncs.pfnSys_SnapVertexToGrid)
@@ -135,7 +139,9 @@ extern plugin_funcs_t gEditorfuncs;
 
 /* Patch API */
 #define Patch_Create				(gEditorfuncs.patchfuncs.pfnPatch_Create)
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Patch_CreateCap				(gEditorfuncs.patchfuncs.pfnPatch_CreateCap)
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Patch_Destroy				(gEditorfuncs.patchfuncs.pfnPatch_Destroy)
 #define Patch_NaturalizeTexture		(gEditorfuncs.patchfuncs.pfnPatch_NaturalizeTexture)
 #define Patch_CapTexture			(gEditorfuncs.patchfuncs.pfnPatch_CapTexture)
@@ -149,7 +155,9 @@ extern plugin_funcs_t gEditorfuncs;
 /* Path API */
 #define Path_Create					(gEditorfuncs.pathfuncs.pfnPath_Create)
 #define Path_Destroy				(gEditorfuncs.pathfuncs.pfnPath_Destroy)
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 #define Path_Build					(gEditorfuncs.pathfuncs.pfnPath_Build)
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 /* Node API */
 #define Node_Insert					(gEditorfuncs.nodefuncs.pfnNode_Insert)

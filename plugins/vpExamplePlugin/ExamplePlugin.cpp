@@ -90,19 +90,35 @@ void RunTests()
 	bOK = Sys_GetModDirectory( out2, sizeof( out2 ) );
 	Sys_Warning( "Sys_GetModDirectory (%d): %s\n", bOK, out2 );
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	char out3[260] = { 0 };
 	bOK = Sys_GetFallbackDirectory( out3, sizeof( out3 ) );
 	Sys_Warning( "Sys_GetFallbackDirectory (%d): %s\n", bOK, out3 );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	Sys_Warning( "V_VersionString: %s\n", V_VersionString() );
 
 	Sys_Warning( "Sys_GetTextureGamma: %f\n", Sys_GetTextureGamma() );
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	Sys_Warning( "Sys_PrintValue: %s\n", Sys_PrintValue( 3.7f ) );
 	Sys_Warning( "Sys_PrintValue: %s\n", Sys_PrintValue( 2.4f ) );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 }
 
-pluginActionInfo_t runTests = { "Run tests", "&Run tests", "Call RunTests()", "ExamplePlugin", 0, RunTests };
+pluginActionDesc_t runTests = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"Run tests",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Run tests",
+	"Call RunTests()",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+	RunTests
+};
 
 void SpawnEntity()
 {
@@ -124,7 +140,19 @@ void SpawnEntity()
 	fclose( f );
 }
 
-pluginActionInfo_t spawnEntity = { "Spawn Entity", "&Spawn Entity", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, SpawnEntity };
+pluginActionDesc_t spawnEntity = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"Spawn Entity",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Spawn Entity",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	SpawnEntity
+};
 
 void CreateCamera()
 {
@@ -143,7 +171,19 @@ void CreateCamera()
 	Camera_SetColor( pCamera, cbColor );
 }
 
-pluginActionInfo_t createCamera = { "CreateCamera", "&Create Camera", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreateCamera };
+pluginActionDesc_t createCamera = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"CreateCamera",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Create Camera",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	CreateCamera
+};
 
 void CreateNodes()
 {
@@ -163,7 +203,19 @@ void CreateNodes()
 	Node_Insert( world, pNode );
 }
 
-pluginActionInfo_t createNodes = { "CreateNodes", "&Create Nodes", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreateNodes };
+pluginActionDesc_t createNodes = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"CreateNodes",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Create Nodes",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	CreateNodes
+};
 
 void CreatePaths()
 {
@@ -180,17 +232,43 @@ void CreatePaths()
 	pPath->m_pathName = Sys_AllocString( "apiPath" );
 	pPath->m_pathDirection = 2;
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	Path_Build( pPath, 0 );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 }
 
-pluginActionInfo_t createPaths = { "CreatePaths", "&Create Paths", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, CreatePaths };
+pluginActionDesc_t createPaths = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"CreatePaths",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Create Paths",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	CreatePaths
+};
 
 void PrintSysFloatTime()
 {
 	Sys_Printf( "Sys_FloatTime: %f\n", Sys_FloatTime() );
 }
 
-pluginActionInfo_t printSysFloatTime = { "PrintSysFloatTime", "&Sys_FloatTime", "", "ExamplePlugin", 0, PrintSysFloatTime };
+pluginActionDesc_t printSysFloatTime = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"PrintSysFloatTime",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&Sys_FloatTime",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+	PrintSysFloatTime
+};
 
 void RunBuildPackageList()
 {
@@ -209,10 +287,34 @@ void RunBuildPackageList()
 	}
 }
 
-pluginActionInfo_t runBuildPackageList = { "RunBuildPackageList", "&BuildPackageList", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, RunBuildPackageList };
+pluginActionDesc_t runBuildPackageList = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"RunBuildPackageList",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&BuildPackageList",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	RunBuildPackageList
+};
 
 extern void MessageBoxTest();
-pluginActionInfo_t mbTest = { "MessageBoxTest", "&MessageBoxTest", "", "ExamplePlugin", 0, MessageBoxTest };
+pluginActionDesc_t mbTest = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"MessageBoxTest",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&MessageBoxTest",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+	MessageBoxTest
+};
 
 void DebuggerBreakWithWorld()
 {
@@ -224,7 +326,19 @@ void DebuggerBreakWithWorld()
 	__debugbreak();
 }
 
-pluginActionInfo_t debuggerbreakwithworld = { "DebuggerBreakWithWorld", "&DebuggerBreak with World", "Perform a __debugbreak with access to the world pointer", "ExamplePlugin", ACTION_FLAG_INLEVEL, DebuggerBreakWithWorld };
+pluginActionDesc_t debuggerbreakwithworld = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"DebuggerBreakWithWorld",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&DebuggerBreak with World",
+	"Perform a __debugbreak with access to the world pointer",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	DebuggerBreakWithWorld
+};
 
 void FindPlayerSpawn()
 {
@@ -244,7 +358,19 @@ void FindPlayerSpawn()
 	Sys_Printf( "Found %s on (%f %f %f)", entityDef->m_className, entityDef->m_vecOrigin.x, entityDef->m_vecOrigin.y, entityDef->m_vecOrigin.z );
 }
 
-pluginActionInfo_t findPlayerSpawn = { "FindPlayerSpawn", "&FindPlayerSpawn", "", "ExamplePlugin", ACTION_FLAG_INLEVEL, FindPlayerSpawn };
+pluginActionDesc_t findPlayerSpawn = {
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"FindPlayerSpawn",
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	"&FindPlayerSpawn",
+	"",
+	"ExamplePlugin",
+#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	ACTION_FLAG_INLEVEL,
+	FindPlayerSpawn
+};
 
 
 void V_ExtractFileExtension( const char *path, char *dest, int destSize )
@@ -473,7 +599,7 @@ void QuakeExtractTexturesToPNGs()
 	Dialog_End();
 }
 
-pluginActionInfo_t quakeExtractTexturesToPNGs = { "QuakeExtractTexturesToPNGs", "&Extract textures...", "Extract Quake textures from BSP/PAK files", "ExamplePlugin", 0, QuakeExtractTexturesToPNGs };
+pluginActionDesc_t quakeExtractTexturesToPNGs = { "QuakeExtractTexturesToPNGs", "&Extract textures...", "Extract Quake textures from BSP/PAK files", "ExamplePlugin", 0, QuakeExtractTexturesToPNGs };
 #endif
 
 #if 0
@@ -510,7 +636,7 @@ void DoomWadTest()
 	Dialog_End();
 }
 
-pluginActionInfo_t doomwadtest = { "DoomWadTest", "&Extract textures...", "Extract DOOM textures from IWAD files", "ExamplePlugin", 0, DoomWadTest };
+pluginActionDesc_t doomwadtest = { "DoomWadTest", "&Extract textures...", "Extract DOOM textures from IWAD files", "ExamplePlugin", 0, DoomWadTest };
 #endif
 
 /*
@@ -721,7 +847,7 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffse
 }
 
 
-#if 1
+#if 0
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
 	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;

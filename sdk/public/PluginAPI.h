@@ -148,6 +148,36 @@ typedef void		(*pfnEditor_SC_SkipBlock)				();
 typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
 typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
+	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
+	pfnEditor_SC_Token pfnSC_Token;
+	pfnEditor_SC_Line pfnSC_Line;
+	pfnEditor_SC_ParseError pfnSC_ParseError;
+	pfnEditor_SC_CheckError pfnSC_CheckError;
+	pfnEditor_SC_ResetError pfnSC_ResetError;
+	pfnEditor_SC_GetToken pfnSC_GetToken;
+	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
+	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
+	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
+	pfnEditor_SC_MatchToken pfnSC_MatchToken;
+	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
+	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
+	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
+	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
+	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
+	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
+	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
+	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
+	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
+	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
+	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
+	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
+	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
+} parser_api_t;
+#else
 typedef struct
 {
 	pfnEditor_SC_Token pfnSC_Token;
@@ -176,6 +206,7 @@ typedef struct
 	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
 	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
 } parser_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Rendering API */
 typedef enum
@@ -206,6 +237,28 @@ typedef void		(*pfnEditor_PR_GetViewInfo)				( viewInfo_s *viewInfo );
 typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgfl ); // ???
 typedef float		(*pfnEditor_PR_GetMinAlpha)				();
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_PR_PointSize pfnPR_PointSize;
+	pfnEditor_PR_LineWidth pfnPR_LineWidth;
+	pfnEditor_PR_BindShader pfnPR_BindShader;
+	pfnEditor_PR_BindTexture pfnPR_BindTexture;
+	pfnEditor_PR_Begin pfnPR_Begin;
+	pfnEditor_PR_End pfnPR_End;
+	pfnEditor_PR_Color4ub pfnPR_Color4ub;
+	pfnEditor_PR_Color4ubv pfnPR_Color4ubv;
+	pfnEditor_PR_TexCoord2f pfnPR_TexCoord2f;
+	pfnEditor_PR_TexCoord2fv pfnPR_TexCoord2fv;
+	pfnEditor_PR_Normal3fv pfnPR_Normal3fv;
+	pfnEditor_PR_Vertex3fv pfnPR_Vertex3fv;
+	pfnEditor_PR_GetState pfnPR_GetState;
+	pfnEditor_PR_SetState pfnPR_SetState;
+	pfnEditor_PR_GetViewInfo pfnPR_GetViewInfo;
+	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
+	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
+} rendering_api_t;
+#else
 typedef struct
 {
 	pfnEditor_PR_BindTexture pfnPR_BindTexture;
@@ -226,6 +279,7 @@ typedef struct
 	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
 	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
 } rendering_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* FileSystem API */
 
@@ -238,9 +292,11 @@ typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
 /* Returns true on success, false on failure */
 typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /* Get current configuration fallback directory */
 /* Returns true on success, false on failure */
 typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
 typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
@@ -252,7 +308,9 @@ typedef struct
 {
 	pfnEditor_Sys_GetBaseDirectory pfnSys_GetBaseDirectory;
 	pfnEditor_Sys_GetModDirectory pfnSys_GetModDirectory;
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	pfnEditor_Sys_GetFallbackDirectory pfnSys_GetFallbackDirectory;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	pfnEditor_Sys_ExpandFileName pfnSys_ExpandFileName;
 	pfnEditor_Sys_MakeLocalFileName pfnSys_MakeLocalFileName;
 	pfnEditor_Sys_FileExists pfnSys_FileExists;
@@ -261,24 +319,44 @@ typedef struct
 } filesystem_api_t;
 
 /* Math API */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef char *		(*pfnEditor_Sys_PrintValue)				( float value );
 typedef char *		(*pfnEditor_Sys_PrintMapCoord)			( float coord );
 typedef char *		(*pfnEditor_Sys_PrintAxis)				( float axis );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef void		(*pfnEditor_Sys_SnapVertex)				( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapAxis)				( int num, float *rgflAxis );
 typedef void		(*pfnEditor_Sys_SnapVertexToGrid)		( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapMapVertex)			( float *rgflVertex );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
 {
-	pfnEditor_Sys_PrintValue pfnSys_PrintValue;
-	pfnEditor_Sys_PrintMapCoord pfnSys_PrintMapCoord;
-	pfnEditor_Sys_PrintAxis pfnSys_PrintAxis;
 	pfnEditor_Sys_SnapVertex pfnSys_SnapVertex;
 	pfnEditor_Sys_SnapAxis pfnSys_SnapAxis;
 	pfnEditor_Sys_SnapVertexToGrid pfnSys_SnapVertexToGrid;
 	pfnEditor_Sys_SnapMapVertex pfnSys_SnapMapVertex;
 } math_api_t;
+#elif JACK_API_VERSION == API_VERSION_STEAM_PUBLIC
+typedef struct
+{
+	pfnEditor_Sys_SnapAxis pfnSys_SnapAxis;
+	pfnEditor_Sys_SnapVertex pfnSys_SnapVertex;
+	pfnEditor_Sys_SnapMapVertex pfnSys_SnapMapVertex;
+	pfnEditor_Sys_SnapVertexToGrid pfnSys_SnapVertexToGrid;
+} math_api_t;
+#elif JACK_API_VERSION >= API_VERSION_STEAM_BETA
+typedef struct
+{
+	pfnEditor_Sys_PrintValue pfnSys_PrintValue;
+	pfnEditor_Sys_PrintMapCoord pfnSys_PrintMapCoord;
+	pfnEditor_Sys_PrintAxis pfnSys_PrintAxis;
+	pfnEditor_Sys_SnapMapVertex pfnSys_SnapMapVertex;
+	pfnEditor_Sys_SnapAxis pfnSys_SnapAxis;
+	pfnEditor_Sys_SnapVertex pfnSys_SnapVertex;
+	pfnEditor_Sys_SnapVertexToGrid pfnSys_SnapVertexToGrid;
+} math_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Returns the current version string (J.A.C.K. 1.2.4603) */
 typedef char *		(*pfnEditor_V_VersionString)			();
@@ -310,6 +388,22 @@ typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qEntity_s *entityDef,
 /* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_targetName value */
 typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qEntity_s *entityDef, const char *targetname );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Entity_Create pfnEntity_Create;
+	pfnEditor_Entity_Build pfnEntity_Build;
+	pfnEditor_Entity_SetColor pfnEntity_SetColor;
+	pfnEditor_Entity_GetColor pfnEntity_GetColor;
+	pfnEditor_Entity_AddToVisGroup pfnEntity_AddToVisGroup;
+	pfnEditor_Entity_RemoveFromVisGroup pfnEntity_RemoveFromVisGroup;
+	pfnEditor_Entity_GetVisGroupCount pfnEntity_GetVisGroupCount;
+	pfnEditor_Entity_GetVisGroupIdent pfnEntity_GetVisGroupIdent;
+	pfnEditor_Entity_FindByClassname pfnEntity_FindByClassname;
+	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
+	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
+} entity_api_t;
+#else
 typedef struct
 {
 	pfnEditor_Entity_Create pfnEntity_Create;
@@ -324,6 +418,7 @@ typedef struct
 	pfnEditor_Entity_FindByClassname pfnEntity_FindByClassname;
 	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
 } entity_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Brush API */
 typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
@@ -335,6 +430,19 @@ typedef void		(*pfnEditor_Brush_RemoveFromVisGroup)	( qWorld_s *worldDef, qBrush
 typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int visGroupId );
 typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Brush_Create pfnBrush_Create;
+	pfnEditor_Brush_Destroy pfnBrush_Destroy;
+	pfnEditor_Brush_SetColor pfnBrush_SetColor;
+	pfnEditor_Brush_GetColor pfnBrush_GetColor;
+	pfnEditor_Brush_AddToVisGroup pfnBrush_AddToVisGroup;
+	pfnEditor_Brush_RemoveFromVisGroup pfnBrush_RemoveFromVisGroup;
+	pfnEditor_Brush_GetVisGroupCount pfnBrush_GetVisGroupCount;
+	pfnEditor_Brush_GetVisGroupIdent pfnBrush_GetVisGroupIdent;
+} brush_api_t;
+#else
 typedef struct
 {
 	pfnEditor_Brush_Create pfnBrush_Create;
@@ -346,6 +454,7 @@ typedef struct
 	pfnEditor_Brush_GetVisGroupIdent pfnBrush_GetVisGroupIdent;
 	pfnEditor_Brush_GetVisGroupCount pfnBrush_GetVisGroupCount;
 } brush_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Face API */
 typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s *texDef, int vertexCount );
@@ -358,6 +467,7 @@ typedef struct
 } face_api_t;
 
 /* Patch API */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef enum
 {
 	/*
@@ -412,15 +522,39 @@ typedef enum
 	PATCHCAP_END = 0,
 	PATCHCAP_START
 } PatchCapLocation_e;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 typedef qPatch_s *	(*pfnEditor_Patch_Create)				( qWorld_s *worldDef, const qTexDef_s *texDef, int numColumns, int numRows );
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef qPatch_s *	(*pfnEditor_Patch_CreateCap)			( qBrush_s *brushDef, const qPatch_s *patchDef, PatchCapType_e capType, PatchCapLocation_e capLocation, int );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef void		(*pfnEditor_Patch_Destroy)				( qPatch_s *patchDef );
 typedef void		(*pfnEditor_Patch_NaturalizeTexture)	( qPatch_s *patchDef );
 typedef void		(*pfnEditor_Patch_CapTexture)			( qPatch_s *patchDef, const float *rgflCap );
 typedef void		(*pfnEditor_Patch_FitTexture)			( qPatch_s *patchDef, float x, float y, int flags );
 typedef void		(*pfnEditor_Patch_InterpolateExteriorPoints)( qPatch_s *patchDef );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Patch_Create pfnPatch_Create;
+	pfnEditor_Patch_Destroy pfnPatch_Destroy;
+	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
+	pfnEditor_Patch_NaturalizeTexture pfnPatch_NaturalizeTexture;
+	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
+	pfnEditor_Patch_CapTexture pfnPatch_CapTexture;
+} patch_api_t;
+#elif JACK_API_VERSION == API_VERSION_STEAM_PUBLIC
+typedef struct
+{
+	pfnEditor_Patch_Create pfnPatch_Create;
+	pfnEditor_Patch_Destroy pfnPatch_Destroy;
+	pfnEditor_Patch_NaturalizeTexture pfnPatch_NaturalizeTexture;
+	pfnEditor_Patch_CapTexture pfnPatch_CapTexture;
+	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
+	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
+} patch_api_t;
+#elif JACK_API_VERSION == API_VERSION_STEAM_BETA
 typedef struct
 {
 	pfnEditor_Patch_Create pfnPatch_Create;
@@ -431,6 +565,7 @@ typedef struct
 	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
 	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
 } patch_api_t;
+#endif
 
 /* Overlay API */
 typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
@@ -445,13 +580,17 @@ typedef struct
 /* Path API */
 typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
-typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int buildFlags );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 typedef struct
 {
 	pfnEditor_Path_Create pfnPath_Create;
 	pfnEditor_Path_Destroy pfnPath_Destroy;
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	pfnEditor_Path_Build pfnPath_Build;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 } path_api_t;
 
 /* Node API */
@@ -459,12 +598,21 @@ typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *par
 typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
 typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *nodeDef );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
 {
-	pfnEditor_Node_Insert pfnNode_Insert;
 	pfnEditor_Node_Append pfnNode_Append;
+	pfnEditor_Node_Insert pfnNode_Insert;
 	pfnEditor_Node_Destroy pfnNode_Destroy;
 } node_api_t;
+#else
+typedef struct
+{
+	pfnEditor_Node_Append pfnNode_Append;
+	pfnEditor_Node_Insert pfnNode_Insert;
+	pfnEditor_Node_Destroy pfnNode_Destroy;
+} node_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Group API */
 typedef qGroup_s *	(*pfnEditor_Group_Create)				( qWorld_s *worldDef );
@@ -475,6 +623,18 @@ typedef void		(*pfnEditor_Group_AddEntity)			( qGroup_s *rootGroupDef, qEntity_s
 typedef void		(*pfnEditor_Group_GetColor)				( qGroup_s *groupDef, byte *cbColorOut );
 typedef void		(*pfnEditor_Group_SetColor)				( qGroup_s *groupDef, const byte *cbColor );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Group_Create pfnGroup_Create;
+	pfnEditor_Group_Destroy pfnGroup_Destroy;
+	pfnEditor_Group_AddGroup pfnGroup_AddGroup;
+	pfnEditor_Group_AddBrush pfnGroup_AddBrush;
+	pfnEditor_Group_AddEntity pfnGroup_AddEntity;
+	pfnEditor_Group_SetColor pfnGroup_SetColor;
+	pfnEditor_Group_GetColor pfnGroup_GetColor;
+} group_api_t;
+#else
 typedef struct
 {
 	pfnEditor_Group_Create pfnGroup_Create;
@@ -485,6 +645,7 @@ typedef struct
 	pfnEditor_Group_GetColor pfnGroup_GetColor;
 	pfnEditor_Group_SetColor pfnGroup_SetColor;
 } group_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Camera API*/
 typedef qCamera_s *	(*pfnEditor_Camera_Create)				( qWorld_s *worldDef );
@@ -493,6 +654,16 @@ typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, byte *cbColorO
 typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cbColor );
 typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Camera_Create pfnCamera_Create;
+	pfnEditor_Camera_Destroy pfnCamera_Destroy;
+	pfnEditor_Camera_SetColor pfnCamera_SetColor;
+	pfnEditor_Camera_GetColor pfnCamera_GetColor;
+	pfnEditor_Camera_Setup pfnCamera_Setup;
+} camera_api_t;
+#else
 typedef struct
 {
 	pfnEditor_Camera_Create pfnCamera_Create;
@@ -501,6 +672,7 @@ typedef struct
 	pfnEditor_Camera_SetColor pfnCamera_SetColor;
 	pfnEditor_Camera_Setup pfnCamera_Setup;
 } camera_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Shader API */
 typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int shaderFlags );
@@ -515,6 +687,22 @@ typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName
 typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *textureName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Shader_Lookup pfnShader_Lookup;
+	pfnEditor_Shader_Create pfnShader_Create;
+	pfnEditor_Shader_Destroy pfnShader_Destroy;
+	pfnEditor_Shader_AddStage pfnShader_AddStage;
+	pfnEditor_Shader_RemoveStage pfnShader_RemoveStage;
+	pfnEditor_Shader_Finish pfnShader_Finish;
+	pfnEditor_Shader_LookupTexture pfnShader_LookupTexture;
+	pfnEditor_Shader_GetWhiteTexture pfnShader_GetWhiteTexture;
+	pfnEditor_Shader_GetBlackTexture pfnShader_GetBlackTexture;
+	pfnEditor_Shader_UploadTexture pfnShader_UploadTexture;
+	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
+} shader_api_t;
+#else
 typedef struct
 {
 	pfnEditor_Shader_Create pfnShader_Create;
@@ -529,6 +717,7 @@ typedef struct
 	pfnEditor_Shader_UploadTexture pfnShader_UploadTexture;
 	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
 } shader_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* VisGroup API */
 typedef unsigned int(*pfnEditor_VisGroup_Add)				( const qWorld_s *worldDef );
@@ -579,36 +768,83 @@ typedef void		(*pfnEditor_Undo_StoreSelectedBrushes)	( const qWorld_s *worldDef 
 typedef void		(*pfnEditor_Undo_StoreSelectedNodes)	( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_Undo_StoreSelectedFaces)	( const qWorld_s *worldDef );
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
 {
 	pfnEditor_Undo_Start pfnUndo_Start;
 	pfnEditor_Undo_End pfnUndo_End;
+
+	pfnEditor_Undo_AddEntity pfnUndo_AddEntity;
+	pfnEditor_Undo_AddBrush pfnUndo_AddBrush;
+	pfnEditor_Undo_AddGroup pfnUndo_AddGroup;
+	pfnEditor_Undo_AddPath pfnUndo_AddPath;
+	pfnEditor_Undo_AddNode pfnUndo_AddNode;
+
+	pfnEditor_Undo_DeleteEntity pfnUndo_DeleteEntity;
+	pfnEditor_Undo_DeleteBrush pfnUndo_DeleteBrush;
+	pfnEditor_Undo_DeleteGroup pfnUndo_DeleteGroup;
+	pfnEditor_Undo_DeletePath pfnUndo_DeletePath;
+	pfnEditor_Undo_DeleteNode pfnUndo_DeleteNode;
+
+	pfnEditor_Undo_StoreEntity pfnUndo_StoreEntity;
+	pfnEditor_Undo_StoreBrush pfnUndo_StoreBrush;
+	pfnEditor_Undo_StoreFace pfnUndo_StoreFace;
+	pfnEditor_Undo_StorePath pfnUndo_StorePath;
+	pfnEditor_Undo_StoreNode pfnUndo_StoreNode;
+
+	pfnEditor_Undo_AddSelectedBrushes pfnUndo_AddSelectedBrushes;
+	pfnEditor_Undo_AddSelectedEntities pfnUndo_AddSelectedEntities;
+	pfnEditor_Undo_AddSelectedNodes pfnUndo_AddSelectedNodes;
+
+	pfnEditor_Undo_DeleteSelectedBrushes pfnUndo_DeleteSelectedBrushes;
+	pfnEditor_Undo_DeleteSelectedEntities pfnUndo_DeleteSelectedEntities;
+	pfnEditor_Undo_DeleteSelectedNodes pfnUndo_DeleteSelectedNodes;
+
+	pfnEditor_Undo_StoreSelectedBrushes pfnUndo_StoreSelectedBrushes;
+	pfnEditor_Undo_StoreSelectedEntities pfnUndo_StoreSelectedEntities;
+	pfnEditor_Undo_StoreSelectedFaces pfnUndo_StoreSelectedFaces;
+	pfnEditor_Undo_StoreSelectedNodes pfnUndo_StoreSelectedNodes;
+} undo_api_t;
+#else
+typedef struct
+{
+	pfnEditor_Undo_Start pfnUndo_Start;
+	pfnEditor_Undo_End pfnUndo_End;
+
 	pfnEditor_Undo_AddGroup pfnUndo_AddGroup;
 	pfnEditor_Undo_AddBrush pfnUndo_AddBrush;
 	pfnEditor_Undo_AddPath pfnUndo_AddPath;
 	pfnEditor_Undo_AddNode pfnUndo_AddNode;
 	pfnEditor_Undo_AddEntity pfnUndo_AddEntity;
+
 	pfnEditor_Undo_DeleteGroup pfnUndo_DeleteGroup;
 	pfnEditor_Undo_DeleteBrush pfnUndo_DeleteBrush;
 	pfnEditor_Undo_DeletePath pfnUndo_DeletePath;
 	pfnEditor_Undo_DeleteNode pfnUndo_DeleteNode;
 	pfnEditor_Undo_DeleteEntity pfnUndo_DeleteEntity;
+
 	pfnEditor_Undo_StoreFace pfnUndo_StoreFace;
 	pfnEditor_Undo_StoreBrush pfnUndo_StoreBrush;
 	pfnEditor_Undo_StorePath pfnUndo_StorePath;
 	pfnEditor_Undo_StoreNode pfnUndo_StoreNode;
 	pfnEditor_Undo_StoreEntity pfnUndo_StoreEntity;
+
 	pfnEditor_Undo_AddSelectedEntities pfnUndo_AddSelectedEntities;
 	pfnEditor_Undo_AddSelectedBrushes pfnUndo_AddSelectedBrushes;
 	pfnEditor_Undo_AddSelectedNodes pfnUndo_AddSelectedNodes;
+
 	pfnEditor_Undo_DeleteSelectedEntities pfnUndo_DeleteSelectedEntities;
 	pfnEditor_Undo_DeleteSelectedBrushes pfnUndo_DeleteSelectedBrushes;
+
 	pfnEditor_Undo_StoreSelectedEntities pfnUndo_StoreSelectedEntities;
+
 	pfnEditor_Undo_DeleteSelectedNodes pfnUndo_DeleteSelectedNodes;
+
 	pfnEditor_Undo_StoreSelectedBrushes pfnUndo_StoreSelectedBrushes;
 	pfnEditor_Undo_StoreSelectedNodes pfnUndo_StoreSelectedNodes;
 	pfnEditor_Undo_StoreSelectedFaces pfnUndo_StoreSelectedFaces;
 } undo_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 /* Dialog API */
 
@@ -753,6 +989,33 @@ typedef void		(*pfnEditor_Dialog_BeginWait)			();
 /* Restores the cursor back to normal and decrements the wait counter by 1 */
 typedef void		(*pfnEditor_Dialog_EndWait)				();
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_Dialog_MessageBox pfnDialog_MessageBox;
+	pfnEditor_Dialog_CheckOptions pfnDialog_CheckOptions;
+	pfnEditor_Dialog_Begin pfnDialog_Begin;
+	pfnEditor_Dialog_InitExternalCommand pfnDialog_InitExternalCommand;
+	pfnEditor_Dialog_InitInternalCommand pfnDialog_InitInternalCommand;
+	pfnEditor_Dialog_SetProgress pfnDialog_SetProgress;
+	pfnEditor_Dialog_AddTextEdit pfnDialog_AddTextEdit;
+	pfnEditor_Dialog_AddCheckBox pfnDialog_AddCheckBox;
+	pfnEditor_Dialog_AddRadioBox pfnDialog_AddRadioBox;
+	pfnEditor_Dialog_AddSpinBox pfnDialog_AddSpinBox;
+	pfnEditor_Dialog_AddSpinBoxFloat pfnDialog_AddSpinBoxFloat;
+	pfnEditor_Dialog_AddComboBox pfnDialog_AddComboBox;
+	pfnEditor_Dialog_AddFileEdit pfnDialog_AddFileEdit;
+	pfnEditor_Dialog_AddFileList pfnDialog_AddFileList;
+	pfnEditor_Dialog_AddDirectoryEdit pfnDialog_AddDirectoryEdit;
+	pfnEditor_Dialog_QueryArgument pfnDialog_QueryArgument;
+	pfnEditor_Dialog_QueryArgumentInt pfnDialog_QueryArgumentInt;
+	pfnEditor_Dialog_QueryArgumentFloat pfnDialog_QueryArgumentFloat;
+	pfnEditor_Dialog_End pfnDialog_End;
+	pfnEditor_Dialog_Printf pfnDialog_Printf;
+	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
+	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
+} dialog_apt_t;
+#else
 typedef struct
 {
 	pfnEditor_Dialog_CheckOptions pfnDialog_CheckOptions;
@@ -778,6 +1041,7 @@ typedef struct
 	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
 	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
 } dialog_apt_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 // clang-format on
 
@@ -793,24 +1057,45 @@ typedef struct plugin_funcs_s
 	pfnEditor_Sys_Warning pfnSys_Warning;
 	pfnEditor_Sys_Error pfnSys_Error;
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+	pfnEditor_Sys_Malloc pfnSys_Malloc;
+	pfnEditor_Sys_Free pfnSys_Free;
+
+	pfnEditor_Sys_AllocString pfnSys_AllocString;
+	pfnEditor_TempBuffer_GetSpace pfnTempBuffer_GetSpace;
+#else
 	pfnEditor_Sys_Free pfnSys_Free;
 	pfnEditor_Sys_Malloc pfnSys_Malloc;
 
 	pfnEditor_TempBuffer_GetSpace pfnTempBuffer_GetSpace;
 	pfnEditor_Sys_AllocString pfnSys_AllocString;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 	pfnEditor_Sys_FloatTime pfnSys_FloatTime;
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+	pfnEditor_Sys_GetOption pfnSys_GetOption;
+	pfnEditor_Sys_SetOption pfnSys_SetOption;
+#else
 	pfnEditor_Sys_SetOption pfnSys_SetOption;
 	pfnEditor_Sys_GetOption pfnSys_GetOption;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 	pfnEditor_Steam_SetAchievemnt pfnSteam_SetAchievemnt;
 
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+	/* Rendering API */
+	rendering_api_t renderingfuncs;
+
+	/* Parser API */
+	parser_api_t parserfuncs;
+#else
 	/* Parser API */
 	parser_api_t parserfuncs;
 
 	/* Rendering API */
 	rendering_api_t renderingfuncs;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 	/* FileSystem API */
 	filesystem_api_t filesystemfuncs;
@@ -867,7 +1152,7 @@ typedef struct plugin_funcs_s
 } plugin_funcs_t;
 COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == SIZEOF_PLUGIN_FUNCS_T );
 
-#define PLUGIN_VERSION 121
+#define PLUGIN_VERSION JACK_API_VERSION
 
 // clang-format off
 

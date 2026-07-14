@@ -62,9 +62,15 @@ struct qShader_s;
 /* vpExport and vpImport are used in pair with vpEnumExportFormats and vpEnumImportFormats */
 /* filePath - path to a file */
 /* seekOffset/readLimit is always set to 0 in the editor */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef int (*vpExport_t)( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef );
 typedef int (*vpImport_t)( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef );
-
+#elif JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+typedef int (*vpExport_t)( int formatIndex, const char *filePath, qWorld_s *worldDef );
+typedef int (*vpImport_t)( int formatIndex, const char *filePath, qWorld_s *worldDef );
+#else
+#error
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 
 /* filePath - path to a file */

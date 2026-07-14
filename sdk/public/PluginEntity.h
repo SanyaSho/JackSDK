@@ -171,7 +171,9 @@ class CMapEntity;
 
 typedef struct qEntity_s
 {
+#if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 	void *firstPtr;
+#endif // JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
 
 	/* Internal */
 	CMapEntity *m_mapEntity;

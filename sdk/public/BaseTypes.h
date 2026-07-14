@@ -10,6 +10,25 @@
 #if !defined( SDK_BASETYPES_H )
 #define SDK_BASETYPES_H
 
+// clang-format off
+
+/*
+ Use this define to select which API level should be implemented.
+
+ 10   - HLFX   Freeware
+ 100  - Steam  Public
+ 121  - Steam  Beta
+*/
+#define API_VERSION_HLFX_FREEWARE	10		/* Has the initial versions of the API structs */
+#define API_VERSION_STEAM_PUBLIC	100		/* Same as API_VERSION_HLFX_FREEWARE, but some of API structs and functions were mixed or swapped */
+#define API_VERSION_STEAM_BETA		121		/* API_VERSION_STEAM_PUBLIC + New functions from the Beta */
+
+#if !defined( JACK_API_VERSION )
+#define JACK_API_VERSION			API_VERSION_STEAM_BETA
+#endif // !JACK_API_VERSION
+
+// clang-format on
+
 #include <string.h>
 
 #if defined( WIN32 )
