@@ -62,8 +62,8 @@ struct qShader_s;
 /* vpExport and vpImport are used in pair with vpEnumExportFormats and vpEnumImportFormats */
 /* filePath - path to a file */
 /* seekOffset/readLimit is always set to 0 in the editor */
-typedef int (*vpExport_t)( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef );
-typedef int (*vpImport_t)( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef );
+typedef int (*vpExport_t)( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef );
+typedef int (*vpImport_t)( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef );
 
 
 
@@ -103,7 +103,7 @@ struct qSpriteData_s;
 
 // TODO: vpUnloadSprite_t
 
-typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData );
+typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *spriteData );
 
 // clang-format on
 
@@ -147,13 +147,13 @@ struct qStudioData_s;
 
 // clang-format off
 
-typedef bool (*vpGetModelFormatFlags_t)( int );
+typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
 
 typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 typedef bool (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
-typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *outStudioData );
+typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData );
 
 typedef bool (*vpRenderModel_t)( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
@@ -206,7 +206,7 @@ struct qParticlesData_s;
 
 typedef bool (*vpUnloadParticles_t)( int formatIndex, qParticlesData_s *particlesData );
 
-typedef bool (*vpLoadParticles_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qParticlesData_s *outParticlesData );
+typedef bool (*vpLoadParticles_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qParticlesData_s *particlesData );
 
 typedef bool (*vpRenderParticles_t)( int formatIndex, int editorFlags, qParticlesData_s *particlesData, qEntity_s *entityInfo );
 
@@ -249,7 +249,8 @@ typedef bool (*vpFindArchiveFile_t)( int formatIndex, qArchiveData_s *archiveDat
 
 /* filePath accepts a full path to the file inside an archive */
 /* Value of **outBuf must be allocated using Sys_Malloc and freed using Sys_Free */
-typedef long (*vpLoadArchiveFile_t)( int formatIndex, qArchiveData_s *archiveData, const char *filePath, char **outBuf );
+/* Returns size of file in bytes */
+typedef size_t (*vpLoadArchiveFile_t)( int formatIndex, qArchiveData_s *archiveData, const char *filePath, char **outBuf );
 
 /* Each value (including **outFiles) in ***outFiles must be allocated using Sys_Malloc and freed using Sys_Free when not needed */
 typedef bool (*vpListArchiveFiles_t)( int formatIndex, qArchiveData_s *archiveData, const char *fileFilter, char ***outFiles );

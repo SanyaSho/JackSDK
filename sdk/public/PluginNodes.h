@@ -40,6 +40,7 @@ typedef struct qNode_s
 	const char *m_nameOverride;
 	const char *m_fireEntityOnPass;
 
+	/* Used as a lock to tell renderer to not redraw the node */
 	int render_unkint;
 
 	int m_editorFlags;

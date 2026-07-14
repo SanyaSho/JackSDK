@@ -20,6 +20,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 			"PrimitivesExample.cpp"
 
 			"MapReader.cpp"
+
+			"vstdlib_static.cpp"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
@@ -32,6 +34,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 			#"DoomWadLoader.h"
 
 			"MapReader.h"
+
+			"vstdlib_static.h"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )

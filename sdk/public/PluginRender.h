@@ -38,12 +38,10 @@ typedef struct renditionInfo_s
 
 typedef struct viewInfo_s
 {
-	void *a;
-	void *b;
-	void *c;
-	void *d;
-	void *e;
-	void *f;
+	vec3_t a;
+	vec3_t b;
+	vec3_t c;
+	vec3_t d;
 } viewInfo_t;
 //COMPILE_TIME_ASSERT( sizeof( viewInfo_t ) == ??? );
 
@@ -92,6 +90,20 @@ typedef struct qTexture_s
 COMPILE_TIME_ASSERT( sizeof( qTexture_t ) == 48 );
 
 
+typedef struct qShaderStageData_s
+{
+	char gap4[92];
+
+	int m_unknownInt1; // Set to 3 for SCROLL texture (vpHalfLife)
+
+	char gap5[20];
+
+	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake // Set to -1.f for SCROLL texture (vpHalfLife)
+
+	char gap6[164];
+} qShaderStageData_t;
+COMPILE_TIME_ASSERT( sizeof( qShaderStageData_t ) == 284 );
+
 /* Wont free any of textures from the textureList in CTextureManager::removeShaderStage */
 #define SHDAERSTAGE_FLAG_NOFREELIST			( 1 << 1 )
 
@@ -116,15 +128,8 @@ typedef struct qShaderStage_s
 
 	float m_framerate;
 
-	char gap4[92];
-
-	int m_unknownInt1;
-
-	char gap5[20];
-
-	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake
-
-	char gap6[164];
+	/* Not sure about this one, vpQuake and vpHalfLife does memset with sizeof( 284 ) on this address (only on Windows) */
+	struct qShaderStageData_s m_data;
 } qShaderStage_t;
 COMPILE_TIME_ASSERT( sizeof( qShaderStage_t ) == 384 );
 
@@ -141,6 +146,8 @@ inline qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *textureHandl
 	return textureHandle;
 }
 
+
+#define SHADER_FLAG_BROKEN_ANIMATION ( 1 << 24 ) // Used to setup textures with animation
 
 typedef struct qShader_s
 {
@@ -169,7 +176,9 @@ typedef struct qShader_s
 
 	float m_framerate; // TODO: Is this actually a framerate?
 
-	char gap5[12];
+	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
+
+	char gap5[8];
 
 	struct qTexture_s *m_skyTextureList[6];
 
@@ -177,10 +186,12 @@ typedef struct qShader_s
 
 	struct qShaderStage_s *m_stage;
 
+	struct qShader_s *next;
+
 #if defined( WIN32 )
-	char gap8[432];
+	char gap8[424];
 #else
-	char gap8[1200];
+	char gap8[1192];
 #endif // WIN32
 } qShader_t;
 #if defined( WIN32 )

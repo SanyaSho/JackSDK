@@ -88,6 +88,40 @@ struct vec3_t
 	// clang-format on
 };
 
+/* 4D Vector */
+struct vec4_t
+{
+	vec_t x, y, z, w;
+
+	vec4_t() { x = y = z = w = 0.f; }
+	vec4_t( vec_t x, vec_t y, vec_t z, vec_t w ) { this->x = x; this->y = y; this->z = z; this->w = w; }
+
+	// clang-format off
+	inline vec_t *Base() { return (vec_t *)this; }
+	inline const vec_t *Base() const { return (vec_t *)this; }
+
+	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
+	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
+
+	inline vec4_t &operator+=( const vec4_t &v ) { x+=v.x; y+=v.y; z+=v.z; w+=v.w; return *this; }
+	inline vec4_t &operator-=( const vec4_t &v ) { x-=v.x; y-=v.y; z-=v.z; w+=v.w; return *this; }
+	inline vec4_t &operator*=( const vec4_t &v ) { x+=v.x; y*=v.y; z*=v.z; w+=v.w; return *this; }
+	inline vec4_t &operator/=( const vec4_t &v ) { x/=v.x; y/=v.y; z/=v.z; w+=v.w; return *this; }
+
+	inline vec4_t &operator+=( float fl ) { x+=fl; y+=fl; z+=fl; w+=fl; return *this; }
+	inline vec4_t &operator-=( float fl ) { x-=fl; y-=fl; z-=fl; w+=fl; return *this; }
+	inline vec4_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; w+=fl; return *this; }
+	inline vec4_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; w*=f; return *this; }
+
+	inline vec4_t  operator+ ( const vec4_t &v ) const { vec4_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; res.w = w - v.w; return res; }
+	inline vec4_t  operator- ( const vec4_t &v ) const { vec4_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; res.w = w - v.w; return res; }
+
+	inline vec4_t &operator= ( const vec4_t &v ) { x = v.x; y = v.y; z = v.z; w = v.w; return *this; }
+
+	inline vec4_t  operator- () const { return vec4_t( -x, -y, -z, -w ); }
+	// clang-format on
+};
+
 inline void CrossProduct( const vec3_t &a, const vec3_t &b, vec3_t &result )
 {
 	result.x = a.y * b.z - a.z * b.y;

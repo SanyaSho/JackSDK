@@ -29,6 +29,7 @@ typedef struct qPath_s
 	struct qPath_s *next;
 	struct qPath_s *prev;
 
+	/* List of nodes attached to the path */
 	struct qNode_s *m_nodeList;
 	struct qNode_s *m_lastNode;
 
@@ -38,8 +39,10 @@ typedef struct qPath_s
 	const char *m_pathName;
 	const char *m_pathClassname;
 	int m_pathDirection;
+
 	int m_editorFlags;
 	int m_editorId;
+
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 	char gap4[4];

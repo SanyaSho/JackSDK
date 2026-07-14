@@ -153,20 +153,25 @@ typedef struct qBrush_s
 	/* Owner entity of this brush (ex. worldspawn) */
 	struct qEntity_s *m_ownerEntity;
 
+	/* Patch attached to this brush */
 	struct qPatch_s *m_patch;
 
+	/* Overlay attached to this brush */
 	struct qOverlay_s *m_overlay;
 
+	/* List of decals touching this brush */
 	struct qDecalFragment_s *m_decalFragmentList;
 
+	/* Used as a lock to tell renderer to not redraw the brush */
 	int render_unkint;
 
 	int m_editorFlags;
 	int m_editorId;
 
 	/* Number of qPatch_t attached to this brush */
-	int m_patchCount;
+	int m_patchCount; // TODO: revisit this
 
+	/* Brush bounds */
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 } qBrush_t;

@@ -23,7 +23,7 @@ struct qShader_s;
 typedef struct qPlane_s
 {
 	vec3_t normal;
-	float dist;
+	float dist; // DotProduct of normal
 	int alignedAxis;
 } qPlane_t;
 COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == 20 );

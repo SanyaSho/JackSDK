@@ -360,54 +360,54 @@ void InitializeEditorFuncs()
 
 	gEditorfuncs.pfnSteam_SetAchievemnt = NULL;
 
-	gEditorfuncs.pfnSC_Token = NULL;
-	gEditorfuncs.pfnSC_Line = NULL;
-	gEditorfuncs.pfnSC_ParseFromFile = NULL;
-	gEditorfuncs.pfnSC_ParseFromMemory = NULL;
-	gEditorfuncs.pfnSC_CheckError = NULL;
-	gEditorfuncs.pfnSC_ParseError = NULL;
-	gEditorfuncs.pfnSC_ResetError = NULL;
-	gEditorfuncs.pfnSC_SafeGetToken = NULL;
-	gEditorfuncs.pfnSC_GetToken = NULL;
-	gEditorfuncs.pfnSC_TokenAvailable = NULL;
-	gEditorfuncs.pfnSC_UnGetToken = NULL;
-	gEditorfuncs.pfnSC_MatchToken = NULL;
-	gEditorfuncs.pfnSC_SafeMatchToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Token = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Line = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_ParseFromFile = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_ParseFromMemory = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_CheckError = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_ParseError = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_ResetError = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SafeGetToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_GetToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_TokenAvailable = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_UnGetToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_MatchToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SafeMatchToken = NULL;
 	// SC_Matrix
-	gEditorfuncs.pfnSC_SkipRestOfLine = NULL;
-	gEditorfuncs.pfnSC_EndOfParsing = NULL;
-	gEditorfuncs.pfnSC_GetParseFlags = NULL;
-	gEditorfuncs.pfnSC_SetParseFlags = NULL;
-	gEditorfuncs.pfnSC_ShouldQuote = NULL;
-	gEditorfuncs.pfnSC_CopyBlock = NULL;
-	gEditorfuncs.pfnSC_SkipBlock = NULL;
-	gEditorfuncs.pfnSC_SkipLineOrBlock = NULL;
-	gEditorfuncs.pfnSC_GetBlockSize = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SkipRestOfLine = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_EndOfParsing = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_GetParseFlags = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SetParseFlags = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_ShouldQuote = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_CopyBlock = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SkipBlock = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SkipLineOrBlock = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_GetBlockSize = NULL;
 
 	gEditorfuncs.pfnSys_GetTextureGamma = Sys_GetTextureGamma;
 
 	// PR[17]
 
-	gEditorfuncs.pfnSys_GetBaseDirectory = NULL;
-	gEditorfuncs.pfnSys_GetModDirectory = NULL;
-	gEditorfuncs.pfnSys_GetFallbackDirectory = NULL;
-	gEditorfuncs.pfnSys_ExpandFileName = NULL;
-	gEditorfuncs.pfnSys_MakeLocalFileName = Sys_MakeLocalFileName;
-	gEditorfuncs.pfnSys_FileExists = NULL;
-	gEditorfuncs.pfnSys_LoadFile = Sys_LoadFile;
-	gEditorfuncs.pfnSys_CreatePath = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_GetBaseDirectory = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_GetModDirectory = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_GetFallbackDirectory = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_ExpandFileName = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_MakeLocalFileName = Sys_MakeLocalFileName;
+	gEditorfuncs.filesystemfuncs.pfnSys_FileExists = NULL;
+	gEditorfuncs.filesystemfuncs.pfnSys_LoadFile = Sys_LoadFile;
+	gEditorfuncs.filesystemfuncs.pfnSys_CreatePath = NULL;
 
-	gEditorfuncs.pfnShader_Create = Shader_Create;
-	gEditorfuncs.pfnShader_Lookup = Shader_Lookup;
-	gEditorfuncs.pfnShader_Destroy = Shader_Destroy;
-	gEditorfuncs.pfnShader_AddStage = Shader_AddStage;
-	gEditorfuncs.pfnShader_RemoveStage = Shader_RemoveStage;
-	gEditorfuncs.pfnShader_Finish = Shader_Finish;
-	gEditorfuncs.pfnShader_GetWhiteTexture = Shader_GetWhiteTexture;
-	gEditorfuncs.pfnShader_GetBlackTexture = Shader_GetBlackTexture;
-	gEditorfuncs.pfnShader_LookupTexture = Shader_LookupTexture;
-	gEditorfuncs.pfnShader_UploadTexture = Shader_UploadTexture;
-	gEditorfuncs.pfnShader_DestroyTexture = Shader_DestroyTexture;
+	gEditorfuncs.shaderfuncs.pfnShader_Create = Shader_Create;
+	gEditorfuncs.shaderfuncs.pfnShader_Lookup = Shader_Lookup;
+	gEditorfuncs.shaderfuncs.pfnShader_Destroy = Shader_Destroy;
+	gEditorfuncs.shaderfuncs.pfnShader_AddStage = Shader_AddStage;
+	gEditorfuncs.shaderfuncs.pfnShader_RemoveStage = Shader_RemoveStage;
+	gEditorfuncs.shaderfuncs.pfnShader_Finish = Shader_Finish;
+	gEditorfuncs.shaderfuncs.pfnShader_GetWhiteTexture = Shader_GetWhiteTexture;
+	gEditorfuncs.shaderfuncs.pfnShader_GetBlackTexture = Shader_GetBlackTexture;
+	gEditorfuncs.shaderfuncs.pfnShader_LookupTexture = Shader_LookupTexture;
+	gEditorfuncs.shaderfuncs.pfnShader_UploadTexture = Shader_UploadTexture;
+	gEditorfuncs.shaderfuncs.pfnShader_DestroyTexture = Shader_DestroyTexture;
 }
 
 static void Editor_RegisterProfile( mapProfile_t *profileInfo, void *libraryHandle )

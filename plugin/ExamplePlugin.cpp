@@ -73,7 +73,7 @@ void RunTests()
 	Sys_Warning( str );
 	Sys_Free( (void *)str );
 
-	Sys_SetOption( SYS_OPTION_MAPGRID, 0 );
+	Sys_SetOption( SYS_OPTION_SHOWGRID, 0 );
 
 	for ( int i = 0; i < 6; i++ )
 	{
@@ -666,7 +666,7 @@ DLL_EXPORT int vpEnumExportFormats( pfnRegisterIOFormat registerIOFormat, void *
 	return registerIOFormat( 0, "Plain Text", ".txt", libraryHandle ) != false;
 }
 
-DLL_EXPORT int vpExport( int formatIndex, const char *filePath, long seekOffset, long readLimit, void *pWorld )
+DLL_EXPORT int vpExport( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, void *pWorld )
 {
 	Sys_Printf( "vpExport (idx: %d / pth: %s / %d %d %p)\n", formatIndex, filePath, seekOffset, readLimit, pWorld );
 	return 0;
@@ -683,7 +683,7 @@ DLL_EXPORT int vpEnumImportFormats( pfnRegisterIOFormat registerIOFormat, void *
 	return registerIOFormat( 0, "Plain Text", ".txt", libraryHandle ) != false;
 }
 
-DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef )
+DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef )
 {
 	Sys_Printf( "vpImport (idx: %d / pth: %s / seekoff: %d / readlim: %d / world: %p)\n", formatIndex, filePath, seekOffset, readLimit, worldDef );
 
@@ -723,13 +723,15 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, long seekOffset,
 }
 
 
+#if 1
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
-	//return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
-	return 0;
+	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
+	return 1;
 }
+#endif // 0
 
-DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, long a6 )
+DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
 	float bbMin[3] = { -8.f, -8.f, -8.f };
 	float bbMax[3] = { 8.f, 8.f, 8.f };
@@ -745,11 +747,31 @@ DLL_EXPORT bool vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 
 DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *outStudioData )
 {
+	outStudioData->m_bboxMin = vec3_t( -8, -8, -8 );
+	outStudioData->m_bboxMax = vec3_t( 8, 8, 8 );
 	return true;
 }
 
 DLL_EXPORT bool vpRenderModel( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
+	/*viewInfo_t viewInfo;
+	PR_GetViewInfo( &viewInfo );*/
+
+	/*Sys_Printf( "%f %f %f / %f %f %f / %f %f %f / %f %f %f",
+		viewInfo.a.x, viewInfo.a.y, viewInfo.a.z,
+		viewInfo.b.x, viewInfo.b.y, viewInfo.b.z,
+		viewInfo.c.x, viewInfo.c.y, viewInfo.c.z,
+		viewInfo.d.x, viewInfo.d.y, viewInfo.d.z
+	);*/
+
+	vec3_t triangle[3] = { { 0.f, 0.5f, 0.f }, { -0.5f, -0.5f, 0.f }, { 0.5f, 0.5f, 0.f } };
+
+	PR_Begin( PRIMTYPE_TRIANGLES );
+	PR_Vertex3fv( triangle[0].Base() );
+	PR_Vertex3fv( triangle[1].Base() );
+	PR_Vertex3fv( triangle[2].Base() );
+	PR_End();
+
 	return true;
 }
 

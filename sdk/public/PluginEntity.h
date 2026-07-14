@@ -198,7 +198,9 @@ typedef struct qEntity_s
 	/* Entity TargetName */
 	char *m_targetName;
 
-	char gap4_1[4];
+	/* Used as a lock to tell renderer to not redraw the entity */
+	int render_unkint;
+
 	char gap4_2[4];
 
 	/* Entity SpawnFlags */

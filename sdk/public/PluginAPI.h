@@ -45,6 +45,8 @@
 #define FL_PATHWAY					( 1 << 7 ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
 // 1 << 8
 #define FL_IGNORE					( 1 << 9 ) /* "Ignore" flag (Brushes and Paths only) */
+// 1 << 20
+// 1 << 21
 // 1 << 23
 
 /*
@@ -60,6 +62,8 @@ EDITORFLAGS:
 1<<7  - Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass)
 1<<8  - ?
 1<<9  - "Ignore" flag (Brushes and Paths only)
+1<<20 - Used by ".map" serializer in vpHalfLife
+1<<21 - Used by ".map" serializer in vpHalfLife
 1<<23 - Used by map serializer and map parser inside some of the plugins. Disables some Sys_Printf calls if set
 */
 
@@ -105,12 +109,12 @@ typedef char *		(*pfnEditor_Sys_AllocString)			( const char *src ); // MUST BE S
 
 typedef float		(*pfnEditor_Sys_FloatTime)				();
 
-#define SYS_OPTION_MAPSNAP		0
-#define SYS_OPTION_MAPGRID		1
-#define SYS_OPTION_MAPGRID3D	2
-#define SYS_OPTION_GRIDSIZE		3
-#define SYS_OPTION_TOOLSIG		4
-#define SYS_OPTION_TOOLSCORDON	5
+#define SYS_OPTION_SNAPTOGRID		0
+#define SYS_OPTION_SHOWGRID			1
+#define SYS_OPTION_SHOW3DGRID		2
+#define SYS_OPTION_GRIDSPACING		3
+#define SYS_OPTION_IGNOREGROUPING	4
+#define SYS_OPTION_TOOLSCORDON		5
 
 typedef void		(*pfnEditor_Sys_SetOption)				( int option, int value );
 typedef long		(*pfnEditor_Sys_GetOption)				( int option );
@@ -144,6 +148,35 @@ typedef void		(*pfnEditor_SC_SkipBlock)				();
 typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
 typedef long		(*pfnEditor_SC_GetBlockSize)			();
 
+typedef struct
+{
+	pfnEditor_SC_Token pfnSC_Token;
+	pfnEditor_SC_Line pfnSC_Line;
+	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
+	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
+	pfnEditor_SC_CheckError pfnSC_CheckError;
+	pfnEditor_SC_ParseError pfnSC_ParseError;
+	pfnEditor_SC_ResetError pfnSC_ResetError;
+	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
+	pfnEditor_SC_GetToken pfnSC_GetToken;
+	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
+	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
+	pfnEditor_SC_MatchToken pfnSC_MatchToken;
+	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
+	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
+	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
+	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
+	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
+	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
+	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
+	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
+	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
+	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
+	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
+	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
+	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
+} parser_api_t;
+
 /* Rendering API */
 typedef enum
 {
@@ -173,6 +206,27 @@ typedef void		(*pfnEditor_PR_GetViewInfo)				( viewInfo_s *viewInfo );
 typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgfl ); // ???
 typedef float		(*pfnEditor_PR_GetMinAlpha)				();
 
+typedef struct
+{
+	pfnEditor_PR_BindTexture pfnPR_BindTexture;
+	pfnEditor_PR_BindShader pfnPR_BindShader;
+	pfnEditor_PR_LineWidth pfnPR_LineWidth;
+	pfnEditor_PR_PointSize pfnPR_PointSize;
+	pfnEditor_PR_Begin pfnPR_Begin;
+	pfnEditor_PR_Color4ub pfnPR_Color4ub;
+	pfnEditor_PR_Color4ubv pfnPR_Color4ubv;
+	pfnEditor_PR_Normal3fv pfnPR_Normal3fv;
+	pfnEditor_PR_TexCoord2f pfnPR_TexCoord2f;
+	pfnEditor_PR_TexCoord2fv pfnPR_TexCoord2fv;
+	pfnEditor_PR_Vertex3fv pfnPR_Vertex3fv;
+	pfnEditor_PR_End pfnPR_End;
+	pfnEditor_PR_GetState pfnPR_GetState;
+	pfnEditor_PR_SetState pfnPR_SetState;
+	pfnEditor_PR_GetViewInfo pfnPR_GetViewInfo;
+	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
+	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
+} rendering_api_t;
+
 /* FileSystem API */
 
 /* Get current configuration base directory */
@@ -194,6 +248,18 @@ typedef bool		(*pfnEditor_Sys_FileExists)				( const char *filePath );
 typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *filePath, int *readBytes );
 typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
 
+typedef struct
+{
+	pfnEditor_Sys_GetBaseDirectory pfnSys_GetBaseDirectory;
+	pfnEditor_Sys_GetModDirectory pfnSys_GetModDirectory;
+	pfnEditor_Sys_GetFallbackDirectory pfnSys_GetFallbackDirectory;
+	pfnEditor_Sys_ExpandFileName pfnSys_ExpandFileName;
+	pfnEditor_Sys_MakeLocalFileName pfnSys_MakeLocalFileName;
+	pfnEditor_Sys_FileExists pfnSys_FileExists;
+	pfnEditor_Sys_LoadFile pfnSys_LoadFile;
+	pfnEditor_Sys_CreatePath pfnSys_CreatePath;
+} filesystem_api_t;
+
 /* Math API */
 typedef char *		(*pfnEditor_Sys_PrintValue)				( float value );
 typedef char *		(*pfnEditor_Sys_PrintMapCoord)			( float coord );
@@ -202,6 +268,17 @@ typedef void		(*pfnEditor_Sys_SnapVertex)				( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapAxis)				( int num, float *rgflAxis );
 typedef void		(*pfnEditor_Sys_SnapVertexToGrid)		( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapMapVertex)			( float *rgflVertex );
+
+typedef struct
+{
+	pfnEditor_Sys_PrintValue pfnSys_PrintValue;
+	pfnEditor_Sys_PrintMapCoord pfnSys_PrintMapCoord;
+	pfnEditor_Sys_PrintAxis pfnSys_PrintAxis;
+	pfnEditor_Sys_SnapVertex pfnSys_SnapVertex;
+	pfnEditor_Sys_SnapAxis pfnSys_SnapAxis;
+	pfnEditor_Sys_SnapVertexToGrid pfnSys_SnapVertexToGrid;
+	pfnEditor_Sys_SnapMapVertex pfnSys_SnapMapVertex;
+} math_api_t;
 
 /* Returns the current version string (J.A.C.K. 1.2.4603) */
 typedef char *		(*pfnEditor_V_VersionString)			();
@@ -233,6 +310,21 @@ typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qEntity_s *entityDef,
 /* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_targetName value */
 typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qEntity_s *entityDef, const char *targetname );
 
+typedef struct
+{
+	pfnEditor_Entity_Create pfnEntity_Create;
+	pfnEditor_Entity_Build pfnEntity_Build;
+	pfnEditor_Entity_GetColor pfnEntity_GetColor;
+	pfnEditor_Entity_SetColor pfnEntity_SetColor;
+	pfnEditor_Entity_AddToVisGroup pfnEntity_AddToVisGroup;
+	pfnEditor_Entity_RemoveFromVisGroup pfnEntity_RemoveFromVisGroup;
+	pfnEditor_Entity_GetVisGroupIdent pfnEntity_GetVisGroupIdent;
+	pfnEditor_Entity_GetVisGroupCount pfnEntity_GetVisGroupCount;
+	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
+	pfnEditor_Entity_FindByClassname pfnEntity_FindByClassname;
+	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
+} entity_api_t;
+
 /* Brush API */
 typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
 typedef void		(*pfnEditor_Brush_Destroy)				( qWorld_s *worldDef, qBrush_s *brushDef );
@@ -243,9 +335,27 @@ typedef void		(*pfnEditor_Brush_RemoveFromVisGroup)	( qWorld_s *worldDef, qBrush
 typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int visGroupId );
 typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
 
+typedef struct
+{
+	pfnEditor_Brush_Create pfnBrush_Create;
+	pfnEditor_Brush_Destroy pfnBrush_Destroy;
+	pfnEditor_Brush_GetColor pfnBrush_GetColor;
+	pfnEditor_Brush_SetColor pfnBrush_SetColor;
+	pfnEditor_Brush_AddToVisGroup pfnBrush_AddToVisGroup;
+	pfnEditor_Brush_RemoveFromVisGroup pfnBrush_RemoveFromVisGroup;
+	pfnEditor_Brush_GetVisGroupIdent pfnBrush_GetVisGroupIdent;
+	pfnEditor_Brush_GetVisGroupCount pfnBrush_GetVisGroupCount;
+} brush_api_t;
+
 /* Face API */
 typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s *texDef, int vertexCount );
 typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
+
+typedef struct
+{
+	pfnEditor_Face_Create pfnFace_Create;
+	pfnEditor_Face_Destroy pfnFace_Destroy;
+} face_api_t;
 
 /* Patch API */
 typedef enum
@@ -311,19 +421,50 @@ typedef void		(*pfnEditor_Patch_CapTexture)			( qPatch_s *patchDef, const float 
 typedef void		(*pfnEditor_Patch_FitTexture)			( qPatch_s *patchDef, float x, float y, int flags );
 typedef void		(*pfnEditor_Patch_InterpolateExteriorPoints)( qPatch_s *patchDef );
 
+typedef struct
+{
+	pfnEditor_Patch_Create pfnPatch_Create;
+	pfnEditor_Patch_CreateCap pfnPatch_CreateCap;
+	pfnEditor_Patch_Destroy pfnPatch_Destroy;
+	pfnEditor_Patch_NaturalizeTexture pfnPatch_NaturalizeTexture;
+	pfnEditor_Patch_CapTexture pfnPatch_CapTexture;
+	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
+	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
+} patch_api_t;
+
 /* Overlay API */
 typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
 typedef void		(*pfnEditor_Overlay_Destroy)			( qOverlay_s *overlayDef );
+
+typedef struct
+{
+	pfnEditor_Overlay_Create pfnOverlay_Create;
+	pfnEditor_Overlay_Destroy pfnOverlay_Destroy;
+} overlay_api_t;
 
 /* Path API */
 typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
 typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int );
 
+typedef struct
+{
+	pfnEditor_Path_Create pfnPath_Create;
+	pfnEditor_Path_Destroy pfnPath_Destroy;
+	pfnEditor_Path_Build pfnPath_Build;
+} path_api_t;
+
 /* Node API */
 typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
 typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
 typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *nodeDef );
+
+typedef struct
+{
+	pfnEditor_Node_Insert pfnNode_Insert;
+	pfnEditor_Node_Append pfnNode_Append;
+	pfnEditor_Node_Destroy pfnNode_Destroy;
+} node_api_t;
 
 /* Group API */
 typedef qGroup_s *	(*pfnEditor_Group_Create)				( qWorld_s *worldDef );
@@ -334,12 +475,32 @@ typedef void		(*pfnEditor_Group_AddEntity)			( qGroup_s *rootGroupDef, qEntity_s
 typedef void		(*pfnEditor_Group_GetColor)				( qGroup_s *groupDef, byte *cbColorOut );
 typedef void		(*pfnEditor_Group_SetColor)				( qGroup_s *groupDef, const byte *cbColor );
 
+typedef struct
+{
+	pfnEditor_Group_Create pfnGroup_Create;
+	pfnEditor_Group_Destroy pfnGroup_Destroy;
+	pfnEditor_Group_AddGroup pfnGroup_AddGroup;
+	pfnEditor_Group_AddBrush pfnGroup_AddBrush;
+	pfnEditor_Group_AddEntity pfnGroup_AddEntity;
+	pfnEditor_Group_GetColor pfnGroup_GetColor;
+	pfnEditor_Group_SetColor pfnGroup_SetColor;
+} group_api_t;
+
 /* Camera API*/
 typedef qCamera_s *	(*pfnEditor_Camera_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *camera );
 typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, byte *cbColorOut );
 typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cbColor );
 typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
+
+typedef struct
+{
+	pfnEditor_Camera_Create pfnCamera_Create;
+	pfnEditor_Camera_Destroy pfnCamera_Destroy;
+	pfnEditor_Camera_GetColor pfnCamera_GetColor;
+	pfnEditor_Camera_SetColor pfnCamera_SetColor;
+	pfnEditor_Camera_Setup pfnCamera_Setup;
+} camera_api_t;
 
 /* Shader API */
 typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int shaderFlags );
@@ -354,6 +515,21 @@ typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName
 typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *textureName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
+typedef struct
+{
+	pfnEditor_Shader_Create pfnShader_Create;
+	pfnEditor_Shader_Lookup pfnShader_Lookup;
+	pfnEditor_Shader_Destroy pfnShader_Destroy;
+	pfnEditor_Shader_AddStage pfnShader_AddStage;
+	pfnEditor_Shader_RemoveStage pfnShader_RemoveStage;
+	pfnEditor_Shader_Finish pfnShader_Finish;
+	pfnEditor_Shader_GetWhiteTexture pfnShader_GetWhiteTexture;
+	pfnEditor_Shader_GetBlackTexture pfnShader_GetBlackTexture;
+	pfnEditor_Shader_LookupTexture pfnShader_LookupTexture;
+	pfnEditor_Shader_UploadTexture pfnShader_UploadTexture;
+	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
+} shader_api_t;
+
 /* VisGroup API */
 typedef unsigned int(*pfnEditor_VisGroup_Add)				( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_VisGroup_Remove)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
@@ -362,6 +538,17 @@ typedef int			(*pfnEditor_VisGroup_GetCount)			( const qWorld_s *worldDef );
 typedef int			(*pfnEditor_VisGroup_GetIndex)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
 typedef void		(*pfnEditor_VisGroup_GetData)			( const qWorld_s *worldDef, int visGroupIndex, char *visGroupNameOut, int visGroupNameOutSize, unsigned int *, int *, byte *cbColorOut );
 typedef void		(*pfnEditor_VisGroup_RebuildIdents)		( const qWorld_s *worldDef );
+
+typedef struct
+{
+	pfnEditor_VisGroup_Add pfnVisGroup_Add;
+	pfnEditor_VisGroup_Remove pfnVisGroup_Remove;
+	pfnEditor_VisGroup_Modify pfnVisGroup_Modify;
+	pfnEditor_VisGroup_GetCount pfnVisGroup_GetCount;
+	pfnEditor_VisGroup_GetIndex pfnVisGroup_GetIndex;
+	pfnEditor_VisGroup_GetData pfnVisGroup_GetData;
+	pfnEditor_VisGroup_RebuildIdents pfnVisGroup_RebuildIdents;
+} visgroup_api_t;
 
 /* Undo API */
 typedef void		(*pfnEditor_Undo_Start)					( const qWorld_s *worldDef, const char * );
@@ -391,6 +578,37 @@ typedef void		(*pfnEditor_Undo_DeleteSelectedNodes)	( const qWorld_s *worldDef )
 typedef void		(*pfnEditor_Undo_StoreSelectedBrushes)	( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_Undo_StoreSelectedNodes)	( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_Undo_StoreSelectedFaces)	( const qWorld_s *worldDef );
+
+typedef struct
+{
+	pfnEditor_Undo_Start pfnUndo_Start;
+	pfnEditor_Undo_End pfnUndo_End;
+	pfnEditor_Undo_AddGroup pfnUndo_AddGroup;
+	pfnEditor_Undo_AddBrush pfnUndo_AddBrush;
+	pfnEditor_Undo_AddPath pfnUndo_AddPath;
+	pfnEditor_Undo_AddNode pfnUndo_AddNode;
+	pfnEditor_Undo_AddEntity pfnUndo_AddEntity;
+	pfnEditor_Undo_DeleteGroup pfnUndo_DeleteGroup;
+	pfnEditor_Undo_DeleteBrush pfnUndo_DeleteBrush;
+	pfnEditor_Undo_DeletePath pfnUndo_DeletePath;
+	pfnEditor_Undo_DeleteNode pfnUndo_DeleteNode;
+	pfnEditor_Undo_DeleteEntity pfnUndo_DeleteEntity;
+	pfnEditor_Undo_StoreFace pfnUndo_StoreFace;
+	pfnEditor_Undo_StoreBrush pfnUndo_StoreBrush;
+	pfnEditor_Undo_StorePath pfnUndo_StorePath;
+	pfnEditor_Undo_StoreNode pfnUndo_StoreNode;
+	pfnEditor_Undo_StoreEntity pfnUndo_StoreEntity;
+	pfnEditor_Undo_AddSelectedEntities pfnUndo_AddSelectedEntities;
+	pfnEditor_Undo_AddSelectedBrushes pfnUndo_AddSelectedBrushes;
+	pfnEditor_Undo_AddSelectedNodes pfnUndo_AddSelectedNodes;
+	pfnEditor_Undo_DeleteSelectedEntities pfnUndo_DeleteSelectedEntities;
+	pfnEditor_Undo_DeleteSelectedBrushes pfnUndo_DeleteSelectedBrushes;
+	pfnEditor_Undo_StoreSelectedEntities pfnUndo_StoreSelectedEntities;
+	pfnEditor_Undo_DeleteSelectedNodes pfnUndo_DeleteSelectedNodes;
+	pfnEditor_Undo_StoreSelectedBrushes pfnUndo_StoreSelectedBrushes;
+	pfnEditor_Undo_StoreSelectedNodes pfnUndo_StoreSelectedNodes;
+	pfnEditor_Undo_StoreSelectedFaces pfnUndo_StoreSelectedFaces;
+} undo_api_t;
 
 /* Dialog API */
 
@@ -508,7 +726,7 @@ typedef void		(*pfnEditor_Dialog_AddDirectoryEdit)	( const char *controlName, co
 
 /* Get control value (string) */
 /* controlName: internal control name */
-/* out: char buffer */
+/* out: char buffer. This value is already cleared and null-terminated inside the function */
 /* n: size of char buffer */
 typedef void		(*pfnEditor_Dialog_QueryArgument)		( const char *controlName, char *out, size_t n );
 
@@ -534,6 +752,32 @@ typedef void		(*pfnEditor_Dialog_BeginWait)			();
 
 /* Restores the cursor back to normal and decrements the wait counter by 1 */
 typedef void		(*pfnEditor_Dialog_EndWait)				();
+
+typedef struct
+{
+	pfnEditor_Dialog_CheckOptions pfnDialog_CheckOptions;
+	pfnEditor_Dialog_MessageBox pfnDialog_MessageBox;
+	pfnEditor_Dialog_Begin pfnDialog_Begin;
+	pfnEditor_Dialog_InitExternalCommand pfnDialog_InitExternalCommand;
+	pfnEditor_Dialog_InitInternalCommand pfnDialog_InitInternalCommand;
+	pfnEditor_Dialog_SetProgress pfnDialog_SetProgress;
+	pfnEditor_Dialog_AddTextEdit pfnDialog_AddTextEdit;
+	pfnEditor_Dialog_AddRadioBox pfnDialog_AddRadioBox;
+	pfnEditor_Dialog_AddCheckBox pfnDialog_AddCheckBox;
+	pfnEditor_Dialog_AddSpinBox pfnDialog_AddSpinBox;
+	pfnEditor_Dialog_AddSpinBoxFloat pfnDialog_AddSpinBoxFloat;
+	pfnEditor_Dialog_AddFileEdit pfnDialog_AddFileEdit;
+	pfnEditor_Dialog_AddFileList pfnDialog_AddFileList;
+	pfnEditor_Dialog_AddComboBox pfnDialog_AddComboBox;
+	pfnEditor_Dialog_AddDirectoryEdit pfnDialog_AddDirectoryEdit;
+	pfnEditor_Dialog_QueryArgument pfnDialog_QueryArgument;
+	pfnEditor_Dialog_QueryArgumentFloat pfnDialog_QueryArgumentFloat;
+	pfnEditor_Dialog_QueryArgumentInt pfnDialog_QueryArgumentInt;
+	pfnEditor_Dialog_End pfnDialog_End;
+	pfnEditor_Dialog_Printf pfnDialog_Printf;
+	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
+	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
+} dialog_apt_t;
 
 // clang-format on
 
@@ -563,69 +807,16 @@ typedef struct plugin_funcs_s
 	pfnEditor_Steam_SetAchievemnt pfnSteam_SetAchievemnt;
 
 	/* Parser API */
-	pfnEditor_SC_Token pfnSC_Token;
-	pfnEditor_SC_Line pfnSC_Line;
-	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
-	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
-	pfnEditor_SC_CheckError pfnSC_CheckError;
-	pfnEditor_SC_ParseError pfnSC_ParseError;
-	pfnEditor_SC_ResetError pfnSC_ResetError;
-	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
-	pfnEditor_SC_GetToken pfnSC_GetToken;
-	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
-	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
-	pfnEditor_SC_MatchToken pfnSC_MatchToken;
-	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
-	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
-	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
-	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
-	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
-	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
-	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
-	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
-	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
-	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
-	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
-	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
-	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
+	parser_api_t parserfuncs;
 
 	/* Rendering API */
-	pfnEditor_PR_BindTexture pfnPR_BindTexture;
-	pfnEditor_PR_BindShader pfnPR_BindShader;
-	pfnEditor_PR_LineWidth pfnPR_LineWidth;
-	pfnEditor_PR_PointSize pfnPR_PointSize;
-	pfnEditor_PR_Begin pfnPR_Begin;
-	pfnEditor_PR_Color4ub pfnPR_Color4ub;
-	pfnEditor_PR_Color4ubv pfnPR_Color4ubv;
-	pfnEditor_PR_Normal3fv pfnPR_Normal3fv;
-	pfnEditor_PR_TexCoord2f pfnPR_TexCoord2f;
-	pfnEditor_PR_TexCoord2fv pfnPR_TexCoord2fv;
-	pfnEditor_PR_Vertex3fv pfnPR_Vertex3fv;
-	pfnEditor_PR_End pfnPR_End;
-	pfnEditor_PR_GetState pfnPR_GetState;
-	pfnEditor_PR_SetState pfnPR_SetState;
-	pfnEditor_PR_GetViewInfo pfnPR_GetViewInfo;
-	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
-	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
+	rendering_api_t renderingfuncs;
 
 	/* FileSystem API */
-	pfnEditor_Sys_GetBaseDirectory pfnSys_GetBaseDirectory;
-	pfnEditor_Sys_GetModDirectory pfnSys_GetModDirectory;
-	pfnEditor_Sys_GetFallbackDirectory pfnSys_GetFallbackDirectory;
-	pfnEditor_Sys_ExpandFileName pfnSys_ExpandFileName;
-	pfnEditor_Sys_MakeLocalFileName pfnSys_MakeLocalFileName;
-	pfnEditor_Sys_FileExists pfnSys_FileExists;
-	pfnEditor_Sys_LoadFile pfnSys_LoadFile;
-	pfnEditor_Sys_CreatePath pfnSys_CreatePath;
+	filesystem_api_t filesystemfuncs;
 
 	/* Math API */
-	pfnEditor_Sys_PrintValue pfnSys_PrintValue;
-	pfnEditor_Sys_PrintMapCoord pfnSys_PrintMapCoord;
-	pfnEditor_Sys_PrintAxis pfnSys_PrintAxis;
-	pfnEditor_Sys_SnapVertex pfnSys_SnapVertex;
-	pfnEditor_Sys_SnapAxis pfnSys_SnapAxis;
-	pfnEditor_Sys_SnapVertexToGrid pfnSys_SnapVertexToGrid;
-	pfnEditor_Sys_SnapMapVertex pfnSys_SnapMapVertex;
+	math_api_t mathfuncs;
 
 	pfnEditor_V_VersionString pfnV_VersionString;
 
@@ -636,145 +827,43 @@ typedef struct plugin_funcs_s
 	pfnEditor_BuildPackageList pfnBuildPackageList;
 
 	/* Entity API */
-	pfnEditor_Entity_Create pfnEntity_Create;
-	pfnEditor_Entity_Build pfnEntity_Build;
-	pfnEditor_Entity_GetColor pfnEntity_GetColor;
-	pfnEditor_Entity_SetColor pfnEntity_SetColor;
-	pfnEditor_Entity_AddToVisGroup pfnEntity_AddToVisGroup;
-	pfnEditor_Entity_RemoveFromVisGroup pfnEntity_RemoveFromVisGroup;
-	pfnEditor_Entity_GetVisGroupIdent pfnEntity_GetVisGroupIdent;
-	pfnEditor_Entity_GetVisGroupCount pfnEntity_GetVisGroupCount;
-	pfnEditor_Entity_FindByKeyValue pfnEntity_FindByKeyValue;
-	pfnEditor_Entity_FindByClassname pfnEntity_FindByClassname;
-	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
+	entity_api_t entityfuncs;
 
 	/* Brush API*/
-	pfnEditor_Brush_Create pfnBrush_Create;
-	pfnEditor_Brush_Destroy pfnBrush_Destroy;
-	pfnEditor_Brush_GetColor pfnBrush_GetColor;
-	pfnEditor_Brush_SetColor pfnBrush_SetColor;
-	pfnEditor_Brush_AddToVisGroup pfnBrush_AddToVisGroup;
-	pfnEditor_Brush_RemoveFromVisGroup pfnBrush_RemoveFromVisGroup;
-	pfnEditor_Brush_GetVisGroupIdent pfnBrush_GetVisGroupIdent;
-	pfnEditor_Brush_GetVisGroupCount pfnBrush_GetVisGroupCount;
+	brush_api_t brushfuncs;
 
 	/* Face API */
-	pfnEditor_Face_Create pfnFace_Create;
-	pfnEditor_Face_Destroy pfnFace_Destroy;
+	face_api_t facefuncs;
 
 	/* Patch API */
-	pfnEditor_Patch_Create pfnPatch_Create;
-	pfnEditor_Patch_CreateCap pfnPatch_CreateCap;
-	pfnEditor_Patch_Destroy pfnPatch_Destroy;
-	pfnEditor_Patch_NaturalizeTexture pfnPatch_NaturalizeTexture;
-	pfnEditor_Patch_CapTexture pfnPatch_CapTexture;
-	pfnEditor_Patch_FitTexture pfnPatch_FitTexture;
-	pfnEditor_Patch_InterpolateExteriorPoints pfnPatch_InterpolateExteriorPoints;
+	patch_api_t patchfuncs;
 
 	/* Overlay API */
-	pfnEditor_Overlay_Create pfnOverlay_Create;
-	pfnEditor_Overlay_Destroy pfnOverlay_Destroy;
+	overlay_api_t overlayfuncs;
 
 	/* Path API */
-	pfnEditor_Path_Create pfnPath_Create;
-	pfnEditor_Path_Destroy pfnPath_Destroy;
-	pfnEditor_Path_Build pfnPath_Build;
+	path_api_t pathfuncs;
 
 	/* Node API */
-	pfnEditor_Node_Insert pfnNode_Insert;
-	pfnEditor_Node_Append pfnNode_Append;
-	pfnEditor_Node_Destroy pfnNode_Destroy;
+	node_api_t nodefuncs;
 
 	/* Group API */
-	pfnEditor_Group_Create pfnGroup_Create;
-	pfnEditor_Group_Destroy pfnGroup_Destroy;
-	pfnEditor_Group_AddGroup pfnGroup_AddGroup;
-	pfnEditor_Group_AddBrush pfnGroup_AddBrush;
-	pfnEditor_Group_AddEntity pfnGroup_AddEntity;
-	pfnEditor_Group_GetColor pfnGroup_GetColor;
-	pfnEditor_Group_SetColor pfnGroup_SetColor;
+	group_api_t groupfuncs;
 
 	/* Camera API */
-	pfnEditor_Camera_Create pfnCamera_Create;
-	pfnEditor_Camera_Destroy pfnCamera_Destroy;
-	pfnEditor_Camera_GetColor pfnCamera_GetColor;
-	pfnEditor_Camera_SetColor pfnCamera_SetColor;
-	pfnEditor_Camera_Setup pfnCamera_Setup;
+	camera_api_t camerafuncs;
 
 	/* Shader API */
-	pfnEditor_Shader_Create pfnShader_Create;
-	pfnEditor_Shader_Lookup pfnShader_Lookup;
-	pfnEditor_Shader_Destroy pfnShader_Destroy;
-	pfnEditor_Shader_AddStage pfnShader_AddStage;
-	pfnEditor_Shader_RemoveStage pfnShader_RemoveStage;
-	pfnEditor_Shader_Finish pfnShader_Finish;
-	pfnEditor_Shader_GetWhiteTexture pfnShader_GetWhiteTexture;
-	pfnEditor_Shader_GetBlackTexture pfnShader_GetBlackTexture;
-	pfnEditor_Shader_LookupTexture pfnShader_LookupTexture;
-	pfnEditor_Shader_UploadTexture pfnShader_UploadTexture;
-	pfnEditor_Shader_DestroyTexture pfnShader_DestroyTexture;
+	shader_api_t shaderfuncs;
 
 	/* VisGroup API */
-	pfnEditor_VisGroup_Add pfnVisGroup_Add;
-	pfnEditor_VisGroup_Remove pfnVisGroup_Remove;
-	pfnEditor_VisGroup_Modify pfnVisGroup_Modify;
-	pfnEditor_VisGroup_GetCount pfnVisGroup_GetCount;
-	pfnEditor_VisGroup_GetIndex pfnVisGroup_GetIndex;
-	pfnEditor_VisGroup_GetData pfnVisGroup_GetData;
-	pfnEditor_VisGroup_RebuildIdents pfnVisGroup_RebuildIdents;
+	visgroup_api_t visgroupfuncs;
 
 	/* Undo API */
-	pfnEditor_Undo_Start pfnUndo_Start;
-	pfnEditor_Undo_End pfnUndo_End;
-	pfnEditor_Undo_AddGroup pfnUndo_AddGroup;
-	pfnEditor_Undo_AddBrush pfnUndo_AddBrush;
-	pfnEditor_Undo_AddPath pfnUndo_AddPath;
-	pfnEditor_Undo_AddNode pfnUndo_AddNode;
-	pfnEditor_Undo_AddEntity pfnUndo_AddEntity;
-	pfnEditor_Undo_DeleteGroup pfnUndo_DeleteGroup;
-	pfnEditor_Undo_DeleteBrush pfnUndo_DeleteBrush;
-	pfnEditor_Undo_DeletePath pfnUndo_DeletePath;
-	pfnEditor_Undo_DeleteNode pfnUndo_DeleteNode;
-	pfnEditor_Undo_DeleteEntity pfnUndo_DeleteEntity;
-	pfnEditor_Undo_StoreFace pfnUndo_StoreFace;
-	pfnEditor_Undo_StoreBrush pfnUndo_StoreBrush;
-	pfnEditor_Undo_StorePath pfnUndo_StorePath;
-	pfnEditor_Undo_StoreNode pfnUndo_StoreNode;
-	pfnEditor_Undo_StoreEntity pfnUndo_StoreEntity;
-	pfnEditor_Undo_AddSelectedEntities pfnUndo_AddSelectedEntities;
-	pfnEditor_Undo_AddSelectedBrushes pfnUndo_AddSelectedBrushes;
-	pfnEditor_Undo_AddSelectedNodes pfnUndo_AddSelectedNodes;
-	pfnEditor_Undo_DeleteSelectedEntities pfnUndo_DeleteSelectedEntities;
-	pfnEditor_Undo_DeleteSelectedBrushes pfnUndo_DeleteSelectedBrushes;
-	pfnEditor_Undo_StoreSelectedEntities pfnUndo_StoreSelectedEntities;
-	pfnEditor_Undo_DeleteSelectedNodes pfnUndo_DeleteSelectedNodes;
-	pfnEditor_Undo_StoreSelectedBrushes pfnUndo_StoreSelectedBrushes;
-	pfnEditor_Undo_StoreSelectedNodes pfnUndo_StoreSelectedNodes;
-	pfnEditor_Undo_StoreSelectedFaces pfnUndo_StoreSelectedFaces;
+	undo_api_t undofuncs;
 
 	/* Dialog API */
-	pfnEditor_Dialog_CheckOptions pfnDialog_CheckOptions;
-	pfnEditor_Dialog_MessageBox pfnDialog_MessageBox;
-	pfnEditor_Dialog_Begin pfnDialog_Begin;
-	pfnEditor_Dialog_InitExternalCommand pfnDialog_InitExternalCommand;
-	pfnEditor_Dialog_InitInternalCommand pfnDialog_InitInternalCommand;
-	pfnEditor_Dialog_SetProgress pfnDialog_SetProgress;
-	pfnEditor_Dialog_AddTextEdit pfnDialog_AddTextEdit;
-	pfnEditor_Dialog_AddRadioBox pfnDialog_AddRadioBox;
-	pfnEditor_Dialog_AddCheckBox pfnDialog_AddCheckBox;
-	pfnEditor_Dialog_AddSpinBox pfnDialog_AddSpinBox;
-	pfnEditor_Dialog_AddSpinBoxFloat pfnDialog_AddSpinBoxFloat;
-	pfnEditor_Dialog_AddFileEdit pfnDialog_AddFileEdit;
-	pfnEditor_Dialog_AddFileList pfnDialog_AddFileList;
-	pfnEditor_Dialog_AddComboBox pfnDialog_AddComboBox;
-	pfnEditor_Dialog_AddDirectoryEdit pfnDialog_AddDirectoryEdit;
-	pfnEditor_Dialog_QueryArgument pfnDialog_QueryArgument;
-	pfnEditor_Dialog_QueryArgumentFloat pfnDialog_QueryArgumentFloat;
-	pfnEditor_Dialog_QueryArgumentInt pfnDialog_QueryArgumentInt;
-	pfnEditor_Dialog_End pfnDialog_End;
-	pfnEditor_Dialog_Printf pfnDialog_Printf;
-	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
-	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
+	dialog_apt_t dialogfuncs;
 } plugin_funcs_t;
 COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == 1512 );
 

@@ -12,6 +12,8 @@
 
 /*
  Groups API
+
+ Groups are stored as a linked list inside of qWorld_s and can be iterated using ->next and ->prev pointers.
 */
 
 #include "BaseTypes.h"
@@ -44,8 +46,10 @@ typedef struct qGroup_s
 	int m_editorFlags;
 	int m_editorId;
 
+	/* Number of objects in this group */
 	int m_objectCount;
 
+	/* Color of the group used by the editor */
 	rgba_t m_editorColor;
 } qGroup_t;
 COMPILE_TIME_ASSERT( sizeof( qGroup_t ) == 80 );
