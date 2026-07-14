@@ -6,13 +6,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+
+static void Sys_Free( void *ptr );
+static void *Sys_Malloc( size_t n );
+static char *Sys_AllocString( const char *src );
+
 #define PLUGINEDITORFUNCTIONS_H
-#include "PluginAPI.h"
-#include "PluginProfile.h"
-#include "PluginData.h"
-#include "PluginActions.h"
-#include "PluginRender.h"
-#include "PluginWorld.h"
+#include "PluginMeta.h"
+
 
 #define PLUGIN_DLL "vpHalfLifex64.dll"
 //#define PLUGIN_DLL "vpQuakex64.dll"
@@ -518,10 +519,13 @@ static bool Editor_RegisterModelFormat( int formatIndex, const char *formatName,
 	/* Not checked */
 
 	s_vpGetModelFormatFlags = (vpGetModelFormatFlags_t)GetProcAddress( (HMODULE)libraryHandle, "vpGetModelFormatFlags" );
+	/* Not checked */
 
 	s_vpGetModelBounds = (vpGetModelBounds_t)GetProcAddress( (HMODULE)libraryHandle, "vpGetModelBounds" );
+	/* Not checked */
 
 	s_vpUnloadModel = (vpUnloadModel_t)GetProcAddress( (HMODULE)libraryHandle, "vpUnloadModel" );
+	/* Not checked */
 
 	s_vpLoadModel = (vpLoadModel_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadModel" );
 	if ( !s_vpLoadModel )
@@ -623,9 +627,20 @@ static bool Editor_RegisterArchiveFormat( int formatIndex, const char *formatNam
 static void Editor_RegisterAction( pluginActionInfo_t *actionInfo, void *pluginManager )
 {
 	Sys_Printf( "  %s / %s / %s / %s / %x / 0x%p", actionInfo->m_actionName, actionInfo->m_actionTitle, actionInfo->m_actionDescription, actionInfo->m_actionCategory, actionInfo->m_actionFlags, actionInfo->m_dispatchFunc );
-
-	//actionInfo->dispatchFunc();
 }
+
+
+static void Editor_RegisterPrimitive( const primitiveDesc_s *primDesc )
+{
+	Sys_Printf( "  %s / %s / %d %d %d / %d / 0x%p", primDesc->m_primitiveName, primDesc->m_primitiveCategory, primDesc->m_numFaces, primDesc->m_minFaces, primDesc->m_maxFaces, primDesc->m_flags, primDesc->pfnDispatchFunc );
+}
+
+
+static void Editor_RegisterFlags( const char *pluginName, const char *surfaceFlagName, unsigned int bitIndex, void *libraryHandle )
+{
+	Sys_Printf( "  %s %s %d", pluginName, surfaceFlagName, bitIndex );
+}
+
 
 static qTexture_t *s_whiteTexture;
 static void CreateWhiteTexture()
@@ -804,7 +819,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		return 0;
 	}
 
-	int ret = pluginMain( &gEditorfuncs, 121 );
+	int ret = pluginMain( &gEditorfuncs, PLUGIN_VERSION );
 	if ( ret == -1 )
 	{
 		Sys_Error( "Plugin \"%s\" has wrong interface size", szPluginPath );
@@ -812,7 +827,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	}
 	if ( ret > 0 )
 	{
-		Sys_Error( "Plugin \"%s\" has wrong version number (%i should be %i)", szPluginPath, ret, 121 );
+		Sys_Error( "Plugin \"%s\" has wrong version number (%i should be %i)", szPluginPath, ret, PLUGIN_VERSION );
 		return 0;
 	}
 
@@ -897,16 +912,34 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	vpEnumActions_t pluginEnumActions = (vpEnumActions_t)GetProcAddress( hPluginModule, "vpEnumActions" );
 	if ( pluginEnumActions )
 	{
-		int ret = pluginEnumActions( Editor_RegisterAction, NULL );
+		int ret = pluginEnumActions( Editor_RegisterAction, hPluginModule ); /* Editor does not check the return value */
 		if ( ret != 0 )
 			Sys_Printf( "%i plugin action(s) registered", ret );
 	}
 
-	// vpEnumPrimitives
+	vpEnumPrimitives_t pluginEnumPrimitives = (vpEnumPrimitives_t)GetProcAddress( hPluginModule, "vpEnumPrimitives" );
+	if ( pluginEnumPrimitives )
+	{
+		int ret = pluginEnumPrimitives( Editor_RegisterPrimitive, hPluginModule );
+		if ( ret != 0 )
+			Sys_Printf( "%i plugin primitive(s) registered", ret );
+	}
 
-	// vpEnumSurfaceFlags
+	vpEnumGenericFlags_t pluginEnumSurfaceFlags = (vpEnumGenericFlags_t)GetProcAddress( hPluginModule, "vpEnumSurfaceFlags" );
+	if ( pluginEnumSurfaceFlags )
+	{
+		int ret = pluginEnumSurfaceFlags( Editor_RegisterFlags, hPluginModule ); /* Editor does not check the return value */
+		if ( ret != 0 )
+			Sys_Printf( "%i plugin surface flag(s) registered", ret );
+	}
 
-	// vpEnumContentFlags
+	vpEnumGenericFlags_t pluginEnumContentFlags = (vpEnumGenericFlags_t)GetProcAddress( hPluginModule, "vpEnumContentFlags" );
+	if ( pluginEnumContentFlags )
+	{
+		int ret = pluginEnumContentFlags( Editor_RegisterFlags, hPluginModule ); /* Editor does not check the return value */
+		if ( ret != 0 )
+			Sys_Printf( "%i plugin content flag(s) registered", ret );
+	}
 
 	RunPluginTests();
 
