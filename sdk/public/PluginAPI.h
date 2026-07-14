@@ -121,6 +121,7 @@ typedef long		(*pfnEditor_Sys_GetOption)				( int option );
 
 typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 
+
 /* Parser API */
 typedef char *		(*pfnEditor_SC_Token)					();
 typedef long		(*pfnEditor_SC_Line)					();
@@ -208,6 +209,7 @@ typedef struct
 } parser_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
+
 /* Rendering API */
 typedef enum
 {
@@ -281,20 +283,39 @@ typedef struct
 } rendering_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
+
 /* FileSystem API */
 
-/* Get current configuration base directory */
-/* Returns true on success, false on failure */
+/*
+ Sys_GetBaseDirectory
+ Get current configuration base directory.
+ Returns true on success, false on failure.
+
+ dest - Output buffer.
+ n - Size of the buffer in bytes.
+*/
 typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
 
-/* Get current configuration mod directory */
-/* Mimics Sys_GetBaseDirectory if not set. */
-/* Returns true on success, false on failure */
+/*
+ Sys_GetModDirectory
+ Get current configuration mod directory.
+ Mimics Sys_GetBaseDirectory if not set.
+ Returns true on success, false on failure.
+
+ dest - Output buffer.
+ n - Size of the buffer in bytes.
+*/
 typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-/* Get current configuration fallback directory */
-/* Returns true on success, false on failure */
+/*
+ Sys_GetFallbackDirectory
+ Get current configuration fallback directory.
+ Returns true on success, false on failure.
+
+ dest - Output buffer.
+ n - Size of the buffer in bytes.
+*/
 typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
@@ -317,6 +338,7 @@ typedef struct
 	pfnEditor_Sys_LoadFile pfnSys_LoadFile;
 	pfnEditor_Sys_CreatePath pfnSys_CreatePath;
 } filesystem_api_t;
+
 
 /* Math API */
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
@@ -358,34 +380,132 @@ typedef struct
 } math_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
-/* Returns the current version string (J.A.C.K. 1.2.4603) */
+
+/*
+ V_VersionString
+ Returns the current version string.
+
+ Possible outputs: "J.A.C.K. 1.2.4603" / "J.A.C.K. 1.1.3773 Freeware"
+*/
 typedef char *		(*pfnEditor_V_VersionString)			();
 
 typedef float		(*pfnEditor_Sys_GetTextureGamma)		();
 
+
+/*
+ Global_GetCurrentWorld
+ Returns a pointer to the currently used world. (Active map)
+*/
 typedef qWorld_s *	(*pfnEditor_Global_GetCurrentWorld)		();
 
-/* outBuf is not an array. It's an allocated string of WADs used on this map separated by listSeparator and it must be free'd */
-/* removeVolumePrefix does not work on Linux */
+
+/*
+ BuildPackageList
+ Returns a list of WADs/Materials used by worldDef. List is separated using listSeparator.
+
+ worldDef - World definition.
+ outBuf - Output buffer. Must be Sys_Free'd after usage.
+ listSeparator - Separator character.
+ removeVolumePrefix - (WINDOWS-ONLY) Removes the drive letter from the paths.
+*/
 typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, char listSeparator, int removeVolumePrefix );
 
+
 /* Entity API */
+
+/*
+ Entity_Create
+ Use this function to create a entity dummy that must be "activated" using Entity_Build function.
+
+ worldDef - Current world definition (can be obtained using Global_GetCurrentWorld).
+ classname - FGD classname of the entity
+ rgflOrigin - Entity's position in world (NOTE: you can use vec3_t::Base instead of making a new float array each time)
+ editorFlags - Flags used to create the entity. See all of them in PluginAPI.h's head.
+*/
 typedef qEntity_s *	(*pfnEditor_Entity_Create)				( qWorld_s *worldDef, const char *classname, const float *rgflOrigin, int editorFlags );
+
+/*
+ Entity_Build
+ "Activates" the entity.
+
+ entityDef - Definition of previously created entity.
+ entityBuildFlags - Flags used to "activate" this entity. For most cases you will want to use ENT_BLDFLG_FULLBUILD. For all flags check PluginEntity.h's head.
+*/
 typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int entityBuildFlags );
+
+/*
+ Entity_GetColor
+ Returns entity's render color.
+
+ entityDef - Entity definition.
+ cbColorOut - Pointer to rgba_t or a uchar[4] array.
+*/
 typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, byte *cbColorOut );
+
+/*
+ Entity_SetColor
+ Sets entity's render color.
+
+ entityDef - Entity definition.
+ cbColor - Pointer to rgba_t::data or a uchar[4] array.
+*/
 typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const byte *cbColor );
+
+/*
+ Entity_AddToVisGroup
+ Adds an entity to the visgroup.
+
+ worldDef - World definition.
+ entityDef - Entity definition.
+ visGroupId - An ID of a VisGroup. VisGroup ID can be obtained from VisGroup_Add.
+*/
 typedef void		(*pfnEditor_Entity_AddToVisGroup)		( qWorld_s *worldDef, qEntity_s *entityDef, unsigned int visGroupId );
+
+/*
+ Entity_RemoveFromVisGroup
+ Removes an entity from the visgroup.
+
+ worldDef - World definition.
+ entityDef - Entity definition.
+ visGroupId - An ID of a VisGroup. VisGroup ID can be obtained from VisGroup_Add.
+*/
 typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( qWorld_s *worldDef, qEntity_s *entityDef, unsigned int visGroupId );
 typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
+
+/*
+ Entity_GetVisGroupCount
+ Returns a count of visgroups that entity belongs to.
+
+ entityDef - Entity definition.
+*/
 typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
 
-/* Iterates thru a list of entities (worldDef->m_entityList for example) and checks for epairs */
+/*
+ Entity_FindByKeyValue
+ Iterates thru a list of entities (worldDef->m_entityList for example) and checks for epairs.
+
+ entityDef - Entity defintion.
+ key - Key to lookup.
+ value - Value to lookup.
+*/
 typedef qEntity_s *	(*pfnEditor_Entity_FindByKeyValue)		( qEntity_s *entityDef, const char *key, const char *value );
 
-/* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_className value */
+/*
+ Entity_FindByClassname
+ Iterates thru a list of (worldDef->m_entityList for example) and checks for m_className value
+
+ entityDef - Entity defintion.
+ classname - Classname to lookup.
+*/
 typedef qEntity_s *	(*pfnEditor_Entity_FindByClassname)		( qEntity_s *entityDef, const char *classname );
 
-/* Iterates thru a list of (worldDef->m_entityList for example) and checks for m_targetName value */
+/*
+ Entity_FindByTargetname
+ Iterates thru a list of (worldDef->m_entityList for example) and checks for m_targetName value
+
+ entityDef - Entity defintion.
+ targetname - Targetname to lookup.
+*/
 typedef qEntity_s *	(*pfnEditor_Entity_FindByTargetname)	( qEntity_s *entityDef, const char *targetname );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
@@ -419,6 +539,7 @@ typedef struct
 	pfnEditor_Entity_FindByTargetname pfnEntity_FindByTargetname;
 } entity_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+
 
 /* Brush API */
 typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
@@ -456,8 +577,29 @@ typedef struct
 } brush_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
+
 /* Face API */
+
+/*
+ Face_Create
+ Creates a face bound to a specific brush.
+
+ Each face must have a qPlane_s calculated and set.
+
+ worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+ brushDef - Brush definition.
+ texDef - Texture definition.
+ vertexCount - Count of vertices used by this face. Allocates the m_vertices array inside qFace_s.
+*/
 typedef qFace_s *	(*pfnEditor_Face_Create)				( qWorld_s *worldDef, qBrush_s *brushDef, const qTexDef_s *texDef, int vertexCount );
+
+/*
+ Face_Destroy
+ Destroys the face.
+
+ worldDef - World definition.
+ faceDef - Face definition.
+*/
 typedef void		(*pfnEditor_Face_Destroy)				( qWorld_s *worldDef, qFace_s *faceDef );
 
 typedef struct
@@ -465,6 +607,7 @@ typedef struct
 	pfnEditor_Face_Create pfnFace_Create;
 	pfnEditor_Face_Destroy pfnFace_Destroy;
 } face_api_t;
+
 
 /* Patch API */
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
@@ -577,6 +720,7 @@ typedef struct
 	pfnEditor_Overlay_Destroy pfnOverlay_Destroy;
 } overlay_api_t;
 
+
 /* Path API */
 typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
 typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
@@ -592,6 +736,7 @@ typedef struct
 	pfnEditor_Path_Build pfnPath_Build;
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 } path_api_t;
+
 
 /* Node API */
 typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
@@ -613,6 +758,7 @@ typedef struct
 	pfnEditor_Node_Destroy pfnNode_Destroy;
 } node_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+
 
 /* Group API */
 typedef qGroup_s *	(*pfnEditor_Group_Create)				( qWorld_s *worldDef );
@@ -647,12 +793,52 @@ typedef struct
 } group_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
+
 /* Camera API*/
+
+/*
+ Camera_Create
+ Creates a editor-only camera which later must be "activated" using Camera_Setup function.
+
+ worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+*/
 typedef qCamera_s *	(*pfnEditor_Camera_Create)				( qWorld_s *worldDef );
-typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *camera );
-typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *camera, byte *cbColorOut );
-typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *camera, const byte *cbColor );
-typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *camera, const float *rgflOrigin, const float *rgflAngles );
+
+/*
+ Camera_Destroy
+ Destroys the camera.
+
+ cameraDef - Camera definition.
+*/
+typedef void		(*pfnEditor_Camera_Destroy)				( qCamera_s *cameraDef );
+
+/*
+ Camera_GetColor
+ Returns camera's render color.
+ 
+ cameraDef - Camera definition.
+ cbColorOut - Pointer to rgba_t or a uchar[4] array.
+*/
+typedef void		(*pfnEditor_Camera_GetColor)			( qCamera_s *cameraDef, byte *cbColorOut );
+
+/*
+ Camera_SetColor
+ Sets camera's render color.
+
+ entityDef - Entity definition.
+ cbColor - Pointer to rgba_t::data or a uchar[4] array.
+*/
+typedef void		(*pfnEditor_Camera_SetColor)			( qCamera_s *cameraDef, const byte *cbColor );
+
+/*
+ Camera_Setup
+ "Activates" the camera.
+
+ entityDef - Entity definition.
+ rgflOrigin - Camera position in the world (NOTE: you can use vec3_t::Base instead of making a new float array each time).
+ rgflAngles - Camera view angles (NOTE: you can use vec3_t::Base instead of making a new float array each time).
+*/
+typedef void		(*pfnEditor_Camera_Setup)				( qCamera_s *cameraDef, const float *rgflOrigin, const float *rgflAngles );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
@@ -673,6 +859,7 @@ typedef struct
 	pfnEditor_Camera_Setup pfnCamera_Setup;
 } camera_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+
 
 /* Shader API */
 typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int shaderFlags );
@@ -719,6 +906,7 @@ typedef struct
 } shader_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
+
 /* VisGroup API */
 typedef unsigned int(*pfnEditor_VisGroup_Add)				( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_VisGroup_Remove)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
@@ -740,7 +928,7 @@ typedef struct
 } visgroup_api_t;
 
 /* Undo API */
-typedef void		(*pfnEditor_Undo_Start)					( const qWorld_s *worldDef, const char * );
+typedef void		(*pfnEditor_Undo_Start)					( const qWorld_s *worldDef, const char *undoName );
 typedef void		(*pfnEditor_Undo_End)					( const qWorld_s *worldDef );
 typedef void		(*pfnEditor_Undo_AddGroup)				( qGroup_s *groupDef );
 typedef void		(*pfnEditor_Undo_AddBrush)				( qBrush_s *brushDef );
@@ -846,8 +1034,8 @@ typedef struct
 } undo_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
-/* Dialog API */
 
+/* Dialog API */
 #define DIALOG_MB_OKCANCEL			( 1 << 0 )
 #define DIALOG_MB_YESNO				( 1 << 1 )
 #define DIALOG_MB_ICONERROR			( 1 << 2 )
@@ -858,135 +1046,224 @@ typedef struct
 #define DIALOG_FILE_OPEN			( 1 << 1 ) /* Will make a dialog open files instead of saving them */
 #define DIALOG_FILE_CONNECT			( 1 << 2 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
 
-/* Check for custom options */
-/* title: dialog title */
-/* text: dialog text */
-/* options: list of options split by | */
-/* returns a bitmask for each option selected OR returns -1 if was closed */
-typedef long		(*pfnEditor_Dialog_CheckOptions)		( const char *title, const char *text, const char *options );
+/*
+ Dialog_CheckOptions
+ Creates a simple dialog with CheckBoxes named from "options". Each CheckBox when selected will add a corresponding bit to the return value.
+ Maximum count of options - 31 (Since only 31 bits can be written to int32)
 
-/* Display a message box */
-/* title: dialog title */
-/* text: dialog text */
-/* flags: type and behavior flags */
-/* If the dialog was created without DIALOG_MB_OKCANCEL or DIALOG_MB_YESNO flags it will always return true upon closing */
+ title - Dialog title.
+ text - Dialog text.
+ options - A list of options split by "|" character.
+*/
+typedef int			(*pfnEditor_Dialog_CheckOptions)		( const char *title, const char *text, const char *options );
+
+/*
+ Dialog_MessageBox
+ Creates a MessageBox depending on "flags".
+ Returns true if:
+ a) Was created with DIALOG_MB_OKCANCEL/DIALOG_MB_YESNO and Ok/Yes button was pressed.
+ b) Was created without DIALOG_MB_OKCANCEL/DIALOG_MB_YESNO and Ok button was pressed or the dialog was closed.
+
+ title - MessageBox title.
+ text - MessageBox text.
+ flags - Behavior flags.
+*/
 typedef bool		(*pfnEditor_Dialog_MessageBox)			( const char *title, const char *text, int flags );
 
-/* Allocates a CPluginDialog instance (NOTE: Only one plugin dialog can be active) */
-/* title: dialog title */
+/*
+ Dialog_Begin
+ Makes the editor know that we want a custom dialog to popup.
+ (NOTE: Only one dialog can be active at the same time!)
+
+ title - Dialog title.
+*/
 typedef void		(*pfnEditor_Dialog_Begin)				( const char *title );
 
-/* buttonText: text that will be displayed on the button */
-/* command: command that will be executed after button is pressed */
+/*
+ Dialog_InitExternalCommand
+ TODO: Find what's the purpose of this function.
+
+ buttonText - Text that will appear on the bottom-left button.
+ command - Some command?
+*/
 typedef void		(*pfnEditor_Dialog_InitExternalCommand)	( const char *buttonText, const char *command );
 
-/* buttonText: text that will be displayed on the button */
-/* pfnCommand: function that will be executed after button is pressed */
+/*
+ Dialog_InitInternalCommand
+ Will install a onPressed callback for the bottom-left button.
+
+ buttonText - Text that will appear on the bottom-left button.
+ pfnCommand - A "callback" that will be executed after pressing the button.
+*/
 typedef void		(*pfnEditor_Dialog_InitInternalCommand)	( const char *buttonText, void (*pfnCommand)() );
 
-/* value: progress bar current value */
-/* maxValue: progress bar max value */
+/*
+ Dialog_SetProgress
+ Sets the dialog progress bar value.
+
+ value - Current value of the progressbar.
+ maxValue - Maximum value of the progressbar.
+*/
 typedef void		(*pfnEditor_Dialog_SetProgress)			( int value, int maxValue );
 
-/* Add a textedit control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial text */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddTextEdit
+ Adds a QLineEdit control to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial text displayed on the control.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddTextEdit)			( const char *controlName, const char *title, const char *defaultValue, int flags );
 
-/* Add a radiobox control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial state (true - checked; false - unchecked) */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddTextEdit
+ Adds a QRadioButton control to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Default value.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddRadioBox)			( const char *controlName, const char *title, bool defaultValue, int flags );
 
-/* Add a checkbox control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial state (true - checked; false - unchecked) */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddCheckBox
+ Adds a QCheckBox control to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial state. true - checked; falue - unchecked
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddCheckBox)			( const char *controlName, const char *title, bool defaultValue, int flags );
 
-/* Add a spinbox control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial value */
-/* minValue: min value */
-/* maxValue: max value */
-/* stepCount: number of elements one step goes thru */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddSpinBox
+ Adds a QSpinBox control to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial value.
+ minValue - Minimal value.
+ maxValue - Maximal value.
+ stepCount - Number of elements passed with one step.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddSpinBox)			( const char *controlName, const char *title, int defaultValue, int minValue, int maxValue, int stepCount, int flags );
 
-/* Add a double spinbox control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial value */
-/* minValue: min value */
-/* maxValue: max value */
-/* stepCount: number of elements one step goes thru */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddSpinBoxFloat
+ Same as Dialog_AddSpinBox, but this one uses floats (doubles internally) instead of plain integers.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial value.
+ minValue - Minimal value.
+ maxValue - Maximal value.
+ stepCount - Number of elements passed with one step.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddSpinBoxFloat)		( const char *controlName, const char *title, float defaultValue, float minValue, float maxValue, float stepCount, int flags );
 
-/* Add a fileedit control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial text */
-/* extensionList: list of possible extensions split by "\n". Can be NULL */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddFileEdit
+ Adds a file selection field to the dialog.
+ By default, this control will work as a "Save As" dialog, but this behavior can be changed with custom flags.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial filename.
+ extensionList - A list of supported extensions split by "\n". Can be NULL.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddFileEdit)			( const char *controlName, const char *title, const char *defaultValue, const char *extensionList, int flags );
 
-/* Add a filelist control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* fileList: list of strings split by "\n" */
-/* extensionList: list of possible extensions split by "\n". Can be NULL */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddFileList
+ Adds a QListWidget used as a file list.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ fileList - Initial list of values split by "\n"
+ extensionList - A list of supported extensions split by "\n". Can be NULL.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddFileList)			( const char *controlName, const char *title, const char *fileList, const char *extensionList, int flags );
 
-/* Add a combobox control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* selectedIndex: will set the selected item to this index after parsing the list from optionsList */
-/* optionsList: list of elements split by "\n" in format NAME\nVALUE (OPT1\n1\nOPT2\n2\nOPT3\n3) */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddComboBox
+ Adds a QComboBox control to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ selectedIndex - Initially selected item in the list.
+ optionsList - A list of keyvalues split by "\n". Example: "OPT1\n1\nOPT2\n2\nOPT3\n3"
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddComboBox)			( const char *controlName, const char *title, int selectedIndex, const char *optionsList, int flags );
 
-/* Add a directoryedit control to the dialog */
-/* controlName: internal control name */
-/* title: textedit title */
-/* defaultValue: initial text */
-/* flags: type and behevaior flags */
+/*
+ Dialog_AddDirectoryEdit
+ Adds a directory selection field to the dialog.
+
+ controlName - Internal name of the control (MUST BE SET)
+ title - Control title (MUST BE SET).
+ defaultValue - Initial path to directory.
+ flags - Behavior flags.
+*/
 typedef void		(*pfnEditor_Dialog_AddDirectoryEdit)	( const char *controlName, const char *title, const char *defaultValue, int flags );
 
-/* Get control value (string) */
-/* controlName: internal control name */
-/* out: char buffer. This value is already cleared and null-terminated inside the function */
-/* n: size of char buffer */
+/*
+ Dialog_QueryArgument
+ Returns the control value. (Text)
+
+ controlName - Internal name of the control.
+ out - An array.
+ n - Size of out in bytes.
+*/
 typedef void		(*pfnEditor_Dialog_QueryArgument)		( const char *controlName, char *out, size_t n );
 
-/* Get control value (float) */
-/* controlName: internal control name */
-/* Returns value of controlName */
+/*
+ Dialog_QueryArgument
+ Returns the control value. (Float)
+
+ controlName - Internal name of the control.
+*/
 typedef float		(*pfnEditor_Dialog_QueryArgumentFloat)	( const char *controlName );
 
-/* Get control value (int) */
-/* controlName: internal control name */
-/* Returns value of controlName */
+/*
+ Dialog_QueryArgument
+ Returns the control value. (Integer)
+
+ controlName - Internal name of the control.
+*/
 typedef int			(*pfnEditor_Dialog_QueryArgumentInt)	( const char *controlName );
 
-/* Finish and draw the dialog */
+/*
+ Dialog_End
+ Finishes the dialog setup and begins the draw.
+*/
 typedef void		(*pfnEditor_Dialog_End)					();
 
-/* Appends text to the dialog */
-/* String must not contain an ending newline */
+/*
+ Dialog_Printf
+ Appends text to the dialog.
+ NOTE: String must not contain an ending newline
+*/
 typedef void		(*pfnEditor_Dialog_Printf)				( const char *format, ... );
 
-/* Changes current cursor to Qt::WaitCursor and increments the wait counter by 1 */
+/*
+ Dialog_BeginWait
+ Changes current cursor to Qt::WaitCursor and increments the internal "wait counter" by 1.
+*/
 typedef void		(*pfnEditor_Dialog_BeginWait)			();
 
-/* Restores the cursor back to normal and decrements the wait counter by 1 */
+/*
+ Dialog_BeginWait
+ Restores the cursor back to normal and decrements the internal "wait counter" by 1.
+*/
 typedef void		(*pfnEditor_Dialog_EndWait)				();
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
@@ -1044,6 +1321,7 @@ typedef struct
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 // clang-format on
+
 
 /* J.A.C.K. Plugin Interface */
 /* m_intefaceVersion is a sizeof( plugin_funcs_t ) */
