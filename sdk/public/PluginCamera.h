@@ -46,7 +46,7 @@ typedef struct qCamera_s
 	vec3_t m_vecOrigin;
 	vec3_t m_vecAngles;
 } qCamera_t;
-COMPILE_TIME_ASSERT( sizeof( qCamera_t ) == 72 );
+COMPILE_TIME_ASSERT( sizeof( qCamera_t ) == SIZEOF_QCAMERA_S );
 
 // clang-format off
 

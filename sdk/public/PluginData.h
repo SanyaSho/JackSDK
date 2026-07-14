@@ -135,7 +135,7 @@ typedef struct qSpriteData_s
 	*/
 	void *pfn_UnloadModel;
 } qSpriteData_t;
-COMPILE_TIME_ASSERT( sizeof( qSpriteData_t ) == 40 );
+COMPILE_TIME_ASSERT( sizeof( qSpriteData_t ) == SIZEOF_QSPRITEDATA_S );
 
 
 /*
@@ -192,7 +192,7 @@ typedef struct qStudioData_s
 	vpGetModelBounds_t pfnGetModelRenderBounds;
 	vpUnloadModel_t pfnUnloadModel;
 } qStudioData_t;
-COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == 72 );
+COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == SIZEOF_QSTUDIODATA_S );
 
 
 /*
@@ -227,7 +227,7 @@ typedef struct qParticlesData_s
 	vpRenderParticles_t pfnRenderParticle;
 	vpUnloadParticles_t pfnUnloadParticle;
 } qParticlesData_t;
-COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == 64 );
+COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == SIZEOF_QPARTICLESDATA_S );
 
 
 /*
@@ -261,6 +261,7 @@ struct unknownArchiveStruct_t
 {
 	char gap[16];
 };
+//COMPILE_TIME_ASSERT( sizeof( unknownArchiveStruct_t ) == ??? );
 
 typedef struct qArchiveData_s
 {
@@ -272,7 +273,9 @@ typedef struct qArchiveData_s
 	*/
 	int m_formatIndex;
 
+#if defined( JACK_64BIT )
 	char gap_[4];
+#endif // JACK_64BIT
 
 	unknownArchiveStruct_t *m_unknownArchiveStruct;
 
@@ -292,7 +295,7 @@ typedef struct qArchiveData_s
 	vpListArchiveFiles_t pfnListArchvieFiles;
 	vpUnloadArchive_t pfnUnloadArchive;
 } qArchiveData_t;
-COMPILE_TIME_ASSERT( sizeof( qArchiveData_t ) == 64 );
+COMPILE_TIME_ASSERT( sizeof( qArchiveData_t ) == SIZEOF_QARCHIVEDATA_S );
 
 // clang-format off
 

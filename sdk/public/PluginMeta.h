@@ -3,8 +3,6 @@
 // Purpose: J.A.C.K. Plugin API
 // J.A.C.K. 1.2.4603
 //
-// Use this header to include all plugin features at once
-//
 // Author(-s): SanyaSho (2026)
 //
 //=====================================================================================//
@@ -12,7 +10,11 @@
 #if !defined( PLUGINMETA_H )
 #define PLUGINMETA_H
 
-#include "BaseTypes.h" // Includes PluginMath.h
+/*
+ Use this header to use all plugin features at once
+*/
+
+#include "BaseTypes.h" // Includes InternalStructSizeOfs.h and PluginMath.h
 
 #include "PluginActions.h"
 #include "PluginCamera.h"

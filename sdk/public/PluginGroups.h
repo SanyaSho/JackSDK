@@ -47,12 +47,9 @@ typedef struct qGroup_s
 	int m_editorId;
 
 	/* Number of objects in this group */
-	int m_objectCount;
-
-	/* Color of the group used by the editor */
-	rgba_t m_editorColor;
+	size_t m_objectCount;
 } qGroup_t;
-COMPILE_TIME_ASSERT( sizeof( qGroup_t ) == 80 );
+COMPILE_TIME_ASSERT( sizeof( qGroup_t ) == SIZEOF_QGROUPS_S );
 
 // clang-format off
 

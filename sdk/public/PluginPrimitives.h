@@ -65,7 +65,7 @@ typedef struct primitiveDesc_s
 	/* Function called when primitive is being created. Function must return false if something has failed and return true on success  */
 	bool (*pfnDispatchFunc)( const stPRIMITIVECREATESTRUCT *primCreate );
 } primitiveDesc_t;
-COMPILE_TIME_ASSERT( sizeof( primitiveDesc_t ) == 40 );
+COMPILE_TIME_ASSERT( sizeof( primitiveDesc_t ) == SIZEOF_PRIMITIVEDESC_S );
 
 
 #define PRIMFLAG_CLOCKWISE ( 1 << 0 )
@@ -93,7 +93,7 @@ struct stPRIMITIVECREATESTRUCT
 	vec3_t m_startPos;
 	vec3_t m_endPos;
 };
-COMPILE_TIME_ASSERT( sizeof( stPRIMITIVECREATESTRUCT ) == 184 );
+COMPILE_TIME_ASSERT( sizeof( stPRIMITIVECREATESTRUCT ) == SIZEOF_STPRIMITIVECREATESTRUCT );
 // 0xB0 (184) - Linux64; 0xB8 (176) - Win64
 // but even with extra 8 bytes it doesn't complain
 

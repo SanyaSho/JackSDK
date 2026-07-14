@@ -865,7 +865,7 @@ typedef struct plugin_funcs_s
 	/* Dialog API */
 	dialog_apt_t dialogfuncs;
 } plugin_funcs_t;
-COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == 1512 );
+COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == SIZEOF_PLUGIN_FUNCS_T );
 
 #define PLUGIN_VERSION 121
 

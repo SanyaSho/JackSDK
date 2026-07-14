@@ -26,7 +26,7 @@ typedef struct qPlane_s
 	float dist; // DotProduct of normal
 	int alignedAxis;
 } qPlane_t;
-COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == 20 );
+COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == SIZEOF_QPLANE_S /* Always 20 */ );
 
 
 #define TEXALIGN_NONE			(      0 )
@@ -57,7 +57,7 @@ typedef struct qTexDef_s
 
 	char m_textureName[64];
 } qTexDef_t;
-COMPILE_TIME_ASSERT( sizeof( qTexDef_t ) == 128 );
+COMPILE_TIME_ASSERT( sizeof( qTexDef_t ) == SIZEOF_QTEXDEF_S /* Always 128 */ );
 
 
 typedef struct qVertex_s
@@ -66,7 +66,7 @@ typedef struct qVertex_s
 	vec2_t uv;
 	int selectionState;
 } qVertex_t;
-COMPILE_TIME_ASSERT( sizeof( qVertex_t ) == 24 );
+COMPILE_TIME_ASSERT( sizeof( qVertex_t ) == SIZEOF_QVERTEX_S /* Always 24 */ );
 
 
 class CMapFace;
@@ -86,7 +86,11 @@ typedef struct qFace_s
 	struct qFace_s *selectedNext;
 	struct qFace_s *selectedPrev;
 
+#if defined( JACK_64BIT )
 	char gap1[8];
+#else
+	char gap1[4];
+#endif // JACK_64BIT
 
 	/* Brush this face belongs to */
 	struct qBrush_s *m_ownerBrush;
@@ -107,11 +111,9 @@ typedef struct qFace_s
 
 	int m_vertexCount;
 
-	char gap5[4];
-
 	struct qVertex_s *m_vertices;
 } qFace_t;
-COMPILE_TIME_ASSERT( sizeof( qFace_t ) == 272 );
+COMPILE_TIME_ASSERT( sizeof( qFace_t ) == SIZEOF_QFACE_S );
 
 // clang-format off
 

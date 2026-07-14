@@ -43,7 +43,7 @@ typedef struct epair_s
 	char *key;
 	char *value;
 } epair_t;
-COMPILE_TIME_ASSERT( sizeof( epair_t ) == 24 );
+COMPILE_TIME_ASSERT( sizeof( epair_t ) == SIZEOF_EPAIR_S );
 
 inline epair_t *AllocEpair( const char *key, const char *value )
 {
@@ -75,14 +75,22 @@ inline void FreeEpairList( epair_t *list )
 typedef struct qSplineNode_s
 {
 	struct qSplineNode_s *nextNode;
+#if defined( JACK_64BIT )
 	char gap[8];
+#else
+	char gap[4];
+#endif // JACK_64BIT
 	struct qEntity_s *owner;
-	char gap2[108];
+	char gap2[24];
+	vec3_t m_vecForward;
+	vec3_t m_vecRight;
+	vec3_t m_vecUp;
+	char gap3[48];
 	float speed;
 	float yaw_speed;
 	float fov;
 } qSplineNode_t;
-COMPILE_TIME_ASSERT( sizeof( qSplineNode_t ) == 144 );
+COMPILE_TIME_ASSERT( sizeof( qSplineNode_t ) == SIZEOF_QSPLINENODE_S );
 
 
 typedef struct qEntityKeys_s
@@ -112,7 +120,7 @@ typedef struct qEntityRenderMode_s
 	/* Render effect */
 	int m_renderFx;
 } qEntityRenderMode_t;
-COMPILE_TIME_ASSERT( sizeof( qEntityRenderMode_t ) == 16 );
+COMPILE_TIME_ASSERT( sizeof( qEntityRenderMode_t ) == SIZEOF_QENTITYRENDERMODE_S );
 
 
 /* This struct is written as a 48 (previously 16) byte blob to the JMF */
@@ -139,7 +147,7 @@ typedef struct qEntityState_s
 	/* Reserved space for alignment */
 	int __pad[7];
 } qEntityState_t;
-COMPILE_TIME_ASSERT( sizeof( qEntityState_t ) == 48 );
+COMPILE_TIME_ASSERT( sizeof( qEntityState_t ) == SIZEOF_QENTITYSTATE_S );
 
 
 /*typedef struct targetInfo_s
@@ -225,7 +233,7 @@ typedef struct qEntity_s
 
 	void *m_drawData; // This pointer size depends on the m_modelType value. See CMapEntity::rebuildUserData.
 } qEntity_t;
-COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == 368 );
+COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == SIZEOF_QENTITY_S );
 
 inline epair_s *AddEpair( qEntity_s *entity, const char *key, const char *value )
 {

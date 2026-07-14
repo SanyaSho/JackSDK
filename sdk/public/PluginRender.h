@@ -24,12 +24,14 @@ typedef struct renditionInfo_s
 {
 	char gap[8];
 	int m_renditionFlags;
-	char gap2[96];
-	vec3_t m_unknownVector1;
-	vec3_t m_unknownVector2;
-	vec3_t m_unknownVector3;
-	vec3_t m_unknownVector4;
-	char gap3[28];
+	char gap2[12];
+	int m_textureBindFlags;
+	char gap3[80];
+	vec3_t m_modelOrigin;
+	vec3_t m_vec1;
+	vec3_t m_right;
+	vec3_t m_up;
+	char gap4[28];
 	CFrustum *m_frustum;
 	CGLState *m_glState;
 } renditionInfo_t;
@@ -87,7 +89,7 @@ typedef struct qTexture_s
 	/* Used to determine the next image frame in the list */
 	struct qTexture_s *next;
 } qTexture_t;
-COMPILE_TIME_ASSERT( sizeof( qTexture_t ) == 48 );
+COMPILE_TIME_ASSERT( sizeof( qTexture_t ) == SIZEOF_QTEXTURE_S );
 
 
 typedef struct qShaderStageData_s
@@ -102,7 +104,7 @@ typedef struct qShaderStageData_s
 
 	char gap6[164];
 } qShaderStageData_t;
-COMPILE_TIME_ASSERT( sizeof( qShaderStageData_t ) == 284 );
+COMPILE_TIME_ASSERT( sizeof( qShaderStageData_t ) == SIZEOF_QSHADERSTAGEDATA_S );
 
 /* Wont free any of textures from the textureList in CTextureManager::removeShaderStage */
 #define SHDAERSTAGE_FLAG_NOFREELIST			( 1 << 1 )
@@ -114,7 +116,11 @@ typedef struct qShaderStage_s
 	/* Currently used texture */
 	struct qTexture_s *m_currentTexture;
 
+#if defined( JACK_64BIT )
 	char gap2[56];
+#else
+	char gap2[28];
+#endif // JACK_64BIT
 
 	/* Texture list (used if texture has multiple frames) */
 	struct qTexture_s *m_textureList;
@@ -131,7 +137,7 @@ typedef struct qShaderStage_s
 	/* Not sure about this one, vpQuake and vpHalfLife does memset with sizeof( 284 ) on this address (only on Windows) */
 	struct qShaderStageData_s m_data;
 } qShaderStage_t;
-COMPILE_TIME_ASSERT( sizeof( qShaderStage_t ) == 384 );
+COMPILE_TIME_ASSERT( sizeof( qShaderStage_t ) == SIZEOF_QSHADERSTAGE_S );
 
 inline qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *textureHandle )
 {
@@ -162,15 +168,18 @@ typedef struct qShader_s
 
 	int m_flags;
 
+#if defined( JACK_64BIT )
 	char gap2[12];
+#else
+	char gap2[8];
+#endif // JACK_64BIT
 
 	int m_surfaceFlags;
 	int m_contentFlags;
 	int m_materialType;
 	int m_value;
-	int unknownInt1;
 
-	char gap3[4];
+	size_t unknownInt1; // TODO: is this size_t?
 
 	struct qTexture_s *m_texture;
 
@@ -178,11 +187,17 @@ typedef struct qShader_s
 
 	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
 
+#if defined( JACK_64BIT )
 	char gap5[8];
+#endif // JACK_64BIT
 
 	struct qTexture_s *m_skyTextureList[6];
 
+#if defined( JACK_64BIT )
 	char gap7[8];
+#else
+	char gap7[4];
+#endif // JACK_64BIT
 
 	struct qShaderStage_s *m_stage;
 
@@ -195,9 +210,9 @@ typedef struct qShader_s
 #endif // WIN32
 } qShader_t;
 #if defined( WIN32 )
-COMPILE_TIME_ASSERT( sizeof( qShader_t ) == 640 );
+COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S_WINDOWS );
 #else
-COMPILE_TIME_ASSERT( sizeof( qShader_t ) == 1408 );
+COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S_LINUX );
 #endif // WIN32
 
 // clang-format off

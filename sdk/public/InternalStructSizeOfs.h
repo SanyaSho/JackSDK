@@ -1,0 +1,157 @@
+//=====================================================================================//
+//
+// Purpose: J.A.C.K. Plugin API
+// J.A.C.K. 1.2.4603
+//
+// Author(-s): SanyaSho (2026)
+//
+//=====================================================================================//
+
+#if !defined( INTERNALSTRUCTSIZEOFS_H )
+#define INTERNALSTRUCTSIZEOFS_H
+
+/*
+ This header is used to define internal struct sizeofs to prevent going out of bounds when adding/removing new elements.
+*/
+
+// clang-format off
+
+#if defined( JACK_64BIT )
+
+// PluginActions.h (64Bit)
+#define SIZEOF_PLUGINACTIONINFO_T		48
+
+// PluginAPI.h (64Bit)
+#define SIZEOF_PLUGIN_FUNCS_T			1512
+
+// PluginCamera.h (64Bit)
+#define SIZEOF_QCAMERA_S				72
+
+// PluginData.h (64Bit)
+#define SIZEOF_QSPRITEDATA_S			40
+#define SIZEOF_QSTUDIODATA_S			72
+#define SIZEOF_QPARTICLESDATA_S			64
+#define SIZEOF_QARCHIVEDATA_S			64
+
+// PluginEntity.h (64Bit)
+#define SIZEOF_EPAIR_S					24
+#define SIZEOF_QSPLINENODE_S			144
+#define SIZEOF_QENTITYRENDERMODE_S		16
+#define SIZEOF_QENTITYSTATE_S			48
+#define SIZEOF_QENTITY_S				368
+
+// PluginFaces.h (64Bit)
+#define SIZEOF_QPLANE_S					20
+#define SIZEOF_QTEXDEF_S				128
+#define SIZEOF_QVERTEX_S				24
+#define SIZEOF_QFACE_S					272
+
+// PluginGroups.h (64Bit)
+#define SIZEOF_QGROUPS_S				80
+
+// PluginNodes.h (64Bit)
+#define SIZEOF_QNODE_S					144
+
+// PluginPaths.h (64Bit)
+#define SIZEOF_QPATH_S					112
+
+// PluginPrimitives.h (64Bit)
+#define SIZEOF_PRIMITIVEDESC_S			40
+#define SIZEOF_STPRIMITIVECREATESTRUCT	184
+
+// PluginProfile.h (64Bit)
+#define SIZEOF_MAPPROFILE_S				2960
+
+// PluginRender.h (64Bit)
+#define SIZEOF_QTEXTURE_S				48
+#define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown*/
+#define SIZEOF_QSHADERSTAGE_S			384
+#define SIZEOF_QSHADER_S_WINDOWS		640
+#define SIZEOF_QSHADER_S_LINUX			1408
+
+// PluginWorld.h (64Bit)
+#define SIZEOF_QOVERLAYDATA_S			24
+#define SIZEOF_QOVERLAY_S				304
+#define SIZEOF_QDECALFRAGMENT_S			32
+#define SIZEOF_QPATCHDATA_S				36 /* NOTE: Size is unknown */
+#define SIZEOF_QPATCH_S					37128
+#define SIZEOF_QBRUSH_S					152
+#define SIZEOF_QTRANS_S					24
+#define SIZEOF_QSKY_S					24
+#define SIZEOF_QSKYDATA_S				24 /* NOTE: Size is unknown */
+#define SIZEOF_QWORLD_S					192
+
+#elif defined( JACK_32BIT )
+
+// PluginActions.h (32Bit)
+#define SIZEOF_PLUGINACTIONINFO_T		32
+
+// PluginAPI.h (32Bit)
+#define SIZEOF_PLUGIN_FUNCS_T			756
+
+// PluginCamera.h (32Bit)
+#define SIZEOF_QCAMERA_S				52
+
+// PluginData.h (32Bit)
+#define SIZEOF_QSPRITEDATA_S			32 /* TODO: Recheck */
+#define SIZEOF_QSTUDIODATA_S			56 /* TODO: Recheck */
+#define SIZEOF_QPARTICLESDATA_S			56 /* TODO: Recheck */
+#define SIZEOF_QARCHIVEDATA_S			36 /* TODO: Recheck */
+
+// PluginEntity.h (32Bit)
+#define SIZEOF_EPAIR_S					12
+#define SIZEOF_QSPLINENODE_S			132
+#define SIZEOF_QENTITYRENDERMODE_S		16
+#define SIZEOF_QENTITYSTATE_S			48
+#define SIZEOF_QENTITY_S				252
+
+// PluginFaces.h (32Bit)
+#define SIZEOF_QPLANE_S					20
+#define SIZEOF_QTEXDEF_S				128
+#define SIZEOF_QVERTEX_S				24
+#define SIZEOF_QFACE_S					228
+
+// PluginGroups.h (32Bit)
+#define SIZEOF_QGROUPS_S				44
+
+// PluginNodes.h (32Bit)
+#define SIZEOF_QNODE_S					100
+
+// PluginPaths.h (32Bit)
+#define SIZEOF_QPATH_S					72
+
+// PluginPrimitives.h (32Bit)
+#define SIZEOF_PRIMITIVEDESC_S			28
+#define SIZEOF_STPRIMITIVECREATESTRUCT	176
+
+// PluginProfile.h (32Bit)
+#define SIZEOF_MAPPROFILE_S				2952
+
+// PluginRender.h (32Bit)
+#define SIZEOF_QTEXTURE_S				40
+#define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown*/
+#define SIZEOF_QSHADERSTAGE_S			344
+#define SIZEOF_QSHADER_S_WINDOWS		584
+#define SIZEOF_QSHADER_S_LINUX			1348
+
+// PluginWorld.h (32Bit)
+#define SIZEOF_QOVERLAYDATA_S			24
+#define SIZEOF_QOVERLAY_S				288
+#define SIZEOF_QDECALFRAGMENT_S			16
+#define SIZEOF_QPATCHDATA_S				36 /* NOTE: Size is unknown */
+#define SIZEOF_QPATCH_S					37084
+#define SIZEOF_QBRUSH_S					96
+#define SIZEOF_QTRANS_S					16
+#define SIZEOF_QSKY_S					12
+#define SIZEOF_QSKYDATA_S				20 /* NOTE: Size is unknown */
+#define SIZEOF_QWORLD_S					116
+
+#else
+
+#error
+
+#endif // JACK_64BIT
+
+// clang-format on
+
+#endif // !INTERNALSTRUCTSIZEOFS_H

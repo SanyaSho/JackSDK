@@ -15,6 +15,7 @@ function( target_use_jackpluginsdk target )
 			SOURCES
 			#{
 				"${JACK_SDK_DIR}/public/BaseTypes.h"
+				"${JACK_SDK_DIR}/public/InternalStructSizeOfs.h"
 				"${JACK_SDK_DIR}/public/PluginAPI.h"
 				"${JACK_SDK_DIR}/public/PluginActions.h"
 				"${JACK_SDK_DIR}/public/PluginCamera.h"
@@ -64,5 +65,20 @@ function( target_use_jackpluginsdk target )
 
 		PLUGINSDK
 	)
+
+	if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+		target_compile_definitions(
+			${target} PRIVATE
+
+			JACK_64BIT
+		)
+	else()
+		target_compile_definitions(
+			${target} PRIVATE
+
+			JACK_32BIT
+		)
+	endif()
+
 endfunction()
 

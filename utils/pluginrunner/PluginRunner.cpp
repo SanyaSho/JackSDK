@@ -15,8 +15,14 @@ static char *Sys_AllocString( const char *src );
 #include "PluginMeta.h"
 
 
+#if defined( JACK_64BIT )
 #define PLUGIN_DLL "vpHalfLifex64.dll"
 //#define PLUGIN_DLL "vpQuakex64.dll"
+#else
+#define PLUGIN_DLL "vpHalfLifex86.dll"
+//#define PLUGIN_DLL "vpQuakex86.dll"
+#endif
+
 
 // clang-format off
 
@@ -160,6 +166,8 @@ static void Sys_Error( const char *format, ... )
 	_snprintf( szBuf, sizeof( szBuf ), "%s", szError );
 	szBuf[sizeof( szBuf ) - 1] = '\0';
 	MessageBox( 0, szBuf, "Error", MB_OK );
+
+	exit( 1 );
 }
 
 static void Sys_Free( void *ptr )
@@ -709,7 +717,7 @@ static void RunPluginTests()
 	}
 
 	/* Sprite IO */
-	if ( 0 && s_vpLoadSprite )
+	if ( 1 && s_vpLoadSprite )
 	{
 		byte *buf = Sys_LoadFile( "valve/sprites/explode1.spr", NULL );
 
@@ -724,7 +732,7 @@ static void RunPluginTests()
 	}
 
 	/* Model IO */
-	if ( 0 && s_vpLoadModel && s_vpUnloadModel )
+	if ( 1 && s_vpLoadModel && s_vpUnloadModel )
 	{
 		byte *buf = Sys_LoadFile( "valve/player.mdl", NULL );
 
@@ -741,7 +749,7 @@ static void RunPluginTests()
 	}
 
 	/* Archive IO */
-	if ( 0 && s_vpLoadArchvie && s_vpFindArchiveFile && s_vpLoadArchiveFile && s_vpListArchiveFiles && s_vpUnloadArchive )
+	if ( 1 && s_vpLoadArchvie && s_vpFindArchiveFile && s_vpLoadArchiveFile && s_vpListArchiveFiles && s_vpUnloadArchive )
 	{
 		qArchiveData_t archiveData;
 

@@ -52,9 +52,17 @@ typedef struct qNode_s
 	vec3_t m_vecOrigin;
 	vec3_t m_vecAngles;
 
-	char gap5[24];
+	float m_speed;
+	float m_yaw_speed;
+	float m_wait;
+	float m_fov;
+	int m_spawnflags;
+
+#if defined( JACK_64BIT )
+	char gap5[4];
+#endif // JACK_64BIT
 } qNode_t;
-COMPILE_TIME_ASSERT( sizeof( qNode_t ) == 144 );
+COMPILE_TIME_ASSERT( sizeof( qNode_t ) == SIZEOF_QNODE_S );
 
 // clang-format off
 

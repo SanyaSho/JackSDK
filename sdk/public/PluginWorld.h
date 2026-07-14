@@ -35,7 +35,7 @@ typedef struct qOverlayData_s
 	vec2_t uv;
 	char gap[4];
 } qOverlayData_t;
-COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == 24 );
+COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == SIZEOF_QOVERLAYDATA_S /* Always 24 */ );
 
 typedef struct qOverlay_s
 {
@@ -62,7 +62,7 @@ typedef struct qOverlay_s
 	/* This field is written as a 96 byte blob into the JMF */
 	struct qOverlayData_s m_data[4];
 } qOverlay_t;
-COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == 304 );
+COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == SIZEOF_QOVERLAY_S );
 
 
 typedef struct qDecalFragment_s
@@ -72,7 +72,7 @@ typedef struct qDecalFragment_s
 	struct qDecal_s *m_decalList;
 	struct qBrush_s *m_brushOwner;
 } qDecalFragment_t;
-COMPILE_TIME_ASSERT( sizeof( qDecalFragment_t ) == 32 );
+COMPILE_TIME_ASSERT( sizeof( qDecalFragment_t ) == SIZEOF_QDECALFRAGMENT_S );
 
 
 class CMapPatch;
@@ -86,7 +86,7 @@ typedef struct qPatchData_s
 	vec2_t uv;
 	int unkint1;
 } qPatchData_t;
-COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == 36 ); // NOTE: The size is unknown
+COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == SIZEOF_QPATCHDATA_S ); // NOTE: The size is unknown
 
 typedef struct qPatch_s
 {
@@ -120,9 +120,13 @@ typedef struct qPatch_s
 	char gap6[16];
 	const void *m_glBackGeometryIndices;
 	const void *m_glPointsIndices;
+#if defined( JACK_64BIT )
 	char gap7[24];
+#else
+	char gap7[4];
+#endif // JACK_64BIT
 } qPatch_t;
-COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == 37128 );
+COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == SIZEOF_QPATCH_S );
 
 
 class CMapBrush;
@@ -175,14 +179,21 @@ typedef struct qBrush_s
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 } qBrush_t;
-COMPILE_TIME_ASSERT( sizeof( qBrush_t ) == 152 );
+COMPILE_TIME_ASSERT( sizeof( qBrush_t ) == SIZEOF_QBRUSH_S );
 
 
 typedef struct qTrans_s
 {
-	char gap[24];
+	char gap[SIZEOF_QTRANS_S];
 } qTrans_t;
-COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == 24 );
+COMPILE_TIME_ASSERT( sizeof( qTrans_t ) == SIZEOF_QTRANS_S );
+
+
+typedef struct qSky_s
+{
+	char gap[SIZEOF_QSKY_S];
+} qSky_t;
+COMPILE_TIME_ASSERT( sizeof( qSky_t ) == SIZEOF_QSKY_S );
 
 
 typedef struct qSkyData_s
@@ -191,7 +202,7 @@ typedef struct qSkyData_s
 	vec3_t m_skyAxis;
 	float m_skyRotate;
 } qSkyData_t;
-COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == 24 );
+COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == SIZEOF_QSKYDATA_S ); // NOTE: The size is unknown
 
 
 class CMapWorld;
@@ -226,21 +237,23 @@ typedef struct qWorld_s
 	struct qNode_s *m_selNodeList;
 
 	/* Translucency data for special entities */
-	struct qTrans_s *m_transData;
+	struct qTrans_s *m_trans;
 
-	char unknown_sky_related[8];
+	struct qSky_s *m_sky;
 
 	int m_editorFlags;
 
 	vec3_t m_vecCordonMin;
 	vec3_t m_vecCordonMax;
 
+#if defined( JACK_64BIT )
 	char qWorld_s_gap5[4];
+#endif // JACK_64BIT
 
 	/* Sky settings */
 	struct qSkyData_s m_skyData;
 } qWorld_t;
-COMPILE_TIME_ASSERT( sizeof( qWorld_t ) == 192 );
+COMPILE_TIME_ASSERT( sizeof( qWorld_t ) == SIZEOF_QWORLD_S );
 
 // clang-format off
 

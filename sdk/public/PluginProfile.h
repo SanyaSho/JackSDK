@@ -61,8 +61,7 @@ typedef struct mapProfile_s
 	// Must always be NULL in the plugin environment
 	void *libraryHandle;
 
-	int unkint1; // used by q3
-	int unkint2;
+	size_t unkint1; // used by q3
 
 	/* Profile options flags */
 	int dataBits;
@@ -131,7 +130,7 @@ typedef struct mapProfile_s
 	int unknown_SurfaceFlagsBitMask;
 	int unknown_ShaderMask;
 } mapProfile_t;
-COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == 2960 );
+COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == SIZEOF_MAPPROFILE_S );
 
 // clang-format off
 

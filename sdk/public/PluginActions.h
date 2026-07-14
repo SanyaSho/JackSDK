@@ -46,12 +46,12 @@ typedef struct pluginActionInfo_s
 	const char *m_actionCategory;
 
 	/* Action flags (see defines above) */
-	int m_actionFlags;
+	uint64 m_actionFlags;
 
 	/* Function called after action interaction */
 	void (*m_dispatchFunc)();
 } pluginActionInfo_t;
-COMPILE_TIME_ASSERT( sizeof( pluginActionInfo_t ) == 48 );
+COMPILE_TIME_ASSERT( sizeof( pluginActionInfo_t ) == SIZEOF_PLUGINACTIONINFO_T );
 
 // clang-format off
 
