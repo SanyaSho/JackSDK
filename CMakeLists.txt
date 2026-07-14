@@ -24,5 +24,5 @@ include( "cmake/srcgrp.cmake" )
 
 include( "cmake/simpleinstall.cmake" )
 
-add_subdirectory( "plugin" )
-add_subdirectory( "pluginrunner" )
+add_subdirectory( "plugins/vpExamplePlugin" )
+add_subdirectory( "utils/pluginrunner" )
