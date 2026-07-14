@@ -1,7 +1,12 @@
 #=============================================================================
 # JackPluginSDK.cmake
 #
-# $
+# Use this file to include the SDK to your project
+# You can define JACK_API_VERSION to select which API level will
+# be implemented. See head of BaseTypes.h for more info.
+#
+# If you're using another buildsystem (not CMake) then you must define
+# JACK_32BIT or JACK_64BIT depending on your platform.
 #=============================================================================
 
 include_guard( GLOBAL )

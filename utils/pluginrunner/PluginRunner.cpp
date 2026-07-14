@@ -283,7 +283,7 @@ static qShader_s *Shader_Lookup( const char *shaderName )
 
 static void Shader_Destroy( qShader_s *shaderHandle )
 {
-	Sys_Printf( "%s( 0x%p )", __FUNCTION__, shaderHandle );
+	Sys_Printf( "%s( 0x%p (%s) )", __FUNCTION__, shaderHandle, shaderHandle->m_name );
 	Sys_Free( shaderHandle );
 }
 
@@ -729,8 +729,10 @@ static void RunPluginTests()
 	{
 		byte *buf = Sys_LoadFile( "valve/sprites/explode1.spr", NULL );
 
-		qSpriteData_t outSpriteData;
-		bool bOK = s_vpLoadSprite( 0, "myshader", buf, 0, &outSpriteData );
+		qSpriteData_t spriteData;
+		memset( &spriteData, 0, sizeof( spriteData ) );
+
+		bool bOK = s_vpLoadSprite( 0, "myshader", buf, 0, &spriteData );
 		if ( bOK )
 		{
 			Sys_Printf( "vpLoadSprite: %d", bOK );
@@ -744,13 +746,15 @@ static void RunPluginTests()
 	{
 		byte *buf = Sys_LoadFile( "valve/player.mdl", NULL );
 
-		qStudioData_t outModelData;
-		bool bOK = s_vpLoadModel( 0, "valve/player.mdl", buf, 0, &outModelData );
+		qStudioData_t modelData;
+		memset( &modelData, 0, sizeof( modelData ) );
+
+		bool bOK = s_vpLoadModel( 0, "valve/player.mdl", buf, 0, &modelData );
 		if ( bOK )
 		{
 			Sys_Printf( "vpLoadModel: %d", bOK );
 
-			s_vpUnloadModel( 0, &outModelData );
+			s_vpUnloadModel( 0, &modelData );
 		}
 
 		Sys_Free( buf );
@@ -760,6 +764,7 @@ static void RunPluginTests()
 	if ( 1 && s_vpLoadArchvie && s_vpFindArchiveFile && s_vpLoadArchiveFile && s_vpListArchiveFiles && s_vpUnloadArchive )
 	{
 		qArchiveData_t archiveData;
+		memset( &archiveData, 0, sizeof( archiveData ) );
 
 		bool bOK = s_vpLoadArchvie( 0, "quake106/ID1/PAK0.PAK", &archiveData );
 		if ( bOK )
