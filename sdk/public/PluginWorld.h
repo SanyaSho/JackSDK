@@ -135,6 +135,9 @@ COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == SIZEOF_QPATCH_S );
 
 class CMapBrush;
 
+#define BRUSH_EXTRADATA_PATCH		1 /* Will serialize a patch attached to the brush */
+#define BRUSH_EXTRADATA_OVERLAY		2 /* Will serialize overlay attached to the brush */
+
 typedef struct qBrush_s
 {
 #if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
@@ -178,8 +181,8 @@ typedef struct qBrush_s
 	int m_editorFlags;
 	int m_editorId;
 
-	/* Number of qPatch_t attached to this brush */
-	int m_patchCount; // TODO: revisit this
+	/* Type of extra data serialized with the brush. See BRUSH_EXTRADATA_ defines above. */
+	int m_extraDataType;
 
 	/* Brush bounds */
 	vec3_t m_bboxMin;
