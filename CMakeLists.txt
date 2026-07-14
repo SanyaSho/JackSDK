@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
-project( JackPlugin CXX C )
+project( JackSDK CXX C )
 
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
