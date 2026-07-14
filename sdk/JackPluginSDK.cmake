@@ -24,6 +24,7 @@ function( target_use_jackpluginsdk target )
 				"${JACK_SDK_DIR}/public/PluginFaces.h"
 				"${JACK_SDK_DIR}/public/PluginGroups.h"
 				"${JACK_SDK_DIR}/public/PluginMath.h"
+				"${JACK_SDK_DIR}/public/PluginMeta.h"
 				"${JACK_SDK_DIR}/public/PluginNodes.h"
 				"${JACK_SDK_DIR}/public/PluginPaths.h"
 				"${JACK_SDK_DIR}/public/PluginPrimitives.h"
