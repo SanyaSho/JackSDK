@@ -52,13 +52,10 @@ typedef struct pluginActionDesc_s
 #endif // JACK_API_VERSION <= 100
 
 	/* Action flags (see defines above) */
-	int m_actionFlags;
-
-	/* This value is redirected into the m_dispatchFunc and can be used to split actions using one function */
-	int m_type;
+	uint64 m_actionFlags;
 
 	/* Function called after action interaction */
-	void (*m_dispatchFunc)( int type );
+	void (*m_dispatchFunc)();
 } pluginActionDesc_t;
 COMPILE_TIME_ASSERT( sizeof( pluginActionDesc_t ) == SIZEOF_PLUGINACTIONDESC_T );
 

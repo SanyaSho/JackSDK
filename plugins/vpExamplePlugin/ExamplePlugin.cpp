@@ -57,7 +57,7 @@ DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
 	return 0;
 }
 
-void RunTests( int type )
+void RunTests()
 {
 	/*float vec3[3] = { 0, 0, 0, };
 	void *ent = Entity_Create( Global_GetCurrentWorld(), "info_player_start", vec3, 0 );
@@ -120,11 +120,10 @@ pluginActionDesc_t runTests = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	0,
-	0,
 	RunTests
 };
 
-void SpawnEntity( int type )
+void SpawnEntity()
 {
 	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
@@ -155,11 +154,10 @@ pluginActionDesc_t spawnEntity = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	SpawnEntity
 };
 
-void CreateCamera( int type )
+void CreateCamera()
 {
 	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
@@ -187,11 +185,10 @@ pluginActionDesc_t createCamera = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	CreateCamera
 };
 
-void CreateNodes( int type )
+void CreateNodes()
 {
 	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
@@ -220,11 +217,10 @@ pluginActionDesc_t createNodes = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	CreateNodes
 };
 
-void CreatePaths( int type )
+void CreatePaths()
 {
 	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
@@ -255,11 +251,10 @@ pluginActionDesc_t createPaths = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	CreatePaths
 };
 
-void PrintSysFloatTime( int type )
+void PrintSysFloatTime()
 {
 	Sys_Printf( "Sys_FloatTime: %f\n", Sys_FloatTime() );
 }
@@ -275,11 +270,10 @@ pluginActionDesc_t printSysFloatTime = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	0,
-	0,
 	PrintSysFloatTime
 };
 
-void RunBuildPackageList( int type )
+void RunBuildPackageList()
 {
 	qWorld_s *world = Global_GetCurrentWorld();
 	if ( !world )
@@ -307,11 +301,10 @@ pluginActionDesc_t runBuildPackageList = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	RunBuildPackageList
 };
 
-extern void MessageBoxTest( int type );
+extern void MessageBoxTest();
 pluginActionDesc_t mbTest = {
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	"MessageBoxTest",
@@ -323,11 +316,10 @@ pluginActionDesc_t mbTest = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	0,
-	0,
 	MessageBoxTest
 };
 
-void DebuggerBreakWithWorld( int type )
+void DebuggerBreakWithWorld()
 {
 	qWorld_t *worldDef = Global_GetCurrentWorld();
 	if ( !worldDef )
@@ -352,11 +344,10 @@ pluginActionDesc_t debuggerbreakwithworld = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	1337,
 	DebuggerBreakWithWorld
 };
 
-void FindPlayerSpawn( int type )
+void FindPlayerSpawn()
 {
 	qWorld_t *worldDef = Global_GetCurrentWorld();
 	if ( !worldDef )
@@ -385,7 +376,6 @@ pluginActionDesc_t findPlayerSpawn = {
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	0,
 	FindPlayerSpawn
 };
 
