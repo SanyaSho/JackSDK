@@ -20,6 +20,10 @@ else()
 	set( IS_64BIT 0 )
 endif()
 
+if( NOT WIN32 )
+	add_compile_options( -ggdb )
+endif()
+
 include( "cmake/srcgrp.cmake" )
 
 include( "cmake/simpleinstall.cmake" )

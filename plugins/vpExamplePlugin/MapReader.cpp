@@ -13,6 +13,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include "MapReader.h"
 
@@ -93,7 +94,7 @@ bool MapReader::LoadMap()
 	else
 	{
 		char szErrorStr[256] = { 0 };
-		strerror_s( szErrorStr, sizeof( szErrorStr ), errno );
+		strncpy( szErrorStr, strerror( errno ), sizeof( szErrorStr ) );
 		Sys_Error( "can't read \"%s\" (%s)", m_filePath, szErrorStr );
 
 		return false;
@@ -209,7 +210,8 @@ bool MapReader::ParseMap()
 		//
 		// value
 		//
-		strcpy_s( value, SC_Token() );
+		strncpy( value, SC_Token(), sizeof( value ) );
+		value[sizeof( value ) - 1] = '\0';
 
 		if ( !stricmp( key, "classname" ) )
 		{

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <memory.h>
 #include <locale.h>
+#if !defined( WIN32 )
+#include <signal.h>
+#endif // !WIN32
 
 
 #include "GL/glew.h"
@@ -77,7 +80,7 @@ void RunTests()
 
 	for ( int i = 0; i < 6; i++ )
 	{
-		__int64 bOK = Sys_GetOption( i );
+		int64 bOK = Sys_GetOption( i );
 
 		Sys_Printf( "PLUGIN: %llu\n", bOK );
 	}
@@ -323,7 +326,11 @@ void DebuggerBreakWithWorld()
 		return;
 
 	Sys_Printf( "worldDef: 0x%p", worldDef );
+#if defined( WIN32 )
 	__debugbreak();
+#else
+	raise( SIGTRAP );
+#endif
 }
 
 pluginActionDesc_t debuggerbreakwithworld = {

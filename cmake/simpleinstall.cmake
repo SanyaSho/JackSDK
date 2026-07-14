@@ -34,6 +34,7 @@ function( install_library )
 		set( ARGS_INSTALL_OUTNAME "${ARGS_INSTALL_OUTNAME}x64" )
 	endif()
 
+	set_target_properties( ${ARGS_TARGET} PROPERTIES PREFIX "" )
 	set_target_properties( ${ARGS_TARGET} PROPERTIES OUTPUT_NAME "${ARGS_INSTALL_OUTNAME}" )
 
 	# Set VS debugger stuff here (ignored by non-VS generators)

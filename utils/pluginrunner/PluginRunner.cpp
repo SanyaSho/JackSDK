@@ -1,5 +1,36 @@
-#include "Windows.h"
 #include "stdio.h"
+
+#if defined( WIN32 )
+#include "Windows.h"
+
+#define _DLL_EXT ".dll"
+#define _PATHSEP "\\"
+#else
+#include <unistd.h>
+#include <dlfcn.h>
+
+typedef void *HMODULE;
+
+static bool GetModuleFileName( void *, char *outBuf, size_t outBufSize )
+{
+	return readlink( "/proc/self/exe", outBuf, outBufSize ) > 0;
+}
+
+#define LOAD_WITH_ALTERED_SEARCH_PATH 0
+
+static HMODULE LoadLibraryEx( const char *pszPath, void *, int )
+{
+	return dlopen( pszPath, RTLD_NOW );
+}
+
+static void *GetProcAddress( HMODULE hHandle, const char *pszName )
+{
+	return dlsym( hHandle, pszName );
+}
+
+#define _DLL_EXT ".so"
+#define _PATHSEP "/"
+#endif // WIN32
 
 #include "GL/glew.h"
 
@@ -16,11 +47,11 @@ static char *Sys_AllocString( const char *src );
 
 
 #if defined( JACK_64BIT )
-#define PLUGIN_DLL "vpHalfLifex64.dll"
-//#define PLUGIN_DLL "vpQuakex64.dll"
+#define PLUGIN_DLL "vpHalfLifex64" _DLL_EXT
+//#define PLUGIN_DLL "vpQuakex64" _DLL_EXT
 #else
-#define PLUGIN_DLL "vpHalfLifex86.dll"
-//#define PLUGIN_DLL "vpQuakex86.dll"
+#define PLUGIN_DLL "vpHalfLifex86" _DLL_EXT
+//#define PLUGIN_DLL "vpQuakex86" _DLL_EXT
 #endif
 
 
@@ -141,16 +172,19 @@ static char *GetBaseDir( const char *pszBuffer )
 
 static void Sys_Printf( const char *format, ... )
 {
-	static char szError[8192] = { 0 };
+	static char szMessage[8192] = { 0 };
 
 	va_list argptr;
 	va_start( argptr, format );
-	vsnprintf( szError, sizeof( szError ), format, argptr );
+	vsnprintf( szMessage, sizeof( szMessage ), format, argptr );
 	va_end( argptr );
 
-	//printf( "%s\n", szError );
-	OutputDebugString( szError );
+#if defined( WIN32 )
+	OutputDebugString( szMessage );
 	OutputDebugString( "\n" );
+#else
+	fprintf( stdout, "%s\n", szMessage );
+#endif
 }
 
 static void Sys_Error( const char *format, ... )
@@ -162,10 +196,14 @@ static void Sys_Error( const char *format, ... )
 	vsnprintf( szError, sizeof( szError ), format, argptr );
 	va_end( argptr );
 
+#if defined( WIN32 )
 	char szBuf[1024];
 	_snprintf( szBuf, sizeof( szBuf ), "%s", szError );
 	szBuf[sizeof( szBuf ) - 1] = '\0';
 	MessageBox( 0, szBuf, "Error", MB_OK );
+#else
+	fprintf( stderr, "%s\n", szError );
+#endif
 
 	exit( 1 );
 }
@@ -805,9 +843,17 @@ static void RunPluginTests()
 	DestroyWhiteTexture();
 }
 
+#if defined( WIN32 )
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
+#else
+int main( int argc, char **argv )
+#endif // WIN32
 {
 	InitializeEditorFuncs();
+
+#if !defined( WIN32 )
+	void *hInstance = NULL;
+#endif // !WIN32
 
 	char moduleName[MAX_PATH];
 	if ( !GetModuleFileName( hInstance, moduleName, MAX_PATH ) )
@@ -818,18 +864,24 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	char *pRootDir = GetBaseDir( moduleName );
 
 	char szPluginPath[MAX_PATH];
-	snprintf( szPluginPath, sizeof( szPluginPath ), "%s\\" PLUGIN_DLL, pRootDir );
+	snprintf( szPluginPath, sizeof( szPluginPath ), "%s" _PATHSEP PLUGIN_DLL, pRootDir );
 	szPluginPath[sizeof( szPluginPath ) - 1] = '\0';
 
 	HMODULE hPluginModule = LoadLibraryEx( szPluginPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 	if ( !hPluginModule )
 	{
 		char *pszError;
+#if defined( WIN32 )
 		FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&pszError, 0, NULL );
+#else
+		pszError = (char *)dlerror();
+#endif
 
 		Sys_Error( "%s", pszError );
 
+#if defined( WIN32 )
 		LocalFree( pszError );
+#endif // WIN32
 		return 0;
 	}
 
