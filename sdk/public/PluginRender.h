@@ -116,6 +116,7 @@ typedef struct qShaderStage_s
 	/* Currently used texture */
 	struct qTexture_s *m_currentTexture;
 
+	/* 7 pointers? */
 #if defined( JACK_64BIT )
 	char gap2[56];
 #else
@@ -168,6 +169,7 @@ typedef struct qShader_s
 
 	int m_flags;
 
+	/* A pointer and an integer/float? */
 #if defined( JACK_64BIT )
 	char gap2[12];
 #else
@@ -187,12 +189,14 @@ typedef struct qShader_s
 
 	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
 
+	/* Who are you? */
 #if defined( JACK_64BIT )
 	char gap5[8];
 #endif // JACK_64BIT
 
 	struct qTexture_s *m_skyTextureList[6];
 
+	/* A pointer? */
 #if defined( JACK_64BIT )
 	char gap7[8];
 #else
@@ -203,17 +207,12 @@ typedef struct qShader_s
 
 	struct qShader_s *next;
 
-#if defined( WIN32 )
-	char gap8[424];
-#else
-	char gap8[1192];
-#endif // WIN32
+	char gap8[164];
+
+	/* Path to the shader file */
+	char m_shaderFilePath[MAX_PATH];
 } qShader_t;
-#if defined( WIN32 )
-COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S_WINDOWS );
-#else
-COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S_LINUX );
-#endif // WIN32
+COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S );
 
 // clang-format off
 

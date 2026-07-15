@@ -671,34 +671,49 @@ typedef struct mapCallbacks_s
 
 bool ShaderEditor_LoadImage( const char *filePath, qShader_s *shaderDef )
 {
-	return 0;
+	return false;
 }
 
 bool ShaderEditor_LoadScriptFile( const char *filePath, qShader_s *shaderDef )
 {
-	return 0;
+	return false;
 }
 
 bool ShaderEditor_SaveScriptFile( const char *filePath, qShader_s *shaderDef, bool )
 {
-	return 0;
+	return false;
 }
 
 bool ShaderEditor_BuildSourceCode( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_PushError pfnPushError1, pfnShaderEditor_PushError pfnPushError2, void *shaderEditorDialog )
 {
 	pfnPushError1( 0, "BuildSourceCode pfnPushError1", shaderEditorDialog );
 	pfnPushError2( 0, "BuildSourceCode pfnPushError2", shaderEditorDialog );
-	return 0;
+	return false;
 }
 
 bool ShaderEditor_ReformatText( const char *str1, const char *str2, int, char *outBuf, size_t outBufSize )
 {
-	return 0;
+	return false;
 }
 
-bool ShaderEditor_FillCompleteSuggestions( const char *parmName, int, char *outBuf, size_t outBufSize )
+bool ShaderEditor_FillCompleteSuggestions( const char *parmName, int a, char *outBuf, size_t outBufSize )
 {
-	return 0;
+	if ( outBuf )
+	{
+		memset( outBuf, 0, outBufSize );
+	}
+
+	if ( parmName && !strcmp( parmName, "test" ) )
+	{
+		strncat( outBuf, "autocomp1", outBufSize );
+		strncat( outBuf, " ", outBufSize );
+
+		strncat( outBuf, "autocomp2", outBufSize );
+		strncat( outBuf, " ", outBufSize );
+		return true;
+	}
+
+	return false;
 }
 
 // clang-format off
@@ -736,7 +751,7 @@ mapProfile_t profile =
 	0b10000000000001001001
 	[0, 3, 6, 19]
 	*/
-	( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_Q3_OVERLAYS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
+	PROFILE_ENABLE_SHADER_EDITOR | ( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_Q3_OVERLAYS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
 	//1<<0|1<<3|1<<6|1<<19,
 
 	"vpHalfLife",

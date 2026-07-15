@@ -97,8 +97,11 @@
 #define SIZEOF_QTEXTURE_S				48
 #define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown */
 #define SIZEOF_QSHADERSTAGE_S			384
-#define SIZEOF_QSHADER_S_WINDOWS		640
-#define SIZEOF_QSHADER_S_LINUX			1408
+#if defined( WIN32 )
+#define SIZEOF_QSHADER_S				640
+#else
+#define SIZEOF_QSHADER_S				1408
+#endif
 
 // PluginWorld.h (64Bit)
 #define SIZEOF_QOVERLAYDATA_S			24
@@ -206,8 +209,11 @@
 #define SIZEOF_QTEXTURE_S				40
 #define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown*/
 #define SIZEOF_QSHADERSTAGE_S			344
-#define SIZEOF_QSHADER_S_WINDOWS		584
-#define SIZEOF_QSHADER_S_LINUX			1348
+#if defined( WIN32 )
+#define SIZEOF_QSHADER_S				584
+#else
+#define SIZEOF_QSHADER_S				1348
+#endif
 
 // PluginWorld.h (32Bit)
 #define SIZEOF_QOVERLAYDATA_S			24

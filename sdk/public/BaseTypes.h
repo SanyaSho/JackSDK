@@ -77,7 +77,11 @@ struct rgba_t
 };
 
 #if !defined( MAX_PATH )
-#define MAX_PATH 260
+#if defined( WIN32 )
+#define MAX_PATH 260 // _MAX_PATH
+#else
+#define MAX_PATH 1024 // _XOPEN_PATH_MAX
+#endif
 #endif // !MAX_PATH
 
 #include "InternalStructSizeOfs.h"
