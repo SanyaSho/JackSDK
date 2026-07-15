@@ -62,13 +62,13 @@ struct qShader_s;
 typedef struct mapProfile_s
 {
 	/* Must always be NULL in the plugin environment */
-	void *libraryHandle;
+	void *m_libraryHandle;
 
 	/* Callbacks for the Shader Editor */
 	struct shaderEditorCallbacks_s *m_shaderEditorCallbacks;
 
 	/* Profile options flags */
-	int dataBits;
+	int m_dataBits;
 
 	/* Profile Info */
 	char pluginName[64];
@@ -119,14 +119,14 @@ typedef struct mapProfile_s
 	char entity_Unknown5[32];
 
 	/* Tool textures */
-	char defaultSkyBoxTexture[64];
-	char triggerTexture[64];
-	char nullTexture[64];
+	char m_defaultSkyBoxTexture[64];
+	char m_triggerTexture[64];
+	char m_nullTexture[64];
 
 	/* Textures used by the premade room */
-	char defaultWallTexture[64];
-	char defaultCeilingTexture[64];
-	char defaultFloorTexture[64];
+	char m_defaultWallTexture[64];
+	char m_defaultCeilingTexture[64];
+	char m_defaultFloorTexture[64];
 
 	char gvn2[64]; // CMapEntity::assignTargetInfo
 
@@ -160,7 +160,7 @@ typedef bool		(*pfnShaderEditor_LoadImage)			( const char *filePath, qShader_s *
 typedef bool		(*pfnShaderEditor_LoadScriptFile)		( const char *filePath, qShader_s *shaderDef );
 
 /* CShaderEditDialog::finalizeShaders */
-typedef bool		(*pfnShaderEditor_SaveScriptFile)		( const char *filePath, qShader_s *shaderDef, bool );
+typedef bool		(*pfnShaderEditor_SaveScriptFile)		( const char *filePath, qShader_s *shaderDef, bool recursive );
 
 /* CShaderEditDialog::updateCurrentScript */
 typedef void		(*pfnShaderEditor_PushError)			( int line, const char *token, void *shaderEditorDialog );

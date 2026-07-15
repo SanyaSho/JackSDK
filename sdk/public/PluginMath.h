@@ -29,28 +29,28 @@ struct vec2_t
 	vec2_t( vec_t x, vec_t y ) { this->x = x; this->y = y; }
 
 	// clang-format off
-	inline vec_t *Base() { return (vec_t *)this; }
-	inline const vec_t *Base() const { return (vec_t *)this; }
+	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
+	FORCEINLINE const vec_t *Base() const { return (vec_t *)this; }
 
-	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
-	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
 
-	inline vec2_t &operator+=( const vec2_t &v ) { x+=v.x; y+=v.y; return *this; }
-	inline vec2_t &operator-=( const vec2_t &v ) { x-=v.x; y-=v.y; return *this; }
-	inline vec2_t &operator*=( const vec2_t &v ) { x+=v.x; y*=v.y; return *this; }
-	inline vec2_t &operator/=( const vec2_t &v ) { x/=v.x; y/=v.y; return *this; }
+	FORCEINLINE vec2_t &operator+=( const vec2_t &v ) { x+=v.x; y+=v.y; return *this; }
+	FORCEINLINE vec2_t &operator-=( const vec2_t &v ) { x-=v.x; y-=v.y; return *this; }
+	FORCEINLINE vec2_t &operator*=( const vec2_t &v ) { x+=v.x; y*=v.y; return *this; }
+	FORCEINLINE vec2_t &operator/=( const vec2_t &v ) { x/=v.x; y/=v.y; return *this; }
 
-	inline vec2_t &operator+=( float fl ) { x+=fl; y+=fl; return *this; }
-	inline vec2_t &operator-=( float fl ) { x-=fl; y-=fl; return *this; }
-	inline vec2_t &operator*=( float fl ) { x*=fl; y*=fl; return *this; }
-	inline vec2_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; return *this; }
+	FORCEINLINE vec2_t &operator+=( float fl ) { x+=fl; y+=fl; return *this; }
+	FORCEINLINE vec2_t &operator-=( float fl ) { x-=fl; y-=fl; return *this; }
+	FORCEINLINE vec2_t &operator*=( float fl ) { x*=fl; y*=fl; return *this; }
+	FORCEINLINE vec2_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; return *this; }
 
-	inline vec2_t  operator+ ( const vec2_t &v ) const { vec2_t res; res.x = x + v.x; res.y = y + v.y; return res; }
-	inline vec2_t  operator- ( const vec2_t &v ) const { vec2_t res; res.x = x - v.x; res.y = y - v.y; return res; }
+	FORCEINLINE vec2_t  operator+ ( const vec2_t &v ) const { vec2_t res; res.x = x + v.x; res.y = y + v.y; return res; }
+	FORCEINLINE vec2_t  operator- ( const vec2_t &v ) const { vec2_t res; res.x = x - v.x; res.y = y - v.y; return res; }
 
-	inline vec2_t &operator= ( const vec2_t &v ) { x = v.x; y = v.y; return *this; }
+	FORCEINLINE vec2_t &operator= ( const vec2_t &v ) { x = v.x; y = v.y; return *this; }
 
-	inline vec2_t  operator- () const { return vec2_t( -x, -y ); }
+	FORCEINLINE vec2_t  operator- () const { return vec2_t( -x, -y ); }
 	// clang-format on
 };
 
@@ -63,28 +63,28 @@ struct vec3_t
 	vec3_t( vec_t x, vec_t y, vec_t z ) { this->x = x; this->y = y; this->z = z; }
 
 	// clang-format off
-	inline vec_t *Base() { return (vec_t *)this; }
-	inline const vec_t *Base() const { return (vec_t *)this; }
+	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
+	FORCEINLINE const vec_t *Base() const { return (vec_t *)this; }
 
-	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
-	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
 
-	inline vec3_t &operator+=( const vec3_t &v ) { x+=v.x; y+=v.y; z+=v.z; return *this; }
-	inline vec3_t &operator-=( const vec3_t &v ) { x-=v.x; y-=v.y; z-=v.z; return *this; }
-	inline vec3_t &operator*=( const vec3_t &v ) { x+=v.x; y*=v.y; z*=v.z; return *this; }
-	inline vec3_t &operator/=( const vec3_t &v ) { x/=v.x; y/=v.y; z/=v.z; return *this; }
+	FORCEINLINE vec3_t &operator+=( const vec3_t &v ) { x+=v.x; y+=v.y; z+=v.z; return *this; }
+	FORCEINLINE vec3_t &operator-=( const vec3_t &v ) { x-=v.x; y-=v.y; z-=v.z; return *this; }
+	FORCEINLINE vec3_t &operator*=( const vec3_t &v ) { x+=v.x; y*=v.y; z*=v.z; return *this; }
+	FORCEINLINE vec3_t &operator/=( const vec3_t &v ) { x/=v.x; y/=v.y; z/=v.z; return *this; }
 
-	inline vec3_t &operator+=( float fl ) { x+=fl; y+=fl; z+=fl; return *this; }
-	inline vec3_t &operator-=( float fl ) { x-=fl; y-=fl; z-=fl; return *this; }
-	inline vec3_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; return *this; }
-	inline vec3_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; return *this; }
+	FORCEINLINE vec3_t &operator+=( float fl ) { x+=fl; y+=fl; z+=fl; return *this; }
+	FORCEINLINE vec3_t &operator-=( float fl ) { x-=fl; y-=fl; z-=fl; return *this; }
+	FORCEINLINE vec3_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; return *this; }
+	FORCEINLINE vec3_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; return *this; }
 
-	inline vec3_t  operator+ ( const vec3_t &v ) const { vec3_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; return res; }
-	inline vec3_t  operator- ( const vec3_t &v ) const { vec3_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; return res; }
+	FORCEINLINE vec3_t  operator+ ( const vec3_t &v ) const { vec3_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; return res; }
+	FORCEINLINE vec3_t  operator- ( const vec3_t &v ) const { vec3_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; return res; }
 
-	inline vec3_t &operator= ( const vec3_t &v ) { x = v.x; y = v.y; z = v.z; return *this; }
+	FORCEINLINE vec3_t &operator= ( const vec3_t &v ) { x = v.x; y = v.y; z = v.z; return *this; }
 
-	inline vec3_t  operator- () const { return vec3_t( -x, -y, -z ); }
+	FORCEINLINE vec3_t  operator- () const { return vec3_t( -x, -y, -z ); }
 	// clang-format on
 };
 
@@ -97,44 +97,44 @@ struct vec4_t
 	vec4_t( vec_t x, vec_t y, vec_t z, vec_t w ) { this->x = x; this->y = y; this->z = z; this->w = w; }
 
 	// clang-format off
-	inline vec_t *Base() { return (vec_t *)this; }
-	inline const vec_t *Base() const { return (vec_t *)this; }
+	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
+	FORCEINLINE const vec_t *Base() const { return (vec_t *)this; }
 
-	inline vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
-	inline vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) { return ((vec_t *)this)[i]; }
+	FORCEINLINE vec_t  &operator[]( int i ) const { return ((vec_t *)this)[i]; }
 
-	inline vec4_t &operator+=( const vec4_t &v ) { x+=v.x; y+=v.y; z+=v.z; w+=v.w; return *this; }
-	inline vec4_t &operator-=( const vec4_t &v ) { x-=v.x; y-=v.y; z-=v.z; w+=v.w; return *this; }
-	inline vec4_t &operator*=( const vec4_t &v ) { x+=v.x; y*=v.y; z*=v.z; w+=v.w; return *this; }
-	inline vec4_t &operator/=( const vec4_t &v ) { x/=v.x; y/=v.y; z/=v.z; w+=v.w; return *this; }
+	FORCEINLINE vec4_t &operator+=( const vec4_t &v ) { x+=v.x; y+=v.y; z+=v.z; w+=v.w; return *this; }
+	FORCEINLINE vec4_t &operator-=( const vec4_t &v ) { x-=v.x; y-=v.y; z-=v.z; w+=v.w; return *this; }
+	FORCEINLINE vec4_t &operator*=( const vec4_t &v ) { x+=v.x; y*=v.y; z*=v.z; w+=v.w; return *this; }
+	FORCEINLINE vec4_t &operator/=( const vec4_t &v ) { x/=v.x; y/=v.y; z/=v.z; w+=v.w; return *this; }
 
-	inline vec4_t &operator+=( float fl ) { x+=fl; y+=fl; z+=fl; w+=fl; return *this; }
-	inline vec4_t &operator-=( float fl ) { x-=fl; y-=fl; z-=fl; w+=fl; return *this; }
-	inline vec4_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; w+=fl; return *this; }
-	inline vec4_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; w*=f; return *this; }
+	FORCEINLINE vec4_t &operator+=( float fl ) { x+=fl; y+=fl; z+=fl; w+=fl; return *this; }
+	FORCEINLINE vec4_t &operator-=( float fl ) { x-=fl; y-=fl; z-=fl; w+=fl; return *this; }
+	FORCEINLINE vec4_t &operator*=( float fl ) { x*=fl; y*=fl; z*=fl; w+=fl; return *this; }
+	FORCEINLINE vec4_t &operator/=( float fl ) { float f = 1.f/fl; x*=f; y*=f; z*=f; w*=f; return *this; }
 
-	inline vec4_t  operator+ ( const vec4_t &v ) const { vec4_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; res.w = w - v.w; return res; }
-	inline vec4_t  operator- ( const vec4_t &v ) const { vec4_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; res.w = w - v.w; return res; }
+	FORCEINLINE vec4_t  operator+ ( const vec4_t &v ) const { vec4_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; res.w = w - v.w; return res; }
+	FORCEINLINE vec4_t  operator- ( const vec4_t &v ) const { vec4_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; res.w = w - v.w; return res; }
 
-	inline vec4_t &operator= ( const vec4_t &v ) { x = v.x; y = v.y; z = v.z; w = v.w; return *this; }
+	FORCEINLINE vec4_t &operator= ( const vec4_t &v ) { x = v.x; y = v.y; z = v.z; w = v.w; return *this; }
 
-	inline vec4_t  operator- () const { return vec4_t( -x, -y, -z, -w ); }
+	FORCEINLINE vec4_t  operator- () const { return vec4_t( -x, -y, -z, -w ); }
 	// clang-format on
 };
 
-inline void CrossProduct( const vec3_t &a, const vec3_t &b, vec3_t &result )
+FORCEINLINE void CrossProduct( const vec3_t &a, const vec3_t &b, vec3_t &result )
 {
 	result.x = a.y * b.z - a.z * b.y;
 	result.y = a.z * b.x - a.x * b.z;
 	result.z = a.x * b.y - a.y * b.x;
 }
 
-inline vec_t DotProduct( const vec3_t &a, const vec3_t &b )
+FORCEINLINE vec_t DotProduct( const vec3_t &a, const vec3_t &b )
 {
 	return ( a.x * b.x + a.y * b.y + a.z * b.z );
 }
 
-inline float VectorNormalize( vec3_t &v )
+FORCEINLINE float VectorNormalize( vec3_t &v )
 {
 	float rad = sqrtf( v.x * v.x + v.y * v.y + v.z * v.z );
 	v *= 1.f / ( rad + FLT_EPSILON );

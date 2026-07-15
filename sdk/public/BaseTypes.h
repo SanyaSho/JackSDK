@@ -35,6 +35,8 @@
 #define DLL_EXPORT extern "C" __declspec( dllexport )
 #define DLL_IMPORT extern "C" __declspec( dllimport )
 
+#define FORCEINLINE __forceinline
+
 typedef __int16 int16;
 typedef unsigned __int16 uint16;
 typedef __int32 int32;
@@ -44,6 +46,8 @@ typedef unsigned __int64 uint64;
 #else
 #define DLL_EXPORT extern "C" __attribute__ ((visibility("default")))
 #define DLL_IMPORT extern "C" 
+
+#define FORCEINLINE inline __attribute__((always_inline))
 
 typedef short int16;
 typedef unsigned short uint16;
