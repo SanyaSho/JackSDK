@@ -214,7 +214,7 @@ typedef struct qSkyData_s
 COMPILE_TIME_ASSERT( sizeof( qSkyData_t ) == SIZEOF_QSKYDATA_S ); // NOTE: The size is unknown
 
 
-class CMapWorld;
+class CMapWorld; /* CMapWorld inherits qWorld_s */
 
 typedef struct qWorld_s
 {

@@ -54,6 +54,9 @@ DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
 
 	memcpy( &gEditorfuncs, editorFuncs, editorFuncs->m_intefaceVersion );
 	setlocale( LC_ALL, "C" );
+
+	srand( 69069 );
+
 	return 0;
 }
 
@@ -188,70 +191,50 @@ pluginActionDesc_t createCamera = {
 	CreateCamera
 };
 
-void CreateNodes()
+void CreatePath()
 {
-	qWorld_s *world = Global_GetCurrentWorld();
-	if ( !world )
+	qWorld_s *worldDef = Global_GetCurrentWorld();
+	if ( !worldDef )
 		return;
 
-	float vec3_origin[3] = { 0, 0, 0 };
+	qPath_t *pathDef = Path_Create( worldDef );
 
-	// TODO: How does this work?
-	qNode_t *pNode = (qNode_t *)Sys_Malloc( sizeof( qNode_t ) );
-	memset( pNode, 0, sizeof( qNode_t ) );
+	pathDef->m_pathClassname = Sys_AllocString( "path_corner" );
+	pathDef->m_pathName = Sys_AllocString( "apiPath" );
+	pathDef->m_pathDirection = 1; // One-way path
 
-	pNode->m_vecOrigin = { 0, 0, 128 };
-	pNode->m_vecAngles = { 90, 35, 0 };
+	for ( int i = 0; i < 5; i++ )
+	{
+		int dir = ( rand() & 2 );
 
-	Node_Insert( world, pNode );
+		qNode_s *nodeDef = Node_Append( worldDef, pathDef );
+
+		nodeDef->m_vecOrigin = vec3_t( dir == 0 ? i * 64.f : 0.f, dir == 1 ? i * 32.f : 0.f, dir == 2 ? i * 48.f : 0.f );
+		nodeDef->m_vecAngles = vec3_t( 0.f, 0.f, 0.f );
+
+		nodeDef->m_speed = 200.f;
+		nodeDef->m_yaw_speed = 0.f;
+		nodeDef->m_wait = 0.1f;
+		nodeDef->m_fov = 90.f;
+	}
+
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	Path_Build( pathDef, 0 );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 }
 
-pluginActionDesc_t createNodes = {
+pluginActionDesc_t createPath = {
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	"CreateNodes",
+	"CreatePath",
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	"&Create Nodes",
+	"&Create a Path",
 	"",
 	"ExamplePlugin",
 #if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	ACTION_FLAG_INLEVEL,
-	CreateNodes
-};
-
-void CreatePaths()
-{
-	qWorld_s *world = Global_GetCurrentWorld();
-	if ( !world )
-		return;
-
-	float vec3_origin[3] = { 0, 0, 0 };
-
-	// TODO: How does this work?
-	qPath_t *pPath = Path_Create( world );
-
-	pPath->m_pathClassname = Sys_AllocString( "path_corner" );
-	pPath->m_pathName = Sys_AllocString( "apiPath" );
-	pPath->m_pathDirection = 2;
-
-#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	Path_Build( pPath, 0 );
-#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
-}
-
-pluginActionDesc_t createPaths = {
-#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	"CreatePaths",
-#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	"&Create Paths",
-	"",
-	"ExamplePlugin",
-#if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
-	0,
-#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
-	ACTION_FLAG_INLEVEL,
-	CreatePaths
+	CreatePath
 };
 
 void PrintSysFloatTime()
@@ -657,8 +640,7 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 	registerAction( &runTests, pluginManager );
 	registerAction( &spawnEntity, pluginManager );
 	registerAction( &createCamera, pluginManager );
-	registerAction( &createNodes, pluginManager );
-	registerAction( &createPaths, pluginManager );
+	registerAction( &createPath, pluginManager );
 	registerAction( &printSysFloatTime, pluginManager );
 	registerAction( &runBuildPackageList, pluginManager );
 	registerAction( &mbTest, pluginManager );

@@ -35,8 +35,10 @@ typedef struct qNode_s
 	struct qNode_s *selectedNext;
 	struct qNode_s *selectedPrev;
 
-	struct qNode_s *m_parent; // TODO: Recheck
+	/* Owner of this node */
+	struct qPath_s *m_ownerPath;
 
+	/* Node KeyValues */
 	struct epair_s *epairs;
 
 	const char *m_nameOverride;
@@ -47,22 +49,27 @@ typedef struct qNode_s
 
 	int m_editorFlags;
 
-	char gap4_1[4];
+	/* Index of the node on a path */
+	int m_nodeIndex;
 
 	int m_editorId;
 
 	vec3_t m_vecOrigin;
 	vec3_t m_vecAngles;
 
+	/* New Train Speed */
 	float m_speed;
-	float m_yaw_speed;
-	float m_wait;
-	float m_fov;
-	int m_spawnflags;
 
-#if defined( JACK_64BIT )
-	char gap5[4];
-#endif // JACK_64BIT
+	/* New Train rot. Speed */
+	float m_yaw_speed;
+
+	/* Wait here (secs) */
+	float m_wait;
+
+	float m_fov;
+
+	/* Node spawnflags */
+	int m_spawnflags;
 } qNode_t;
 COMPILE_TIME_ASSERT( sizeof( qNode_t ) == SIZEOF_QNODE_S );
 

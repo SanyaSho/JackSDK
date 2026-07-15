@@ -47,10 +47,6 @@ typedef struct qPath_s
 
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
-
-#if defined( JACK_64BIT )
-	char gap4[4];
-#endif // JACK_64BIT
 } qPath_t;
 COMPILE_TIME_ASSERT( sizeof( qPath_t ) == SIZEOF_QPATH_S );
 

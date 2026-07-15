@@ -727,10 +727,32 @@ typedef struct
 
 
 /* Path API */
+
+/*
+ Path_Create
+ Creates an empty path definition.
+
+ worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+*/
 typedef qPath_s *	(*pfnEditor_Path_Create)				( qWorld_s *worldDef );
-typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *path );
+
+/*
+ Path_Destroy
+ Destroys the path.
+
+ pathDef - Path definition.
+*/
+typedef void		(*pfnEditor_Path_Destroy)				( qPath_s *pathDef );
+
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-typedef void		(*pfnEditor_Path_Build)					( qPath_s *path, int buildFlags );
+/*
+ Path_Build
+ Will update the index of each node attached to pathDef.
+
+ pathDef - Path definition.
+ buildFlags - Build flags (Currently reserved, must be set to 0).
+*/
+typedef void		(*pfnEditor_Path_Build)					( qPath_s *pathDef, int buildFlags );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 typedef struct
@@ -744,8 +766,31 @@ typedef struct
 
 
 /* Node API */
-typedef void		(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *path );
+
+/*
+ Node_Append
+ Appends a node to the path.
+
+ worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+ pathDef - Path definition (can be obtained after creating the path using Path_Create or accessing the worldDef->m_pathList).
+*/
+typedef qNode_s *	(*pfnEditor_Node_Append)				( qWorld_s *worldDef, qPath_s *pathDef );
+
+/*
+ Node_Insert
+ Inserts a node into previously allocated linked list.
+
+ worldDef - World definition.
+ parentNode - A list of nodes (example: qPath_s::m_nodeList)
+*/
 typedef qNode_s *	(*pfnEditor_Node_Insert)				( qWorld_s *worldDef, qNode_s *parentNode );
+
+/*
+ Node_Destroy
+ Destroys the node.
+
+ nodeDef - Node definition.
+*/
 typedef void		(*pfnEditor_Node_Destroy)				( qNode_s *nodeDef );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
@@ -758,8 +803,8 @@ typedef struct
 #else
 typedef struct
 {
-	pfnEditor_Node_Append pfnNode_Append;
 	pfnEditor_Node_Insert pfnNode_Insert;
+	pfnEditor_Node_Append pfnNode_Append;
 	pfnEditor_Node_Destroy pfnNode_Destroy;
 } node_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
