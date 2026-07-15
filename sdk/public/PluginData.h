@@ -22,8 +22,8 @@
 
  Quake II/Quake III uses custom fields for face's surface and content flags
  New flags can be registered using vpEnumSurfaceFlags and vpEnumContentFlags functions.
- Max count of surface flags: 19
- Max count of content flags: 31
+ Max count of surface flags: 20
+ Max count of content flags: 32
 
  Example:
  DLL_EXPORT int vpEnumSurfaceFlags( pfnRegisterFlags registerFlags, void *libraryHandle )

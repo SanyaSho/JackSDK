@@ -20,13 +20,12 @@
  
  DLL_EXPORT int vpEnumPrimitives( pfnRegisterPrimitive registerPrimitive, void *libraryHandle )
  {
- 	(void)libraryHandle;
- 	registerPrimitive( &customPrimitive );
+ 	registerPrimitive( &customPrimitive, libraryHandle );
  	return 1;
  }
 
  Retured value is the count of primitives added by the plugin.
- libraryHandle is not used and must be ignored.
+ libraryHandle must be redirected into the registerPrimitive call.
 */
 
 #include "BaseTypes.h"
@@ -100,7 +99,7 @@ COMPILE_TIME_ASSERT( sizeof( stPRIMITIVECREATESTRUCT ) == SIZEOF_STPRIMITIVECREA
 // clang-format off
 
 // Prototype for the function that is used to register primitives internally
-typedef void (*pfnRegisterPrimitive)( const primitiveDesc_s *primDesc );
+typedef void (*pfnRegisterPrimitive)( const primitiveDesc_s *primDesc, void *libraryHandle );
 
 typedef int (*vpEnumPrimitives_t)( pfnRegisterPrimitive registerPrimitive, void *libraryHandle );
 

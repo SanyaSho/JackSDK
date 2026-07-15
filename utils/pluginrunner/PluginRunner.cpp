@@ -49,9 +49,11 @@ static char *Sys_AllocString( const char *src );
 #if defined( JACK_64BIT )
 #define PLUGIN_DLL "vpHalfLifex64" _DLL_EXT
 //#define PLUGIN_DLL "vpQuakex64" _DLL_EXT
+//#define PLUGIN_DLL "vpQuake3x64" _DLL_EXT
 #else
 #define PLUGIN_DLL "vpHalfLifex86" _DLL_EXT
 //#define PLUGIN_DLL "vpQuakex86" _DLL_EXT
+//#define PLUGIN_DLL "vpQuake3x86" _DLL_EXT
 #endif
 
 
@@ -684,7 +686,7 @@ static void Editor_RegisterAction( pluginActionDesc_t *actionInfo, void *pluginM
 }
 
 
-static void Editor_RegisterPrimitive( const primitiveDesc_s *primDesc )
+static void Editor_RegisterPrimitive( const primitiveDesc_s *primDesc, void *libraryHandle )
 {
 	Sys_Printf( "  %s / %s / %d %d %d / %d / 0x%p", primDesc->m_primitiveName, primDesc->m_primitiveCategory, primDesc->m_numFaces, primDesc->m_minFaces, primDesc->m_maxFaces, primDesc->m_flags, primDesc->pfnDispatchFunc );
 }

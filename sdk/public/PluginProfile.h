@@ -28,9 +28,12 @@
 
 #include "BaseTypes.h"
 
+struct qShader_s;
+
+
 // clang-format off
 
-//#define PROFILE_BIT0						( 1 << 0  )
+#define PROFILE_ENABLE_SHADER_EDITOR		( 1 << 0  )
 #define PROFILE_ALLOW_CUSTOM_PALETTE		( 1 << 1  ) // CPreferencesDialog::exec_on_mapProfileChanged
 #define PROFILE_FACE_HAS_SURFACEFLAGS		( 1 << 2  ) // CFacePropertiesDialog::measureAndSetupFlags
 #define PROFILE_FACE_HAS_CONTENTFLAGS		( 1 << 3  ) // CFacePropertiesDialog::measureAndSetupFlags
@@ -58,10 +61,11 @@
 
 typedef struct mapProfile_s
 {
-	// Must always be NULL in the plugin environment
+	/* Must always be NULL in the plugin environment */
 	void *libraryHandle;
 
-	size_t unkint1; // used by q3
+	/* Callbacks for the Shader Editor */
+	struct shaderEditorCallbacks_s *m_shaderEditorCallbacks;
 
 	/* Profile options flags */
 	int dataBits;
@@ -126,11 +130,57 @@ typedef struct mapProfile_s
 
 	char gvn2[64]; // CMapEntity::assignTargetInfo
 
-	int unknown_ContentFlagsBitMask;
-	int unknown_SurfaceFlagsBitMask;
-	int unknown_ShaderMask;
+	/* Enables the "Make Detail" tool which sets those flags to the brush. Also enables the "Make Structural" tool which removes those flags from the brush */
+	int m_detailFlags;
+
+	int m_surfaceFlagsFirstBit;
+	int m_contentFlagsFirstBit;
 } mapProfile_t;
 COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == SIZEOF_MAPPROFILE_S );
+
+// clang-format off
+
+/* CShaderEditDialog::exec_on_load_image */
+typedef bool		(*pfnShaderEditor_LoadImage)			( const char *filePath, qShader_s *shaderDef );
+
+/* CShaderEditDialog::exec_on_load_scriptfile */
+typedef bool		(*pfnShaderEditor_LoadScriptFile)		( const char *filePath, qShader_s *shaderDef );
+
+/* CShaderEditDialog::finalizeShaders */
+typedef bool		(*pfnShaderEditor_SaveScriptFile)		( const char *filePath, qShader_s *shaderDef, bool );
+
+/* CShaderEditDialog::updateCurrentScript */
+typedef void		(*pfnShaderEditor_PushError)			( int line, const char *token, void *shaderEditorDialog );
+typedef bool		(*pfnShaderEditor_BuildSourceCode)		( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_PushError pfnPushError1, pfnShaderEditor_PushError pfnPushError2, void *shaderEditorDialog );
+
+/* CShaderEditScript::reformatText */
+typedef bool		(*pfnShaderEditor_ReformatText)			( const char *str1, const char *str2, int, char *outBuf, size_t outBufSize );
+
+/* CShaderEditScript::fillCompleteSuggestions */
+/* outBuf / outBufSize is a char[16*1024] split by ' ' */
+typedef bool		(*pfnShaderEditor_FillCompleteSuggestions)( const char *parmName, int, char *outBuf, size_t outBufSize );
+// clang-format on
+
+
+/* Shader Editor callback interface */
+/* m_intefaceVersion is a sizeof( mapCallbacks_t ) */
+typedef struct shaderEditorCallbacks_s
+{
+	size_t m_interfaceVersion;
+
+	pfnShaderEditor_LoadImage pfnLoadImage;
+
+	pfnShaderEditor_LoadScriptFile pfnLoadScriptFile;
+
+	pfnShaderEditor_SaveScriptFile pfnSaveScriptFile;
+
+	pfnShaderEditor_BuildSourceCode pfnBuildSourceCode;
+
+	pfnShaderEditor_ReformatText pfnReformatText;
+
+	pfnShaderEditor_FillCompleteSuggestions pfnFillCompleteSuggestions;
+} shaderEditorCallbacks_t;
+
 
 // clang-format off
 

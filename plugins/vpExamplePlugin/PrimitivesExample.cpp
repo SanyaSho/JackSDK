@@ -111,7 +111,6 @@ vpEnumPrimitives
 */
 DLL_EXPORT int vpEnumPrimitives( pfnRegisterPrimitive registerPrimitive, void *libraryHandle )
 {
-	(void)libraryHandle;
-	registerPrimitive( &blockPrimitive );
+	registerPrimitive( &blockPrimitive, libraryHandle );
 	return 1;
 }

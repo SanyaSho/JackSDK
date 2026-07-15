@@ -23,13 +23,22 @@
  }
 
  Retured value is the count of actions added by the plugin. Returned value is not checked by the editor.
- pluginManager must be redirected into registerAction call.
+ pluginManager must be redirected into the registerAction call.
 */
 
 #include "BaseTypes.h"
 
 #define ACTION_FLAG_HIDDEN	( 1 << 0 ) /* Completly hides the action until the level is loaded */
 #define ACTION_FLAG_INLEVEL ( 1 << 1 ) /* Action is grayed out until the level is loaded */
+
+/*
+    if ( (v14 & 0xC00) != 0 )
+      QAction::setEnabled(this: *i, a2: true);
+    if ( (v14 & 0x400) != 0 && m_shaderEditorCallbacks == nullptr )
+      QAction::setEnabled(this: *i, a2: false);
+    if ( (v14 & 0x800) != 0 && !v8 )
+      QAction::setEnabled(this: *i, a2: false);
+*/
 
 typedef struct pluginActionDesc_s
 {

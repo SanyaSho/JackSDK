@@ -1347,7 +1347,7 @@ typedef struct
 	pfnEditor_Dialog_Printf pfnDialog_Printf;
 	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
 	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
-} dialog_apt_t;
+} dialog_api_t;
 #else
 typedef struct
 {
@@ -1373,7 +1373,7 @@ typedef struct
 	pfnEditor_Dialog_Printf pfnDialog_Printf;
 	pfnEditor_Dialog_BeginWait pfnDialog_BeginWait;
 	pfnEditor_Dialog_EndWait pfnDialog_EndWait;
-} dialog_apt_t;
+} dialog_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 // clang-format on
@@ -1482,7 +1482,7 @@ typedef struct plugin_funcs_s
 	undo_api_t undofuncs;
 
 	/* Dialog API */
-	dialog_apt_t dialogfuncs;
+	dialog_api_t dialogfuncs;
 } plugin_funcs_t;
 COMPILE_TIME_ASSERT( sizeof( plugin_funcs_t ) == SIZEOF_PLUGIN_FUNCS_T );
 

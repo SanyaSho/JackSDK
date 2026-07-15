@@ -656,13 +656,68 @@ DLL_EXPORT int vpEnumActions( pfnRegisterAction registerAction, void *pluginMana
 #endif
 	return 10;
 }
+/*
+typedef struct mapCallbacks_s
+{
+	size_t m_interfaceVersion;
+
+	void ( *fn0 )( const char *, void * );
+	void ( *fn1 )( char *, const char * );
+	void ( *fn2 )( char *, char *, bool );
+	void ( *fn3 )( char *, char *, void *, void *, void * );
+	void ( *fn4 )( char *, char *, char *, char *, size_t );
+	void ( *fn5 )( char *, int, char *, size_t );
+} mapCallbacks_t;*/
+
+bool ShaderEditor_LoadImage( const char *filePath, qShader_s *shaderDef )
+{
+	return 0;
+}
+
+bool ShaderEditor_LoadScriptFile( const char *filePath, qShader_s *shaderDef )
+{
+	return 0;
+}
+
+bool ShaderEditor_SaveScriptFile( const char *filePath, qShader_s *shaderDef, bool )
+{
+	return 0;
+}
+
+bool ShaderEditor_BuildSourceCode( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_PushError pfnPushError1, pfnShaderEditor_PushError pfnPushError2, void *shaderEditorDialog )
+{
+	pfnPushError1( 0, "BuildSourceCode pfnPushError1", shaderEditorDialog );
+	pfnPushError2( 0, "BuildSourceCode pfnPushError2", shaderEditorDialog );
+	return 0;
+}
+
+bool ShaderEditor_ReformatText( const char *str1, const char *str2, int, char *outBuf, size_t outBufSize )
+{
+	return 0;
+}
+
+bool ShaderEditor_FillCompleteSuggestions( const char *parmName, int, char *outBuf, size_t outBufSize )
+{
+	return 0;
+}
 
 // clang-format off
+shaderEditorCallbacks_t g_callbacks =
+{
+	sizeof( shaderEditorCallbacks_t ),
+	&ShaderEditor_LoadImage,
+	&ShaderEditor_LoadScriptFile,
+	&ShaderEditor_SaveScriptFile,
+	&ShaderEditor_BuildSourceCode,
+	&ShaderEditor_ReformatText,
+	&ShaderEditor_FillCompleteSuggestions
+};
+
 mapProfile_t profile =
 {
 	NULL,
 
-	0,
+	&g_callbacks,
 
 	/*
 	hl1:
@@ -682,13 +737,14 @@ mapProfile_t profile =
 	[0, 3, 6, 19]
 	*/
 	( 1 << 6  ) | PROFILE_FACE_HAS_SURFACEFLAGS | PROFILE_FACE_HAS_CONTENTFLAGS |PROFILE_DECALTOOL_USE_Q3_OVERLAYS | PROFILE_ENTITY_HL1_RENDERPROPS | ( 1 << 10 ) | ( 1 << 14 ) | PROFILE_SKY_SHADER | PROFILE_STUDIO_INVERT_PITCH_STATE | PROFILE_ENABLE_FALLBACK_DIR,
+	//1<<0|1<<3|1<<6|1<<19,
 
 	"vpHalfLife",
 	"Half-Life / TFC (Custom)",
 
 	".bsp",
 	"",
-	".wad",
+	".wad;.shader",//".wad",
 	".pak",
 	".spr;.png;.gif",//".spr",
 	".mdl",
@@ -707,7 +763,7 @@ mapProfile_t profile =
 	"",
 	"",
 	"textures",
-	"",
+	"scripts",
 	"gfx/env",
 
 	"-onlyents",
@@ -735,7 +791,7 @@ mapProfile_t profile =
 
 	"+-",
 
-	0,
+	1<<2,
 	0,
 	0
 };
@@ -1017,12 +1073,14 @@ DLL_EXPORT bool vpLoadSprite( int formatIndex, const char *filePath, byte *buf, 
 DLL_EXPORT int vpEnumSurfaceFlags( pfnRegisterFlags reg, void *libraryHandle )
 {
 	reg( "vpHalfLife", "MySurfaceFlag", 1, libraryHandle );
+	reg( "vpHalfLife", "MySurfaceFlag 2", 2, libraryHandle );
 	return 1;
 }
 
 DLL_EXPORT int vpEnumContentFlags( pfnRegisterFlags reg, void *libraryHandle )
 {
 	reg( "vpHalfLife", "MyContentFlag", 1, libraryHandle );
+	reg( "vpHalfLife", "MyContentFlag 2", 2, libraryHandle );
 	return 1;
 }
 
