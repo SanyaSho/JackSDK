@@ -140,6 +140,19 @@ COMPILE_TIME_ASSERT( sizeof( mapProfile_t ) == SIZEOF_MAPPROFILE_S );
 
 // clang-format off
 
+// Prototype for the function that is used to register game profiles internally
+typedef void (*pfnRegisterProfile)( mapProfile_t *profileInfo, void *libraryHandle );
+
+typedef int (*vpEnumProfiles_t)( pfnRegisterProfile registerProfile, void *libraryHandle );
+
+// clang-format on
+
+/*
+ Shader Editor API
+*/
+
+// clang-format off
+
 /* CShaderEditDialog::exec_on_load_image */
 typedef bool		(*pfnShaderEditor_LoadImage)			( const char *filePath, qShader_s *shaderDef );
 
@@ -159,11 +172,12 @@ typedef bool		(*pfnShaderEditor_ReformatText)			( const char *str1, const char *
 /* CShaderEditScript::fillCompleteSuggestions */
 /* outBuf / outBufSize is a char[16*1024] split by ' ' */
 typedef bool		(*pfnShaderEditor_FillCompleteSuggestions)( const char *parmName, int, char *outBuf, size_t outBufSize );
+
 // clang-format on
 
 
 /* Shader Editor callback interface */
-/* m_intefaceVersion is a sizeof( mapCallbacks_t ) */
+/* m_intefaceVersion is a sizeof( shaderEditorCallbacks_t ) */
 typedef struct shaderEditorCallbacks_s
 {
 	size_t m_interfaceVersion;
@@ -180,15 +194,6 @@ typedef struct shaderEditorCallbacks_s
 
 	pfnShaderEditor_FillCompleteSuggestions pfnFillCompleteSuggestions;
 } shaderEditorCallbacks_t;
-
-
-// clang-format off
-
-// Prototype for the function that is used to register game profiles internally
-typedef void (*pfnRegisterProfile)( mapProfile_t *profileInfo, void *libraryHandle );
-
-typedef int (*vpEnumProfiles_t)( pfnRegisterProfile registerProfile, void *libraryHandle );
-
-// clang-format on
+COMPILE_TIME_ASSERT( sizeof( shaderEditorCallbacks_t ) == SIZEOF_SHADEREDITORCALLBACKS_S );
 
 #endif // !PLUGINPROFILE_H

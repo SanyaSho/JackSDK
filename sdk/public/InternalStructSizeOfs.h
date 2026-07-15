@@ -91,10 +91,11 @@
 
 // PluginProfile.h (64Bit)
 #define SIZEOF_MAPPROFILE_S				2960
+#define SIZEOF_SHADEREDITORCALLBACKS_S	56 /* NOTE: Size is unknown */
 
 // PluginRender.h (64Bit)
 #define SIZEOF_QTEXTURE_S				48
-#define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown*/
+#define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown */
 #define SIZEOF_QSHADERSTAGE_S			384
 #define SIZEOF_QSHADER_S_WINDOWS		640
 #define SIZEOF_QSHADER_S_LINUX			1408
@@ -199,6 +200,7 @@
 
 // PluginProfile.h (32Bit)
 #define SIZEOF_MAPPROFILE_S				2952
+#define SIZEOF_SHADEREDITORCALLBACKS_S	28 /* NOTE: Size is unknown */
 
 // PluginRender.h (32Bit)
 #define SIZEOF_QTEXTURE_S				40
