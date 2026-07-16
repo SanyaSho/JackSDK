@@ -463,6 +463,9 @@ void InitializeEditorFuncs()
 
 static void Editor_RegisterProfile( mapProfile_t *profileInfo, void *libraryHandle )
 {
+	assert( profileInfo->m_shaderEditorCallbacks && ( profileInfo->m_dataBits & PROFILE_ENABLE_SHADER_EDITOR ) != 0 );
+
+	Sys_Printf( "  %s (%s)", profileInfo->pluginName, profileInfo->mapFormat );
 }
 
 static bool Editor_RegisterIOFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
@@ -909,7 +912,9 @@ int main( int argc, char **argv )
 	vpEnumProfiles_t pluginEnumProfiles = (vpEnumProfiles_t)GetProcAddress( hPluginModule, "vpEnumProfiles" );
 	if ( pluginEnumProfiles )
 	{
-		pluginEnumProfiles( Editor_RegisterProfile, hPluginModule );
+		int ret = pluginEnumProfiles( Editor_RegisterProfile, hPluginModule ); /* Editor does not check the return value */
+		if ( ret != 0 )
+			Sys_Printf( "%i game profile(s) registered", ret );
 	}
 
 	vpEnumGenericFunction_t pluginEnumExportFormats = (vpEnumGenericFunction_t)GetProcAddress( hPluginModule, "vpEnumExportFormats" );

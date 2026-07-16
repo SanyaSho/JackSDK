@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "PluginAPI.h"
+#include "PluginMeta.h"
 
 static void ControlsTest_InternalCommand()
 {
@@ -98,7 +98,7 @@ void MessageBoxTest()
 	}
 
 	/*
-	 Will spawn a dialog window with some various controls to play with
+	 Will spawn a dialog window with various controls to play with
 	*/
 	if ( ( mask & TEXT_MSGBOX_CONTROLS ) != 0 )
 	{

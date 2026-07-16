@@ -16,6 +16,8 @@
 
 #include "BaseTypes.h" // Includes InternalStructSizeOfs.h and PluginMath.h
 
+#include "PluginAPI.h" // Includes PluginEditorFunctions.h
+
 #include "PluginActions.h"
 #include "PluginCamera.h"
 #include "PluginData.h"
@@ -28,7 +30,5 @@
 #include "PluginProfile.h"
 #include "PluginRender.h"
 #include "PluginWorld.h"
-
-#include "PluginAPI.h" // Includes PluginEditorFunctions.h
 
 #endif // !PLUGINMETA_H

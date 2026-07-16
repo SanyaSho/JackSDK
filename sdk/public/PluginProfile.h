@@ -163,8 +163,8 @@ typedef bool		(*pfnShaderEditor_LoadScriptFile)		( const char *filePath, qShader
 typedef bool		(*pfnShaderEditor_SaveScriptFile)		( const char *filePath, qShader_s *shaderDef, bool recursive );
 
 /* CShaderEditDialog::updateCurrentScript */
-typedef void		(*pfnShaderEditor_PushError)			( int line, const char *token, void *shaderEditorDialog );
-typedef bool		(*pfnShaderEditor_BuildSourceCode)		( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_PushError pfnPushError1, pfnShaderEditor_PushError pfnPushError2, void *shaderEditorDialog );
+typedef void		(*pfnShaderEditor_Message)			( int line, const char *token, void *shaderEditorDialog );
+typedef bool		(*pfnShaderEditor_BuildSourceCode)		( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_Message pfnPushWarning, pfnShaderEditor_Message pfnPushError, void *shaderEditorDialog );
 
 /* CShaderEditScript::reformatText */
 typedef bool		(*pfnShaderEditor_ReformatText)			( const char *str1, const char *str2, int, char *outBuf, size_t outBufSize );

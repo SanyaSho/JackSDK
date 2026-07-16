@@ -6,9 +6,6 @@
 #endif // !WIN32
 
 
-#include "GL/glew.h"
-
-
 #include "PluginAPI.h"
 #include "PluginActions.h"
 #include "PluginCamera.h"
@@ -25,9 +22,6 @@
 //#define STBI_MALLOC( sz )		 Sys_Malloc( sz )
 //#define STBI_REALLOC( p, newsz ) realloc( p, newsz )
 //#define STBI_FREE( p )			 Sys_Free( p )
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -679,15 +673,15 @@ bool ShaderEditor_LoadScriptFile( const char *filePath, qShader_s *shaderDef )
 	return false;
 }
 
-bool ShaderEditor_SaveScriptFile( const char *filePath, qShader_s *shaderDef, bool )
+bool ShaderEditor_SaveScriptFile( const char *filePath, qShader_s *shaderDef, bool recursive )
 {
 	return false;
 }
 
-bool ShaderEditor_BuildSourceCode( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_PushError pfnPushError1, pfnShaderEditor_PushError pfnPushError2, void *shaderEditorDialog )
+bool ShaderEditor_BuildSourceCode( const char *filePath, qShader_s *shaderDef, pfnShaderEditor_Message pfnPushWarning, pfnShaderEditor_Message pfnPushError, void *shaderEditorDialog )
 {
-	pfnPushError1( 0, "BuildSourceCode pfnPushError1", shaderEditorDialog );
-	pfnPushError2( 0, "BuildSourceCode pfnPushError2", shaderEditorDialog );
+	pfnPushWarning( 1, "BuildSourceCode pfnPushWarning", shaderEditorDialog );
+	pfnPushError( 2, "BuildSourceCode pfnPushError", shaderEditorDialog );
 	return false;
 }
 
@@ -967,123 +961,6 @@ DLL_EXPORT bool vpRenderModel( int formatIndex, int editorFlags, qStudioData_s *
 	int flags;
 	char gap2[1320];
 };*/
-
-
-
-DLL_EXPORT int vpEnumSpriteFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
-{
-	registerIOFormat( 0, "Portable Network Graphics", ".png", libraryHandle );
-	registerIOFormat( 1, "Graphics Interchange Format", ".gif", libraryHandle );
-	return 2;
-}
-
-DLL_EXPORT bool vpUnloadSprite( int formatIndex, qSpriteData_s *spriteData )
-{
-	return true;
-}
-
-static bool LoadSprite_PNG( const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
-{
-	static const unsigned char s_pngSignature[8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-	if ( memcmp( buf, s_pngSignature, sizeof( s_pngSignature ) ) != 0 )
-	{
-		Sys_Printf( "Failed to load \"%s\". (Not a valid PNG)", filePath );
-		return false;
-	}
-
-	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
-
-	/* Create the shader */
-	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
-
-	spriteShader->m_flags |= 0x2040;
-
-	int width, height, numchannels;
-	unsigned char *pixels = stbi_load_from_memory( buf, bufSize, &width, &height, &numchannels, 4 );
-
-	spriteShader->m_textureWidth = width;
-	spriteShader->m_textureHeight = height;
-
-	qShaderStage_t shaderStage;
-	memset( &shaderStage, 0, sizeof( qShaderStage_t ) );
-
-	shaderStage.m_framerate = 1.f;
-
-	qTexture_t *pTexture = Shader_UploadTexture( spriteShader, NULL, GL_RGBA, GL_COMPRESSED_RGBA, numchannels, width, height, true, pixels );
-	AddTextureToList( shaderStage.m_textureList, pTexture );
-
-	spriteShader->m_texture = shaderStage.m_currentTexture = shaderStage.m_textureList;
-
-	++shaderStage.m_textureList->m_refCount;
-
-	Shader_AddStage( spriteShader, &shaderStage );
-	Shader_Finish( spriteShader );
-
-	outSpriteData->m_spriteShader = spriteShader;
-
-	return true;
-}
-
-static bool LoadSprite_GIF( const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
-{
-	static const unsigned char s_gifSignature[6] = { 'G', 'I', 'F', '8', '9', 'a' };
-	if ( memcmp( buf, s_gifSignature, sizeof( s_gifSignature ) ) != 0 )
-	{
-		Sys_Printf( "Failed to load \"%s\". (Not a valid GIF)", filePath );
-		return false;
-	}
-
-	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
-
-	/* Create the shader */
-	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
-
-	spriteShader->m_flags |= 0x2040;
-
-	int *numdelays = NULL;
-	int width, height, numframes, numchannels;
-	unsigned char *pixels = stbi_load_gif_from_memory( buf, bufSize, &numdelays, &width, &height, &numframes, &numchannels, 4 );
-
-	spriteShader->m_textureWidth = width;
-	spriteShader->m_textureHeight = height;
-
-	qShaderStage_t shaderStage;
-	memset( &shaderStage, 0, sizeof( qShaderStage_t ) );
-
-	shaderStage.m_framerate = 1.f;
-
-	for ( int i = 0; i < numframes; i++ )
-	{
-		unsigned char *framePixels = pixels + ( width * height * numchannels * i );
-
-		qTexture_t *pTexture = Shader_UploadTexture( spriteShader, NULL, GL_RGBA, GL_COMPRESSED_RGBA, numchannels, width, height, true, framePixels );
-		AddTextureToList( shaderStage.m_textureList, pTexture );
-	}
-
-	spriteShader->m_texture = shaderStage.m_currentTexture = shaderStage.m_textureList;
-
-	++shaderStage.m_textureList->m_refCount;
-
-	Shader_AddStage( spriteShader, &shaderStage );
-	Shader_Finish( spriteShader );
-
-	outSpriteData->m_spriteShader = spriteShader;
-
-	return true;
-}
-
-DLL_EXPORT bool vpLoadSprite( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *outSpriteData )
-{
-	switch ( formatIndex )
-	{
-	case 0:
-		return LoadSprite_PNG( filePath, buf, bufSize, outSpriteData );
-	case 1:
-		return LoadSprite_GIF( filePath, buf, bufSize, outSpriteData );
-	};
-
-	return false;
-}
 
 DLL_EXPORT int vpEnumSurfaceFlags( pfnRegisterFlags reg, void *libraryHandle )
 {

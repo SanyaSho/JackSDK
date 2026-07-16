@@ -13,6 +13,7 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			"CustomSpriteFormatExample.cpp"
 			"DialogsExample.cpp"
 			#"DoomWadLoader.cpp"
 
