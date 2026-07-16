@@ -11,11 +11,6 @@
 
 typedef void *HMODULE;
 
-static bool GetModuleFileName( void *, char *outBuf, size_t outBufSize )
-{
-	return readlink( "/proc/self/exe", outBuf, outBufSize ) > 0;
-}
-
 #define LOAD_WITH_ALTERED_SEARCH_PATH 0
 
 static HMODULE LoadLibraryEx( const char *pszPath, void *, int )
@@ -210,12 +205,6 @@ static void Sys_Error( const char *format, ... )
 	exit( 1 );
 }
 
-static void Sys_Free( void *ptr )
-{
-	//Sys_Printf( "%s( 0x%p )", __FUNCTION__, ptr );
-	free( ptr );
-}
-
 static void *Sys_Malloc( size_t n )
 {
 	//Sys_Printf( "%s( %d )", __FUNCTION__, n );
@@ -230,11 +219,10 @@ static void *Sys_Malloc( size_t n )
 	return ptr;
 }
 
-static void *TempBuffer_GetSpace( int buffer, size_t size )
+static void Sys_Free( void *ptr )
 {
-	void *ptr = Sys_Malloc( size );
-	Sys_Printf( "%s( %d, %d ) -> 0x%p", __FUNCTION__, buffer, size, ptr );
-	return ptr;
+	//Sys_Printf( "%s( 0x%p )", __FUNCTION__, ptr );
+	free( ptr );
 }
 
 static char *Sys_AllocString( const char *src )
@@ -249,10 +237,22 @@ static char *Sys_AllocString( const char *src )
 	return str;
 }
 
+static void *TempBuffer_GetSpace( int buffer, size_t size )
+{
+	void *ptr = Sys_Malloc( size );
+	Sys_Printf( "%s( %d, %d ) -> 0x%p", __FUNCTION__, buffer, size, ptr );
+	return ptr;
+}
+
 static float Sys_FloatTime()
 {
 	Sys_Printf( "%s()", __FUNCTION__ );
 	return 1.f;
+}
+
+static char *V_VersionString()
+{
+	return "PluginRunner";//"J.A.C.K. 1.2.4603";
 }
 
 static float Sys_GetTextureGamma()
@@ -396,46 +396,62 @@ void InitializeEditorFuncs()
 	gEditorfuncs.pfnSys_Warning = Sys_Printf;
 	gEditorfuncs.pfnSys_Error = Sys_Error;
 
-	gEditorfuncs.pfnSys_Free = Sys_Free;
 	gEditorfuncs.pfnSys_Malloc = Sys_Malloc;
+	gEditorfuncs.pfnSys_Free = Sys_Free;
 
-	gEditorfuncs.pfnTempBuffer_GetSpace = TempBuffer_GetSpace;
 	gEditorfuncs.pfnSys_AllocString = Sys_AllocString;
+	gEditorfuncs.pfnTempBuffer_GetSpace = TempBuffer_GetSpace;
 
 	gEditorfuncs.pfnSys_FloatTime = Sys_FloatTime;
 
-	gEditorfuncs.pfnSys_SetOption = NULL;
 	gEditorfuncs.pfnSys_GetOption = NULL;
+	gEditorfuncs.pfnSys_SetOption = NULL;
 
 	gEditorfuncs.pfnSteam_SetAchievemnt = NULL;
 
-	gEditorfuncs.parserfuncs.pfnSC_Token = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_Line = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_BindTexture = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_BindShader = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_LineWidth = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_PointSize = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_Begin = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_Color4ub = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_Color4ubv = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_Normal3fv = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_TexCoord2f = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_TexCoord2fv = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_Vertex3fv = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_End = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_GetState = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_SetState = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_GetViewInfo = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_CalcLighting = NULL;
+	gEditorfuncs.renderingfuncs.pfnPR_GetMinAlpha = NULL;
+
 	gEditorfuncs.parserfuncs.pfnSC_ParseFromFile = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_ParseFromMemory = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_CheckError = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Token = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Line = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_ParseError = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_CheckError = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_ResetError = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_SafeGetToken = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_GetToken = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_TokenAvailable = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_SafeGetToken = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_UnGetToken = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_TokenAvailable = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_MatchToken = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_SafeMatchToken = NULL;
-	// SC_Matrix
 	gEditorfuncs.parserfuncs.pfnSC_SkipRestOfLine = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Parse1DMatrix = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Parse2DMatrix = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_Parse3DMatrix = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_EndOfParsing = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_GetParseFlags = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_SetParseFlags = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_ShouldQuote = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_GetParseFlags = NULL;
+	gEditorfuncs.parserfuncs.pfnSC_GetBlockSize = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_CopyBlock = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_SkipBlock = NULL;
 	gEditorfuncs.parserfuncs.pfnSC_SkipLineOrBlock = NULL;
-	gEditorfuncs.parserfuncs.pfnSC_GetBlockSize = NULL;
-
-	gEditorfuncs.pfnSys_GetTextureGamma = Sys_GetTextureGamma;
-
-	// PR[17]
+	gEditorfuncs.parserfuncs.pfnSC_ShouldQuote = NULL;
 
 	gEditorfuncs.filesystemfuncs.pfnSys_GetBaseDirectory = NULL;
 	gEditorfuncs.filesystemfuncs.pfnSys_GetModDirectory = NULL;
@@ -448,15 +464,33 @@ void InitializeEditorFuncs()
 	gEditorfuncs.filesystemfuncs.pfnSys_LoadFile = Sys_LoadFile;
 	gEditorfuncs.filesystemfuncs.pfnSys_CreatePath = NULL;
 
-	gEditorfuncs.shaderfuncs.pfnShader_Create = Shader_Create;
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	gEditorfuncs.mathfuncs.pfnSys_PrintValue = NULL;
+	gEditorfuncs.mathfuncs.pfnSys_PrintMapCoord = NULL;
+	gEditorfuncs.mathfuncs.pfnSys_PrintAxis = NULL;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	gEditorfuncs.mathfuncs.pfnSys_SnapVertex = NULL;
+	gEditorfuncs.mathfuncs.pfnSys_SnapAxis = NULL;
+	gEditorfuncs.mathfuncs.pfnSys_SnapVertexToGrid = NULL;
+	gEditorfuncs.mathfuncs.pfnSys_SnapMapVertex = NULL;
+
+	gEditorfuncs.pfnV_VersionString = V_VersionString;
+
+	gEditorfuncs.pfnSys_GetTextureGamma = Sys_GetTextureGamma;
+
+	gEditorfuncs.pfnGlobal_GetCurrentWorld = NULL;
+
+	gEditorfuncs.pfnBuildPackageList = NULL;
+
 	gEditorfuncs.shaderfuncs.pfnShader_Lookup = Shader_Lookup;
+	gEditorfuncs.shaderfuncs.pfnShader_Create = Shader_Create;
 	gEditorfuncs.shaderfuncs.pfnShader_Destroy = Shader_Destroy;
 	gEditorfuncs.shaderfuncs.pfnShader_AddStage = Shader_AddStage;
 	gEditorfuncs.shaderfuncs.pfnShader_RemoveStage = Shader_RemoveStage;
 	gEditorfuncs.shaderfuncs.pfnShader_Finish = Shader_Finish;
+	gEditorfuncs.shaderfuncs.pfnShader_LookupTexture = Shader_LookupTexture;
 	gEditorfuncs.shaderfuncs.pfnShader_GetWhiteTexture = Shader_GetWhiteTexture;
 	gEditorfuncs.shaderfuncs.pfnShader_GetBlackTexture = Shader_GetBlackTexture;
-	gEditorfuncs.shaderfuncs.pfnShader_LookupTexture = Shader_LookupTexture;
 	gEditorfuncs.shaderfuncs.pfnShader_UploadTexture = Shader_UploadTexture;
 	gEditorfuncs.shaderfuncs.pfnShader_DestroyTexture = Shader_DestroyTexture;
 }
@@ -894,12 +928,12 @@ int main( int argc, char **argv )
 {
 	InitializeEditorFuncs();
 
-#if !defined( WIN32 )
-	void *hInstance = NULL;
-#endif // !WIN32
-
 	char moduleName[MAX_PATH];
+#if defined( WIN32 )
 	if ( !GetModuleFileName( hInstance, moduleName, MAX_PATH ) )
+#else
+	if ( readlink( "/proc/self/exe", moduleName, MAX_PATH ) <= 0 )
+#endif
 	{
 		return 0;
 	}

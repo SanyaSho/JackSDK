@@ -58,7 +58,7 @@ typedef struct pluginActionDesc_s
 
 #if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	int m_unknown;
-#endif // JACK_API_VERSION <= 100
+#endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 
 	/* Action flags (see defines above) */
 	uint64 m_actionFlags;

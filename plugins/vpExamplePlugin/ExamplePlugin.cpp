@@ -5,6 +5,8 @@
 #include <signal.h>
 #endif // !WIN32
 
+// class ImageLoader
+#include "ImageLoader.h"
 
 #include "PluginAPI.h"
 #include "PluginActions.h"
@@ -758,10 +760,10 @@ mapProfile_t profile =
 	"Half-Life / TFC (Custom)",
 
 	".bsp",
-	".png",//"",
+	".png;.bmp;.gif;.psd;.pic;.jpg;.pnm;.hdr;.tga",/* vpEnumTextureFormats */ //"",
 	".wad",
 	".pak",
-	".spr;.png;.gif",//".spr",
+	".spr;.png;.gif", /* vpEnumSpriteFormats */ //".spr",
 	".mdl",
 	".wav",
 	".aur",
@@ -907,7 +909,7 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffse
 }
 
 
-#if 0
+#if 1
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
 	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
@@ -947,6 +949,9 @@ DLL_EXPORT bool vpRenderModel( int formatIndex, int editorFlags, qStudioData_s *
 		viewInfo.c.x, viewInfo.c.y, viewInfo.c.z,
 		viewInfo.d.x, viewInfo.d.y, viewInfo.d.z
 	);*/
+
+	qStudioDrawData_t *drawData = (qStudioDrawData_t *)entityInfo->m_drawData;
+	(void)drawData;
 
 	vec3_t triangle[3] = { { 0.f, 0.5f, 0.f }, { -0.5f, -0.5f, 0.f }, { 0.5f, 0.5f, 0.f } };
 

@@ -913,15 +913,15 @@ typedef struct
 
 /* Shader API */
 typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *shaderName );
-typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *shaderName, const char *textureName, int shaderFlags );
-typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderHandle );
-typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderHandle, qShaderStage_s *shaderStage );
+typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *hashName, const char *shaderName, int shaderFlags );
+typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderDef );
+typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderDef, qShaderStage_s *shaderStage );
 typedef void		(*pfnEditor_Shader_RemoveStage)			( qShaderStage_s *shaderStage );
-typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderHandle );
-typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *textureName );
+typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderDef );
+typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *hashName );
 typedef qTexture_s *(*pfnEditor_Shader_GetWhiteTexture)		();
 typedef qTexture_s *(*pfnEditor_Shader_GetBlackTexture)		();
-typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderHandle, const char *textureName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
+typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderDef, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE

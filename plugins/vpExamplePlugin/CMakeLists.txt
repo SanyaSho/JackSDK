@@ -14,6 +14,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 		SOURCES
 		#{
 			"CustomSpriteFormatExample.cpp"
+			"CustomTextureFormatExample.cpp"
+
 			"DialogsExample.cpp"
 			#"DoomWadLoader.cpp"
 
@@ -23,6 +25,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 			"MapReader.cpp"
 
 			"vstdlib_static.cpp"
+
+			"../common/ImageLoader.cpp"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
@@ -37,6 +41,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 			"MapReader.h"
 
 			"vstdlib_static.h"
+
+			"../common/ImageLoader.h"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
@@ -50,6 +56,20 @@ install_library(
 	TARGET exampleplugin
 	INSTALL_OUTNAME "vpExamplePlugin"
 	INSTALL_DEST "${CMAKE_INSTALL_PREFIX}"
+)
+
+target_include_directories(
+	exampleplugin PRIVATE
+
+	"."
+	"../common"
+)
+
+target_compile_definitions(
+	exampleplugin PRIVATE
+
+	# ImageLoader
+	ENABLE_STB_IMAGELOADER
 )
 
 target_use_jackpluginsdk( exampleplugin )
