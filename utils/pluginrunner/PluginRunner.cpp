@@ -365,13 +365,13 @@ static int s_texNum = 0;
 static qTexture_s *Shader_UploadTexture( qShader_s *shaderHandle, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool b, unsigned char *textureData )
 {
 	void *ptr = Sys_Malloc( sizeof( qTexture_s ) );
-	Sys_Printf( "%s( 0x%p, %d, %d, %d, %d, %d, %d, 0x%p ) -> 0x%p", __FUNCTION__, shaderHandle, pixelFormat, textureFormat, textureNumChannels, textureWidth, textureHeight, b, ptr );
+	Sys_Printf( "%s( sH: 0x%p, sN: %s, pF: %x, tF: %x, nC: %d, w: %d, h: %d, %d, 0x%p ) -> 0x%p", __FUNCTION__, shaderHandle, shaderName, pixelFormat, textureFormat, textureNumChannels, textureWidth, textureHeight, b, ptr );
 
 	{
 		char s[16];
-		snprintf( s, sizeof( s ), "%d.bmp", s_texNum++ );
+		snprintf( s, sizeof( s ), "%d.png", s_texNum++ );
 		s[sizeof( s ) - 1] = 0;
-		stbi_write_bmp( s, textureWidth, textureHeight, textureNumChannels, textureData );
+		stbi_write_png( s, textureWidth, textureHeight, textureNumChannels, textureData, 0 );
 		Sys_Printf( "Writting %s", s );
 	}
 
@@ -478,12 +478,25 @@ static vpSetPalette_t s_vpSetPalette;
 
 
 /* Texture IO */
+static vpFilterTextureName_t s_vpFilterTextureName;
+static vpLoadTexture_t s_vpLoadTexture;
 
 static bool Editor_RegisterTextureFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
 {
 	Sys_Printf( "  %d / %s / %s", formatIndex, formatName, formatExtension );
 
 	s_vpSetPalette = (vpSetPalette_t)GetProcAddress( (HMODULE)libraryHandle, "vpSetPalette" );
+	/* Not checked */
+
+	s_vpFilterTextureName = (vpFilterTextureName_t)GetProcAddress( (HMODULE)libraryHandle, "vpFilterTextureName" );
+	/* Not checked */
+
+	s_vpLoadTexture = (vpLoadTexture_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadTexture" );
+	if ( !s_vpLoadTexture )
+	{
+		Sys_Error( "Plugin \"%s\" defines texture format \"%s\" (%s), but doesn't export \"vpLoadTexture\" function!", PLUGIN_DLL, formatName, formatExtension );
+		return false;
+	}
 
 	return true;
 }
@@ -537,14 +550,17 @@ static bool Editor_RegisterSkyFormat( int formatIndex, const char *formatName, c
 
 /* Sprite IO */
 static vpLoadSprite_t s_vpLoadSprite;
+static vpUnloadSprite_t s_vpUnloadSprite;
 
 static bool Editor_RegisterSpriteFormat( int formatIndex, const char *formatName, const char *formatExtension, void *libraryHandle )
 {
 	Sys_Printf( "  %d / %s / %s", formatIndex, formatName, formatExtension );
 
 	s_vpSetPalette = (vpSetPalette_t)GetProcAddress( (HMODULE)libraryHandle, "vpSetPalette" );
+	/* Not checked */
 
-	// vpUnloadSprite
+	s_vpUnloadSprite = (vpUnloadSprite_t)GetProcAddress( (HMODULE)libraryHandle, "vpUnloadSprite" );
+	/* Not checked */
 
 	s_vpLoadSprite = (vpLoadSprite_t)GetProcAddress( (HMODULE)libraryHandle, "vpLoadSprite" );
 	if ( !s_vpLoadSprite )
@@ -754,6 +770,23 @@ static void RunPluginTests()
 		}
 
 		Sys_Free( skyShader );
+
+		Sys_Free( buf );
+	}
+
+	/* Texture IO */
+	if ( 0 && s_vpLoadTexture ) // vpQuake3
+	{
+		int numBytes = 0;
+		byte *buf = Sys_LoadFile( "valve/gfx/env/cityft.tga", &numBytes );
+
+		bool bOK = s_vpLoadTexture( 0, "valve/gfx/env/cityft.tga", buf, numBytes );
+		if ( bOK )
+		{
+			Sys_Printf( "  valve/gfx/env/cityft.tga" );
+		}
+
+		Sys_Free( buf );
 	}
 
 	/* Package IO */
@@ -779,6 +812,11 @@ static void RunPluginTests()
 		if ( bOK )
 		{
 			Sys_Printf( "vpLoadSprite: %d", bOK );
+		}
+
+		if ( s_vpUnloadSprite )
+		{
+			s_vpUnloadSprite( 0, &spriteData );
 		}
 
 		Sys_Free( buf );

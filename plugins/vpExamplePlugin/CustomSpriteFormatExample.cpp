@@ -19,8 +19,8 @@
 /*
 ===============
 vpEnumSpriteFormats
-Tells the editor which formats are implemented by this plugin.
-Those formats must be set as a supported sprite types in the game profile.
+Tells the editor which sprite formats are implemented by this plugin.
+Extensions of those formats must be set as supported in the game profile.
 ===============
 */
 DLL_EXPORT int vpEnumSpriteFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )

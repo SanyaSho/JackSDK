@@ -157,6 +157,7 @@ COMPILE_TIME_ASSERT( sizeof( qEntityState_t ) == SIZEOF_QENTITYSTATE_S /* Always
 } targetInfo_t;
 COMPILE_TIME_ASSERT( sizeof( targetInfo_t ) == 16 );*/
 
+
 typedef enum modtype_s
 {
 	mod_brush = 0,

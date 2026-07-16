@@ -40,8 +40,8 @@ typedef struct renditionInfo_s
 
 typedef struct viewInfo_s
 {
-	vec3_t a;
-	vec3_t b;
+	vec3_t a; // Distance from camera to entity (?)
+	vec3_t b; // Angle (???)
 	vec3_t c;
 	vec3_t d;
 } viewInfo_t;
@@ -229,6 +229,92 @@ typedef struct qShader_s
 	char m_shaderFilePath[MAX_PATH];
 } qShader_t;
 COMPILE_TIME_ASSERT( sizeof( qShader_t ) == SIZEOF_QSHADER_S );
+
+
+/*
+ qEntity_s::m_drawData for mod_sprite
+*/
+typedef struct qSpriteDrawData_s
+{
+	struct qSpriteData_s *m_spriteData;
+	char gap1[2];
+	char gap2[2];
+	char gap3[4];
+	char gap4[4];
+	int m_unknownInt1;
+} qSpriteDrawData_t;
+COMPILE_TIME_ASSERT( sizeof( qSpriteDrawData_t ) == SIZEOF_QSPRITEDRAWDATA_S );
+
+
+/*
+ qEntity_s::m_drawData for mod_decal
+*/
+typedef struct qDecalDrawData_s
+{
+	struct qDecal_s *m_decalData;
+
+	/* Shader used by this decal */
+	struct qShader_s *m_decalShader;
+
+	/* Selection box size */
+	vec3_t m_sizeMin;
+	vec3_t m_sizeMax;
+} qDecalDrawData_t;
+COMPILE_TIME_ASSERT( sizeof( qDecalDrawData_t ) == SIZEOF_QDECALDRAWDATA_S );
+
+
+/*
+ qEntity_s::m_drawData for mod_studio
+*/
+typedef struct qStudioDrawData_s
+{
+	struct qStudioData_s *m_studioData1; // /shrug
+	struct qStudioData_s *m_studioData2; // /shrug
+
+	/* Selection box size */
+	vec3_t m_sizeMin;
+	vec3_t m_sizeMax;
+
+	int m_unknownInt1;
+
+	/* Sequence frametime (host_frametime) */
+	float m_frametime;
+
+	/* Quake III bobparms */
+	/*
+	if ( v71 != nullptr && (v71->m_flags & 0x4000) != 0 )
+	{
+		this->m_entityData->m_drawData->m_bobParms1 = v71->m_bobParms;
+		this->m_entityData->m_drawData->m_bobParms2 = this->m_currentGDClass->m_bobParms2;
+	}
+	*/
+	vec3_t m_bobParmsMin;
+	vec3_t m_bobParmsMax;
+} qStudioDrawData_t;
+COMPILE_TIME_ASSERT( sizeof( qStudioDrawData_t ) == SIZEOF_QSTUDIODRAWDATA_S );
+
+
+/*
+ qEntity_s::m_drawData for mod_particles
+*/
+typedef struct qParticlesDrawData_s
+{
+	struct qParticlesData_s *m_particlesData;
+
+	/* A pointer? */
+#if defined( JACK_64BIT )
+	char gap[8];
+#else
+	char gap[4];
+#endif // JACK_64BIT
+
+	/* Selection box size */
+	vec3_t m_sizeMin;
+	vec3_t m_sizeMax;
+
+	char gap2[8];
+} qParticlesDrawData_t;
+COMPILE_TIME_ASSERT( sizeof( qParticlesDrawData_t ) == SIZEOF_QPARTICLESDRAWDATA_S );
 
 // clang-format off
 

@@ -73,6 +73,10 @@ typedef int (*vpImport_t)( int formatIndex, const char *filePath, qWorld_s *worl
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 
+typedef const char *(*vpFilterTextureName_t)( int formatIndex, const char *textureName );
+typedef bool (*vpLoadTexture_t)( int formatIndex, const char *textureName, byte *buf, int bufSize );
+
+
 /* filePath - path to a file */
 /* numMipTex - count of TYP_MIPTEX inside a WAD2/WAD3 */
 typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *numMipTex );
@@ -107,7 +111,7 @@ struct qSpriteData_s;
 
 // clang-format off
 
-// TODO: vpUnloadSprite_t
+typedef bool (*vpUnloadSprite_t)( int formatIndex, qSpriteData_s *spriteData );
 
 typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *spriteData );
 
@@ -139,7 +143,7 @@ typedef struct qSpriteData_s
 	/*
 	 vpUnloadSprite
 	*/
-	void *pfn_UnloadModel;
+	vpUnloadSprite_t m_pfnUnloadSprite;
 } qSpriteData_t;
 COMPILE_TIME_ASSERT( sizeof( qSpriteData_t ) == SIZEOF_QSPRITEDATA_S );
 
@@ -153,15 +157,24 @@ struct qStudioData_s;
 
 // clang-format off
 
+/*
+ Returns true if the model is a studiomodel (adds a 0x8000 flag to the entity)
+*/
 typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
 
+/*
+ flags:
+ 0x20 - !Sys_VectorEmpty( m_bobParms1 )
+ 0x40 - has 0x8000 in GDClass
+ 0x80 - StudioInvertPitchScale
+*/
 typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 typedef bool (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
 typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData );
 
-typedef bool (*vpRenderModel_t)( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
+typedef bool (*vpRenderModel_t)( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 // clang-format on
 
@@ -194,9 +207,9 @@ typedef struct qStudioData_s
 	/*
 	 vpRenderModel, vpGetModelBounds, vpUnloadModel
 	*/
-	vpRenderModel_t pfnRenderModel;
-	vpGetModelBounds_t pfnGetModelRenderBounds;
-	vpUnloadModel_t pfnUnloadModel;
+	vpRenderModel_t m_pfnRenderModel;
+	vpGetModelBounds_t m_pfnGetModelRenderBounds;
+	vpUnloadModel_t m_pfnUnloadModel;
 } qStudioData_t;
 COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == SIZEOF_QSTUDIODATA_S );
 
@@ -228,10 +241,15 @@ typedef struct qParticlesData_s
 	*/
 	int m_formatIndex;
 
-	char gap2[36];
+	char gap2[4];
 
-	vpRenderParticles_t pfnRenderParticle;
-	vpUnloadParticles_t pfnUnloadParticle;
+	vec3_t m_bboxMin;
+	vec3_t m_bboxMax;
+
+	char gap3[8];
+
+	vpRenderParticles_t m_pfnRenderParticle;
+	vpUnloadParticles_t m_pfnUnloadParticle;
 } qParticlesData_t;
 COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == SIZEOF_QPARTICLESDATA_S );
 
@@ -279,10 +297,6 @@ typedef struct qArchiveData_s
 	*/
 	int m_formatIndex;
 
-#if defined( JACK_64BIT )
-	char gap_[4];
-#endif // JACK_64BIT
-
 	unknownArchiveStruct_t *m_unknownArchiveStruct;
 
 	/*
@@ -296,10 +310,10 @@ typedef struct qArchiveData_s
 	/*
 	 vpFindArchiveFile, vpLoadArchvie, vpListArchiveFiles, vpUnloadArchive
 	*/
-	vpFindArchiveFile_t pfnFindArchiveFile;
-	vpLoadArchive_t pfnLoadArchive;
-	vpListArchiveFiles_t pfnListArchvieFiles;
-	vpUnloadArchive_t pfnUnloadArchive;
+	vpFindArchiveFile_t m_pfnFindArchiveFile;
+	vpLoadArchive_t m_pfnLoadArchive;
+	vpListArchiveFiles_t m_pfnListArchvieFiles;
+	vpUnloadArchive_t m_pfnUnloadArchive;
 } qArchiveData_t;
 COMPILE_TIME_ASSERT( sizeof( qArchiveData_t ) == SIZEOF_QARCHIVEDATA_S );
 
