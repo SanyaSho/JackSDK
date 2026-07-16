@@ -46,6 +46,8 @@ typedef struct qGroup_s
 	struct qWorld_s *m_ownerWorld;
 
 	int m_editorFlags;
+
+	/* Internal group ID */
 	int m_editorId;
 
 	/* Number of objects in this group */

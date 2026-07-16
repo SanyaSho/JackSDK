@@ -94,15 +94,23 @@ COMPILE_TIME_ASSERT( sizeof( qTexture_t ) == SIZEOF_QTEXTURE_S );
 
 typedef struct qShaderStageData_s
 {
-	char gap4[92];
+	char gap4[28];
 
-	int m_unknownInt1; // Set to 3 for SCROLL texture (vpHalfLife)
+	int m_unknownInt1; // Set to 2 for shadereditor material (vpQuake3)
 
 	char gap5[20];
 
+	int m_unknownInt2; // Set to 1 for shadereditor material (vpQuake3)
+
+	char gap6[36];
+
+	int m_unknownInt3;  // Set to 3 for SCROLL texture (vpHalfLife)
+
+	char gap7[20];
+
 	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake // Set to -1.f for SCROLL texture (vpHalfLife)
 
-	char gap6[164];
+	char gap8[164];
 } qShaderStageData_t;
 COMPILE_TIME_ASSERT( sizeof( qShaderStageData_t ) == SIZEOF_QSHADERSTAGEDATA_S );
 
@@ -169,11 +177,13 @@ typedef struct qShader_s
 
 	int m_flags;
 
-	/* A pointer and an integer/float? */
+	char gap1[4];
+
+	/* A pointer? */
 #if defined( JACK_64BIT )
-	char gap2[12];
-#else
 	char gap2[8];
+#else
+	char gap2[4];
 #endif // JACK_64BIT
 
 	int m_surfaceFlags;
@@ -181,7 +191,7 @@ typedef struct qShader_s
 	int m_materialType;
 	int m_value;
 
-	size_t unknownInt1; // TODO: is this size_t?
+	int unknownInt1;
 
 	struct qTexture_s *m_texture;
 
@@ -189,9 +199,11 @@ typedef struct qShader_s
 
 	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
 
-	/* Who are you? */
+	/* A pointer? */
 #if defined( JACK_64BIT )
 	char gap5[8];
+#else
+	char gap5[4];
 #endif // JACK_64BIT
 
 	struct qTexture_s *m_skyTextureList[6];
@@ -205,9 +217,13 @@ typedef struct qShader_s
 
 	struct qShaderStage_s *m_stage;
 
+	/* Next shader in the list */
 	struct qShader_s *next;
 
-	char gap8[164];
+	/* Currently used shader code (must be allocated and freed if used) */
+	char *m_shaderCode;
+
+	char gap8[156];
 
 	/* Path to the shader file */
 	char m_shaderFilePath[MAX_PATH];

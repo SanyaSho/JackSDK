@@ -43,6 +43,7 @@ typedef struct qCamera_s
 
 	int m_editorFlags;
 
+	/* Internal camera ID */
 	int m_editorId;
 
 	vec3_t m_vecOrigin;

@@ -52,6 +52,7 @@ typedef struct qNode_s
 	/* Index of the node on a path */
 	int m_nodeIndex;
 
+	/* Internal node ID */
 	int m_editorId;
 
 	vec3_t m_vecOrigin;

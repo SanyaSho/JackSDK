@@ -265,6 +265,12 @@ void RunBuildPackageList()
 	{
 		Sys_Printf( "packageList: %s", buf );
 	}
+
+	if ( buf )
+	{
+		Sys_Free( buf );
+		buf = NULL;
+	}
 }
 
 pluginActionDesc_t runBuildPackageList = {
@@ -752,8 +758,8 @@ mapProfile_t profile =
 	"Half-Life / TFC (Custom)",
 
 	".bsp",
-	"",
-	".wad;.shader",//".wad",
+	".png",//"",
+	".wad",
 	".pak",
 	".spr;.png;.gif",//".spr",
 	".mdl",

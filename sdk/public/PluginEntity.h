@@ -217,6 +217,8 @@ typedef struct qEntity_s
 	int m_spawnflags;
 
 	int m_editorFlags;
+
+	/* Internal entity ID */
 	int m_editorId;
 
 	modtype_t m_modelType;

@@ -43,6 +43,8 @@ typedef struct qPath_s
 	int m_pathDirection;
 
 	int m_editorFlags;
+
+	/* Internal path ID */
 	int m_editorId;
 
 	vec3_t m_bboxMin;

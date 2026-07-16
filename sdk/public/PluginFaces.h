@@ -102,6 +102,8 @@ typedef struct qFace_s
 	char gap2[4];
 
 	int m_editorFlags;
+
+	/* Internal face ID */
 	int m_editorId;
 
 	struct qPlane_s m_plane;

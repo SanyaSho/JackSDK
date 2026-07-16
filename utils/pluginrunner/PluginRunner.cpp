@@ -1002,7 +1002,7 @@ int main( int argc, char **argv )
 	{
 		int ret = pluginEnumPrimitives( Editor_RegisterPrimitive, hPluginModule );
 		if ( ret != 0 )
-			Sys_Printf( "%i plugin primitive(s) registered", ret );
+			Sys_Printf( "%i primitive type(s) registered", ret );
 	}
 
 	vpEnumGenericFlags_t pluginEnumSurfaceFlags = (vpEnumGenericFlags_t)GetProcAddress( hPluginModule, "vpEnumSurfaceFlags" );

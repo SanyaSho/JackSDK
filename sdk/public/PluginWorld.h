@@ -179,6 +179,8 @@ typedef struct qBrush_s
 	int render_unkint;
 
 	int m_editorFlags;
+
+	/* Internal brush ID */
 	int m_editorId;
 
 	/* Type of extra data serialized with the brush. See BRUSH_EXTRADATA_ defines above. */
