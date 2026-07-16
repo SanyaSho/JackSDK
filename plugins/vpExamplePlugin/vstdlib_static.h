@@ -11,4 +11,6 @@
 
 extern int V_Hash( const char *src, int tableSize );
 
+extern void V_SinCosPrecise( float *sinOut, float *cosOut, float angle );
+
 #endif // !VSTDLIB_STATIC_H

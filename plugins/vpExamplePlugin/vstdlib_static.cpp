@@ -11,6 +11,7 @@
 #include <string.h>
 #include <memory.h>
 #include <assert.h>
+#include <math.h>
 
 #include "vstdlib_static.h"
 
@@ -27,4 +28,10 @@ int V_Hash( const char *src, int tableSize )
 	}
 
 	return hash & ( tableSize - 1 );
+}
+
+void V_SinCosPrecise( float *sinOut, float *cosOut, float angle )
+{
+	*sinOut = sin( angle );
+	*cosOut = cos( angle );
 }

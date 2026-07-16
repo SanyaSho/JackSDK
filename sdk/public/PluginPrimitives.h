@@ -68,7 +68,7 @@ COMPILE_TIME_ASSERT( sizeof( primitiveDesc_t ) == SIZEOF_PRIMITIVEDESC_S );
 
 
 #define PRIMFLAG_CLOCKWISE ( 1 << 0 )
-#define PRIMFLAG_FLOOR ( 1 << 1 )
+#define PRIMFLAG_FLOORSNAP ( 1 << 1 )
 
 struct stPRIMITIVECREATESTRUCT
 {
