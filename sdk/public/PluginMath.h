@@ -47,6 +47,13 @@ struct vec2_t
 
 	FORCEINLINE vec2_t  operator+ ( const vec2_t &v ) const { vec2_t res; res.x = x + v.x; res.y = y + v.y; return res; }
 	FORCEINLINE vec2_t  operator- ( const vec2_t &v ) const { vec2_t res; res.x = x - v.x; res.y = y - v.y; return res; }
+	FORCEINLINE vec2_t  operator* ( const vec2_t &v ) const { vec2_t res; res.x = x * v.x; res.y = y * v.y; return res; }
+	FORCEINLINE vec2_t  operator/ ( const vec2_t &v ) const { vec2_t res; res.x = x / v.x; res.y = y / v.y; return res; }
+
+	FORCEINLINE vec2_t  operator+ ( float fl ) const { vec2_t res; res.x = x + fl; res.y = y + fl; return res; }
+	FORCEINLINE vec2_t  operator- ( float fl ) const { vec2_t res; res.x = x - fl; res.y = y - fl; return res; }
+	FORCEINLINE vec2_t  operator* ( float fl ) const { vec2_t res; res.x = x * fl; res.y = y * fl; return res; }
+	FORCEINLINE vec2_t  operator/ ( float fl ) const { float f = 1.f/fl; vec2_t res; res.x = x * f; res.y = y * f; return res; }
 
 	FORCEINLINE vec2_t &operator= ( const vec2_t &v ) { x = v.x; y = v.y; return *this; }
 
@@ -81,6 +88,13 @@ struct vec3_t
 
 	FORCEINLINE vec3_t  operator+ ( const vec3_t &v ) const { vec3_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; return res; }
 	FORCEINLINE vec3_t  operator- ( const vec3_t &v ) const { vec3_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; return res; }
+	FORCEINLINE vec3_t  operator* ( const vec3_t &v ) const { vec3_t res; res.x = x * v.x; res.y = y * v.y; res.z = z * v.z; return res; }
+	FORCEINLINE vec3_t  operator/ ( const vec3_t &v ) const { vec3_t res; res.x = x / v.x; res.y = y / v.y; res.z = z / v.z; return res; }
+
+	FORCEINLINE vec3_t  operator+ ( float fl ) const { vec3_t res; res.x = x + fl; res.y = y + fl; res.z = z + fl; return res; }
+	FORCEINLINE vec3_t  operator- ( float fl ) const { vec3_t res; res.x = x - fl; res.y = y - fl; res.z = z - fl; return res; }
+	FORCEINLINE vec3_t  operator* ( float fl ) const { vec3_t res; res.x = x * fl; res.y = y * fl; res.z = z * fl; return res; }
+	FORCEINLINE vec3_t  operator/ ( float fl ) const { float f = 1.f/fl; vec3_t res; res.x = x * f; res.y = y * f; res.z = z * f; return res; }
 
 	FORCEINLINE vec3_t &operator= ( const vec3_t &v ) { x = v.x; y = v.y; z = v.z; return *this; }
 
@@ -115,6 +129,13 @@ struct vec4_t
 
 	FORCEINLINE vec4_t  operator+ ( const vec4_t &v ) const { vec4_t res; res.x = x + v.x; res.y = y + v.y; res.z = z + v.z; res.w = w - v.w; return res; }
 	FORCEINLINE vec4_t  operator- ( const vec4_t &v ) const { vec4_t res; res.x = x - v.x; res.y = y - v.y; res.z = z - v.z; res.w = w - v.w; return res; }
+	FORCEINLINE vec4_t  operator* ( const vec4_t &v ) const { vec4_t res; res.x = x * v.x; res.y = y * v.y; res.z = z * v.z; res.w = w * v.w; return res; }
+	FORCEINLINE vec4_t  operator/ ( const vec4_t &v ) const { vec4_t res; res.x = x / v.x; res.y = y / v.y; res.z = z / v.z; res.w = w / v.w; return res; }
+
+	FORCEINLINE vec4_t  operator+ ( float fl ) const { vec4_t res; res.x = x + fl; res.y = y + fl; res.z = z + fl; res.w = w + fl; return res; }
+	FORCEINLINE vec4_t  operator- ( float fl ) const { vec4_t res; res.x = x - fl; res.y = y - fl; res.z = z - fl; res.w = w - fl; return res; }
+	FORCEINLINE vec4_t  operator* ( float fl ) const { vec4_t res; res.x = x * fl; res.y = y * fl; res.z = z * fl; res.w = w * fl; return res; }
+	FORCEINLINE vec4_t  operator/ ( float fl ) const { float f = 1.f/fl; vec4_t res; res.x = x * f; res.y = y * f; res.z = z * f; res.w = w * f; return res; }
 
 	FORCEINLINE vec4_t &operator= ( const vec4_t &v ) { x = v.x; y = v.y; z = v.z; w = v.w; return *this; }
 
