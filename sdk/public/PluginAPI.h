@@ -1245,7 +1245,7 @@ typedef void		(*pfnEditor_Dialog_AddComboBox)			( const char *controlName, const
  controlName - Internal name of the control (MUST BE SET)
  title - Control title (MUST BE SET).
  defaultValue - Initial filename.
- extensionList - A list of supported extensions split by "\n". Can be NULL.
+ extensionList - A list of supported extensions split by "\n" (example: *.pak\n*.bsp). Can be NULL.
  flags - Behavior flags.
 */
 typedef void		(*pfnEditor_Dialog_AddFileEdit)			( const char *controlName, const char *title, const char *defaultValue, const char *extensionList, int flags );
@@ -1257,7 +1257,7 @@ typedef void		(*pfnEditor_Dialog_AddFileEdit)			( const char *controlName, const
  controlName - Internal name of the control (MUST BE SET)
  title - Control title (MUST BE SET).
  fileList - Initial list of values split by "\n"
- extensionList - A list of supported extensions split by "\n". Can be NULL.
+ extensionList - A list of supported extensions split by "\n" (example: *.pak\n*.bsp). Can be NULL.
  flags - Behavior flags.
 */
 typedef void		(*pfnEditor_Dialog_AddFileList)			( const char *controlName, const char *title, const char *fileList, const char *extensionList, int flags );

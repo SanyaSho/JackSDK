@@ -45,7 +45,7 @@ typedef struct epair_s
 } epair_t;
 COMPILE_TIME_ASSERT( sizeof( epair_t ) == SIZEOF_EPAIR_S );
 
-inline epair_t *AllocEpair( const char *key, const char *value )
+FORCEINLINE epair_t *AllocEpair( const char *key, const char *value )
 {
 	epair_t *pair = (epair_t *)Sys_Malloc( sizeof( epair_t ) );
 
@@ -56,7 +56,7 @@ inline epair_t *AllocEpair( const char *key, const char *value )
 	return pair;
 }
 
-inline void FreeEpairList( epair_t *list )
+FORCEINLINE void FreeEpairList( epair_t *list )
 {
 	for ( epair_t *pair = list, *next; pair != NULL; pair = next )
 	{
@@ -240,7 +240,7 @@ typedef struct qEntity_s
 } qEntity_t;
 COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == SIZEOF_QENTITY_S );
 
-inline epair_s *AddEpair( qEntity_s *entity, const char *key, const char *value )
+FORCEINLINE epair_s *AddEpair( qEntity_s *entity, const char *key, const char *value )
 {
 	if ( !entity )
 		return nullptr;

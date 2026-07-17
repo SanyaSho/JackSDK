@@ -88,6 +88,7 @@ typedef struct qFace_s
 	struct qFace_s *selectedNext;
 	struct qFace_s *selectedPrev;
 
+	/* A pointer? */
 #if defined( JACK_64BIT )
 	char gap1[8];
 #else
@@ -114,7 +115,6 @@ typedef struct qFace_s
 	vec3_t m_bboxMax;
 
 	int m_vertexCount;
-
 	struct qVertex_s *m_vertices;
 } qFace_t;
 COMPILE_TIME_ASSERT( sizeof( qFace_t ) == SIZEOF_QFACE_S );

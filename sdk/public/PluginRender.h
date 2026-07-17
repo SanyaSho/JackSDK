@@ -148,7 +148,7 @@ typedef struct qShaderStage_s
 } qShaderStage_t;
 COMPILE_TIME_ASSERT( sizeof( qShaderStage_t ) == SIZEOF_QSHADERSTAGE_S );
 
-inline qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *textureHandle )
+FORCEINLINE qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *textureHandle )
 {
 	qTexture_s **it = &head;
 
@@ -223,6 +223,7 @@ typedef struct qShader_s
 	/* Currently used shader code (must be allocated and freed if used) */
 	char *m_shaderCode;
 
+	/* This gap is always 0 and always 156 bytes (no pointers) */
 	char gap8[156];
 
 	/* Path to the shader file */

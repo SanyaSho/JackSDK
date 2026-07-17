@@ -73,8 +73,7 @@ bool ImageLoader::LoadImage( const byte *buf, unsigned int bufSize, const char *
 	else
 	{
 #if defined( USE_GPL_CODE )
-		if ( !g_built_gamma_table )
-			BuildGammaTable();
+		BuildGammaTable();
 #endif // USE_GPL_CODE
 
 		int width, height, numchannels;

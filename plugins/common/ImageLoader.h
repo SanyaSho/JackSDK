@@ -10,8 +10,6 @@
 #if !defined( IMAGELOADER_H )
 #define IMAGELOADER_H
 
-#define ENABLE_STB_IMAGELOADER
-
 #include "BaseTypes.h"
 
 class ImageLoader
