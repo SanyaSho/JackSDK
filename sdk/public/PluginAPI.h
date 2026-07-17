@@ -1137,16 +1137,18 @@ typedef void		(*pfnEditor_Dialog_Begin)				( const char *title );
 
 /*
  Dialog_InitExternalCommand
- TODO: Find what's the purpose of this function.
+ Will install a onPressed callback for the bottom-left button.
+ Each control present on dialog will become a part of the commandline. (ex. "-ComboBox 1 -DirectoryEdit C:\JACK_10155")
 
  buttonText - Text that will appear on the bottom-left button.
- command - Some command?
+ command - Executable to run.
 */
 typedef void		(*pfnEditor_Dialog_InitExternalCommand)	( const char *buttonText, const char *command );
 
 /*
  Dialog_InitInternalCommand
  Will install a onPressed callback for the bottom-left button.
+ Calling this after calling Dialog_InitExternalCommand will override dialog behavior.
 
  buttonText - Text that will appear on the bottom-left button.
  pfnCommand - A "callback" that will be executed after pressing the button.

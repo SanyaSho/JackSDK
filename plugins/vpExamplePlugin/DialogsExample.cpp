@@ -125,7 +125,7 @@ void MessageBoxTest()
 			// SpinBox with values [0-15], step count 1 and initial value 1
 			Dialog_AddSpinBoxFloat( "SpinBoxFloat", "My SpinBox", 1.f, 0.f, 100.f, 2.5f, 0 );
 
-			//Dialog_InitExternalCommand( "buttonTextExternal", "test" );
+			//Dialog_InitExternalCommand( "buttonTextExternal", "calc.exe" );
 			Dialog_InitInternalCommand( "buttonTextInternal", ControlsTest_InternalCommand );
 
 			Dialog_Printf( "Dialog_Printf test" );
