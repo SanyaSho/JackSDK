@@ -104,10 +104,10 @@ typedef struct qEntityRenderMode_s
 {
 	/* Editor-specific rendering flags */
 	/*
-	 Normal			- 256		0b100000000				[8]
-	 Color/Texture	- 262245	0b1000000000001100101	[0, 2, 5, 6, 18]
-	 Glow/Additive	- 37		0b100101				[0, 2, 5]
-	 Solid			- 262501	0b111101101010111001	[0, 3, 4, 5, 7, 9, 11, 12, 14, 15, 16, 17]
+	 Normal			- GLS_DEPTHWRITE
+	 Color/Texture	- GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_ATEST_ALWAYS
+	 Glow/Additive	- GLS_DSTBLEND_ONE | GLS_SRCBLEND_SRC_ALPHA
+	 Solid			- GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_DEPTHWRITE | GLS_ATEST_ALWAYS
 	*/
 	int m_renderFlags;
 

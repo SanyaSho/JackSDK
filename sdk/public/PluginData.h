@@ -188,7 +188,7 @@ typedef struct qStudioData_s
 	*/
 	int m_formatIndex;
 
-	char gap_[4];
+	int m_unknownInt;
 
 	/*
 	 Model bounding box

@@ -16,6 +16,18 @@
 
 #include "BaseTypes.h"
 
+/*
+RENDERFLAGS:
+1<<0 - ?
+1<<1 - ?
+1<<2 - Animate models
+1<<3 - Don't scale the model
+1<<4 - ?
+1<<5 - ?
+1<<6 - Sequence-related
+1<<7 - QSB (Invert studio model pitch)
+*/
+
 
 class CFrustum;
 class CGLState;
@@ -40,9 +52,9 @@ typedef struct renditionInfo_s
 
 typedef struct viewInfo_s
 {
-	vec3_t a; // Distance from camera to entity (?)
-	vec3_t b; // Angle (???)
-	vec3_t c;
+	vec3_t r_origin;
+	vec3_t b;
+	vec3_t vright;
 	vec3_t d;
 } viewInfo_t;
 //COMPILE_TIME_ASSERT( sizeof( viewInfo_t ) == ??? );
@@ -162,7 +174,9 @@ FORCEINLINE qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *texture
 }
 
 
-#define SHADER_FLAG_BROKEN_ANIMATION ( 1 << 24 ) // Used to setup textures with animation
+#define SHADER_FLAG_BIT6				( 1 << 6 )
+#define SHADER_FLAG_BIT13				( 1 << 13 )
+#define SHADER_FLAG_BROKEN_ANIMATION	( 1 << 24 ) // Used to setup textures with animation
 
 typedef struct qShader_s
 {
