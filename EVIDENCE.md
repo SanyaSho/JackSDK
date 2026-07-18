@@ -18,3 +18,9 @@
 - Function uses the same constants, the same month table but it does not include build time.
 ![GPL-licensed code inside J.A.C.K.'s build_number function (original function name is unknown)](.github/evidence/3_jack.png)
 ![QuakeWorld source code from IdSoftware's GitHub](.github/evidence/3_quakeworld.png)
+
+### (Jack) Stolen GL_State function from Quake III Arena
+- Licensing issue.
+- Function uses the same constants, but it was extended a bit and it does not have a way to disable DEPTH_TEST.
+![GPL-licensed code inside J.A.C.K.'s CGLState::setState function](.github/evidence/4_jack.png)
+![Quake III Arena source code from IdSoftware's GitHub](.github/evidence/4_quake3.png)
