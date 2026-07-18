@@ -20,6 +20,10 @@
 #define M_PI 3.14159265358979323846
 #endif // !M_PI
 
+#define PITCH	0
+#define YAW		1
+#define ROLL	2
+
 /* 2D Vector */
 struct vec2_t
 {
@@ -27,6 +31,7 @@ struct vec2_t
 
 	vec2_t() { x = y = 0.f; }
 	vec2_t( vec_t x, vec_t y ) { this->x = x; this->y = y; }
+	vec2_t( const float *rgflVector ) { this->x = rgflVector[0]; this->y = rgflVector[1]; }
 
 	// clang-format off
 	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
@@ -68,6 +73,7 @@ struct vec3_t
 
 	vec3_t() { x = y = z = 0.f; }
 	vec3_t( vec_t x, vec_t y, vec_t z ) { this->x = x; this->y = y; this->z = z; }
+	vec3_t( const float *rgflVector ) { this->x = rgflVector[0]; this->y = rgflVector[1]; this->z = rgflVector[2]; }
 
 	// clang-format off
 	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
@@ -109,6 +115,7 @@ struct vec4_t
 
 	vec4_t() { x = y = z = w = 0.f; }
 	vec4_t( vec_t x, vec_t y, vec_t z, vec_t w ) { this->x = x; this->y = y; this->z = z; this->w = w; }
+	vec4_t( const float *rgflVector ) { this->x = rgflVector[0]; this->y = rgflVector[1]; this->z = rgflVector[2]; this->w = rgflVector[4]; }
 
 	// clang-format off
 	FORCEINLINE vec_t *Base() { return (vec_t *)this; }
