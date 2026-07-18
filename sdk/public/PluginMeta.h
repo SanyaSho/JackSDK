@@ -31,4 +31,7 @@
 #include "PluginRender.h"
 #include "PluginWorld.h"
 
+// Include GLEW headers for Shader_UploadTexture
+#include "GL/glew.h"
+
 #endif // !PLUGINMETA_H
