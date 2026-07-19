@@ -47,9 +47,35 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 
+set( GOLDSRC_SOURCE_FILES )
+BEGIN_SRC( GOLDSRC_SOURCE_FILES "GoldSrc Source Files" )
+	SRC_GRP(
+		SOURCES
+		#{
+			"engine/mathlib.cpp"
+			"engine/l_studio.cpp"
+			"engine/r_studio.cpp"
+		#}
+	)
+END_SRC( GOLDSRC_SOURCE_FILES "GoldSrc Source Files" )
+
+set( GOLDSRC_HEADER_FILES )
+BEGIN_SRC( GOLDSRC_HEADER_FILES "GoldSrc Header Files" )
+	SRC_GRP(
+		SOURCES
+		#{
+			"engine/mathlib.h"
+			"engine/quakedef.h"
+			"engine/r_studio.h"
+			"engine/studio.h"
+		#}
+	)
+END_SRC( GOLDSRC_HEADER_FILES "GoldSrc Header Files" )
+
 add_library(
 	exampleplugin MODULE
 	${EXAMPLEPLUGIN_SOURCE_FILES} ${EXAMPLEPLUGIN_HEADER_FILES}
+	${GOLDSRC_SOURCE_FILES} ${GOLDSRC_HEADER_FILES}
 )
 
 install_library(
@@ -72,4 +98,11 @@ target_compile_definitions(
 	ENABLE_STB_IMAGELOADER
 )
 
+#target_compile_options(
+#	exampleplugin PRIVATE
+#
+#	/fsanitize=address
+#)
+
 target_use_jackpluginsdk( exampleplugin )
+

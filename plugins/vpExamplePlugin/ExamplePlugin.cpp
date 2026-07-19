@@ -32,6 +32,8 @@
 
 //#include "DoomWadLoader.h"
 
+#include "engine/r_studio.h"
+
 plugin_funcs_t gEditorfuncs;
 
 /*
@@ -912,56 +914,62 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffse
 #if 1
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
-	return registerIOFormat( 0, "MDL", ".mdl", libraryHandle ) != false;
+	return registerIOFormat( 0, "Half-Life Alpha 0.52 MDL", ".mdl", libraryHandle ) != false;
 	return 1;
 }
 #endif // 0
 
 DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	float bbMin[3] = { -8.f, -8.f, -8.f };
-	float bbMax[3] = { 8.f, 8.f, 8.f };
-	bboxMin = bbMin;
-	bboxMax = bbMax;
-	return true;
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	if ( studioRender )
+	{
+		studioRender->GetModelBounds( flags, (vec3_t *)&bboxMin, (vec3_t *)&bboxMax );
+		return true;
+	}
+
+	return false;
 }
 
 DLL_EXPORT bool vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 {
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	if ( studioRender )
+	{
+		delete studioRender;
+		studioData->m_studioInfo = NULL;
+
+		return true;
+	}
+
+	return false;
+}
+
+DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData )
+{
+	StudioRender *studioRender = new StudioRender();
+	if ( !studioRender->Mod_LoadStudioModel( filePath, buf, bufSize, studioData ) )
+	{
+		delete studioRender;
+		return false;
+	}
+
+	studioRender->GetModelBounds( 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
+
+	studioData->m_studioInfo = studioRender;
 	return true;
 }
 
-DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *outStudioData )
+DLL_EXPORT bool vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	outStudioData->m_bboxMin = vec3_t( -8, -8, -8 );
-	outStudioData->m_bboxMax = vec3_t( 8, 8, 8 );
-	return true;
-}
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	if ( studioRender )
+	{
+		studioRender->R_StudioRenderFinal( entityInfo, studioData, renderFlags );
+		return true;
+	}
 
-DLL_EXPORT bool vpRenderModel( int formatIndex, int editorFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
-{
-	/*viewInfo_t viewInfo;
-	PR_GetViewInfo( &viewInfo );*/
-
-	/*Sys_Printf( "%f %f %f / %f %f %f / %f %f %f / %f %f %f",
-		viewInfo.a.x, viewInfo.a.y, viewInfo.a.z,
-		viewInfo.b.x, viewInfo.b.y, viewInfo.b.z,
-		viewInfo.c.x, viewInfo.c.y, viewInfo.c.z,
-		viewInfo.d.x, viewInfo.d.y, viewInfo.d.z
-	);*/
-
-	qStudioDrawData_t *drawData = (qStudioDrawData_t *)entityInfo->m_drawData;
-	(void)drawData;
-
-	vec3_t triangle[3] = { { 0.f, 0.5f, 0.f }, { -0.5f, -0.5f, 0.f }, { 0.5f, 0.5f, 0.f } };
-
-	PR_Begin( PRIMTYPE_TRIANGLES );
-	PR_Vertex3fv( triangle[0].Base() );
-	PR_Vertex3fv( triangle[1].Base() );
-	PR_Vertex3fv( triangle[2].Base() );
-	PR_End();
-
-	return true;
+	return false;
 }
 
 /*struct qShader_s

@@ -50,7 +50,7 @@ bool ImageLoader::LoadImage( const byte *buf, unsigned int bufSize, const char *
 	V_StripExtension( hashName );
 
 	char shaderName[64] = { 0 };
-	strncat( shaderName, hashName, sizeof( shaderName ) );
+	strncpy( shaderName, hashName, sizeof( shaderName ) );
 	shaderName[sizeof( shaderName ) - 1] = '\0';
 
 	V_FixSlashes( shaderName, '\\', '/' );
