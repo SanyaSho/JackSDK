@@ -212,7 +212,8 @@ typedef struct qEntity_s
 	/* Used as a lock to tell renderer to not redraw the entity */
 	int render_unkint;
 
-	char gap4_2[4];
+	/* Used as a g_chromeage hash by StudioRender */
+	int render_chromeage_unkint; // g_smodels_total?
 
 	/* Entity SpawnFlags */
 	int m_spawnflags;

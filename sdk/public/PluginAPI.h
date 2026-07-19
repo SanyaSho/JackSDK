@@ -35,20 +35,6 @@
  editorPluginVersion is set to current API level in the editor.
 */
 
-// 1 << 0
-#define FL_SELECTED					( 1 << 1 ) /* Object is selected. This flag cannot be set manually when creating/building entities */
-#define FL_DIRTY					( 1 << 2 ) /* Object was modified */
-#define FL_HIDDEN					( 1 << 3 ) /* Object is hidden */
-#define FL_TRANSPARENT				( 1 << 4 ) /* Entity is transparent */
-#define FL_WORLDSPAWN				( 1 << 5 ) /* A worldspawn */
-#define FL_INVENTORYITEM			( 1 << 6 ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
-#define FL_PATHWAY					( 1 << 7 ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
-// 1 << 8
-#define FL_IGNORE					( 1 << 9 ) /* "Ignore" flag (Brushes and Paths only) */
-// 1 << 20
-// 1 << 21
-// 1 << 23
-
 /*
 EDITORFLAGS:
 
@@ -66,6 +52,24 @@ EDITORFLAGS:
 1<<21 - Used by ".map" serializer in vpHalfLife
 1<<23 - Used by map serializer and map parser inside some of the plugins. Disables some Sys_Printf calls if set
 */
+
+// clang-format off
+
+// 1 << 0
+#define EFL_SELECTED				( 1 << 1 ) /* Object is selected. This flag cannot be set manually when creating/building entities */
+#define EFL_DIRTY					( 1 << 2 ) /* Object was modified */
+#define EFL_HIDDEN					( 1 << 3 ) /* Object is hidden */
+#define EFL_TRANSPARENT				( 1 << 4 ) /* Entity is transparent */
+#define EFL_WORLDSPAWN				( 1 << 5 ) /* A worldspawn */
+#define EFL_INVENTORYITEM			( 1 << 6 ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
+#define EFL_PATHWAY					( 1 << 7 ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
+// 1 << 8
+#define EFL_IGNORE					( 1 << 9 ) /* "Ignore" flag (Brushes and Paths only) */
+// 1 << 20
+// 1 << 21
+// 1 << 23
+
+// clang-format on
 
 #include "BaseTypes.h"
 

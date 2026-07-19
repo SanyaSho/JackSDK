@@ -92,4 +92,8 @@ struct rgba_t
 
 #include "PluginMath.h"
 
+#define FBitSet( bitlist, bits )	( bitlist &   ( bits ) )
+#define SetBits( bitlist, bits )	( bitlist |=  ( bits ) )
+#define ClearBits( bitlist, bits )	( bitlist &= ~( bits ) )
+
 #endif // !SDK_BASETYPES_H

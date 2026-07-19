@@ -14,19 +14,34 @@
  Rendering API
 */
 
-#include "BaseTypes.h"
-
 /*
 RENDERFLAGS:
-1<<0 - ?
-1<<1 - ?
+1<<0 - Wireframe
+1<<1 - No textures. Set if current viewmode is "3D Filled Polygons"; Set in pair with 1<<0 if current viewmode is "3D Wireframe"
 1<<2 - Animate models
-1<<3 - Don't scale the model
-1<<4 - ?
+1<<3 - Don't scale the model (???)
+1<<4 - Fullbright. Set if current viewmode is "3D Textured Polygons"
 1<<5 - ?
 1<<6 - Sequence-related
 1<<7 - QSB (Invert studio model pitch)
+
+!( 1<<1 and 1<<4 ) must be checked before calling PR_CalcLighing
 */
+
+// clang-format off
+
+#define RFL_WIREFRAME				( 1 << 0 ) /* Viewport wants a wireframe renderer */
+#define RFL_NOTEXTURES				( 1 << 1 ) /* Viewport doesnt want to draw textures */
+#define RFL_ANIMATEMODELS			( 1 << 2 ) /* "Animate models" is checked */
+#define RFL_DISABLESCALING			( 1 << 3 )
+#define RFL_FULLBRIGHT				( 1 << 4 ) /* Viewport doesnt want to draw lighting */
+// 1 << 5
+// 1 << 6
+#define RFL_INVERTSTUDIOPITCH		( 1 << 7 ) /* Invert studio model pitch ("Stupid Quake Bug") */
+
+// clang-format on
+
+#include "BaseTypes.h"
 
 
 class CFrustum;

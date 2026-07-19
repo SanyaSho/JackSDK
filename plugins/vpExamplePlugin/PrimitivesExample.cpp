@@ -25,12 +25,12 @@ static bool Jack_Primitive_CreateBlock( const stPRIMITIVECREATESTRUCT *primCreat
 {
 	// clang-format off
 	static unsigned int faceTable[6][4] = {
-		{ 0, 1, 3, 2 },
-		{ 2, 3, 5, 4 },
-		{ 4, 5, 7, 6 },
-		{ 6, 7, 1, 0 },
-		{ 1, 7, 5, 3 },
-		{ 0, 2, 4, 6 }
+		{ 0, 1, 3, 2 }, // Left
+		{ 2, 3, 5, 4 }, // Front
+		{ 4, 5, 7, 6 }, // Right
+		{ 6, 7, 1, 0 }, // Back
+		{ 1, 7, 5, 3 }, // Top
+		{ 0, 2, 4, 6 }  // Bottom
 	};
 	// clang-format on
 
@@ -41,7 +41,7 @@ static bool Jack_Primitive_CreateBlock( const stPRIMITIVECREATESTRUCT *primCreat
 	if ( !worldSpawn )
 		return false;
 
-	assert( worldSpawn->m_editorFlags & FL_WORLDSPAWN );
+	assert( worldSpawn->m_editorFlags & EFL_WORLDSPAWN );
 
 	float startX = primCreate->m_startPos.x;
 	float startY = primCreate->m_startPos.y;
@@ -121,7 +121,7 @@ static bool Jack_Primitive_CreateCylinder( const stPRIMITIVECREATESTRUCT *primCr
 	if ( !worldSpawn )
 		return false;
 
-	assert( worldSpawn->m_editorFlags & FL_WORLDSPAWN );
+	assert( worldSpawn->m_editorFlags & EFL_WORLDSPAWN );
 
 	vec3_t center = ( primCreate->m_startPos + primCreate->m_endPos ) * 0.5f;
 

@@ -169,4 +169,11 @@ FORCEINLINE float VectorNormalize( vec3_t &v )
 	return rad;
 }
 
+FORCEINLINE void VectorRotate( const vec3_t &in1, const float mat[3][4], vec3_t &out )
+{
+	out[0] = DotProduct( in1, mat[0] );
+	out[1] = DotProduct( in1, mat[1] );
+	out[2] = DotProduct( in1, mat[2] );
+}
+
 #endif // !PLUGINMATH_H

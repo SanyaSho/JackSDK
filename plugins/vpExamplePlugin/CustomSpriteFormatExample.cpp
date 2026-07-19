@@ -60,7 +60,7 @@ static bool LoadSprite_PNG( const char *filePath, byte *buf, int bufSize, qSprit
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
 
-	spriteShader->m_flags |= 0x2040;
+	SetBits( spriteShader->m_flags, SHADER_FLAG_BIT6 | SHADER_FLAG_BIT13 );
 
 	int width, height, numchannels;
 	unsigned char *pixels = stbi_load_from_memory( buf, bufSize, &width, &height, &numchannels, 4 );
@@ -108,7 +108,7 @@ static bool LoadSprite_GIF( const char *filePath, byte *buf, int bufSize, qSprit
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
 
-	spriteShader->m_flags |= 0x2040;
+	SetBits( spriteShader->m_flags, SHADER_FLAG_BIT6 | SHADER_FLAG_BIT13 );
 
 	int *numdelays = NULL;
 	int width, height, numframes, numchannels;
