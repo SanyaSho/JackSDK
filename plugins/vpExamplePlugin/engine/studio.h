@@ -21,7 +21,7 @@ Studio models are position independent, so the cache manager can move them.
 #define STUDIO_VERSION	6
 
 #define MAXSTUDIOTRIANGLES	20000	// TODO: tune this
-#define MAXSTUDIOVERTS		2048	// TODO: tune this
+#define MAXSTUDIOVERTS		4096	// TODO: tune this (expanded from 2048 because of polyrobo.mdl)
 #define MAXSTUDIOSEQUENCES	256		// total animation sequences
 #define MAXSTUDIOSKINS		100		// total textures
 #define MAXSTUDIOSRCBONES	512		// bones allowed at source movement
