@@ -21,18 +21,16 @@ bool StudioRender::Mod_LoadStudioModel( const char *filePath, byte *buf, int buf
 	id = LittleLong (pinmodel->id);
 	if (id != IDSTUDIOHEADER)
 	{
-		Sys_Error ("%s has wrong header magic (%x should be %x)", filePath, id, IDSTUDIOHEADER);
 		return false;
 	}
 
 	version = LittleLong (pinmodel->version);
 	if (version != STUDIO_VERSION)
 	{
-		memset (pinmodel, 0, sizeof(studiohdr_t));
+		/*memset (pinmodel, 0, sizeof(studiohdr_t));
 		strcpy (pinmodel->name, "bogus");
-		pinmodel->length = sizeof(studiohdr_t);
-
-		Sys_Error ("%s has wrong version number (%i should be %i)", filePath, version, STUDIO_VERSION);
+		pinmodel->length = sizeof(studiohdr_t);*/
+		return false;
 	}
 
 	assert( pinmodel->numbones < MAXSTUDIOBONES );
