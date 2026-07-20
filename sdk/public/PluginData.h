@@ -170,25 +170,35 @@ typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
 */
 typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
-typedef bool (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
+typedef void (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
 typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData );
 
-typedef bool (*vpRenderModel_t)( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
+typedef void (*vpRenderModel_t)( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 // clang-format on
 
 typedef struct qStudioData_s
 {
-	int unkint1;
-	int unkint2;
+	/*
+	 Indicates that the model is loaded. Set by the editor after successful vpLoadModel call
+	*/
+	int m_loaded;
+
+	/*
+	 The model wont be free'd after opening a new file
+	*/
+	int m_persistent;
 
 	/*
 	 Internal format declared by vpEnumModelFormats
 	*/
 	int m_formatIndex;
 
-	int m_unknownInt;
+	/*
+	 Does this model has transparent textures?
+	*/
+	int m_hasTranslucency;
 
 	/*
 	 Model bounding box
@@ -197,7 +207,7 @@ typedef struct qStudioData_s
 	vec3_t m_bboxMax;
 
 	/*
-	 Pointer to an allocated memory (ex. studiohdr_t)
+	 Pointer to an allocated memory (ex. StudioRender class instance)
 
 	 Created by: vpLoadModel
 	 Destroyed by: vpUnloadModel

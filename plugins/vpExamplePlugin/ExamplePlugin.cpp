@@ -921,6 +921,9 @@ DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *l
 
 DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
+	if ( formatIndex != 0 )
+		return false;
+
 	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
 	if ( studioRender )
 	{
@@ -931,22 +934,24 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMa
 	return false;
 }
 
-DLL_EXPORT bool vpUnloadModel( int formatIndex, qStudioData_s *studioData )
+DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 {
+	if ( formatIndex != 0 )
+		return;
+
 	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
 	if ( studioRender )
 	{
 		delete studioRender;
 		studioData->m_studioInfo = NULL;
-
-		return true;
 	}
-
-	return false;
 }
 
 DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData )
 {
+	if ( formatIndex != 0 )
+		return false;
+
 	StudioRender *studioRender = new StudioRender();
 	if ( !studioRender->Mod_LoadStudioModel( filePath, buf, bufSize, studioData ) )
 	{
@@ -960,16 +965,16 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 	return true;
 }
 
-DLL_EXPORT bool vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
+DLL_EXPORT void vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
+	if ( formatIndex != 0 )
+		return;
+
 	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
 	if ( studioRender )
 	{
 		studioRender->R_StudioRenderFinal( entityInfo, studioData, renderFlags );
-		return true;
 	}
-
-	return false;
 }
 
 /*struct qShader_s
