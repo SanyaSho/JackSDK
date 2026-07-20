@@ -35,6 +35,11 @@ bool StudioRender::Mod_LoadStudioModel( const char *filePath, byte *buf, int buf
 		Sys_Error ("%s has wrong version number (%i should be %i)", filePath, version, STUDIO_VERSION);
 	}
 
+	assert( pinmodel->numbones < MAXSTUDIOBONES );
+	assert( pinmodel->numbonecontrollers < MAXSTUDIOCONTROLLERS );
+	assert( pinmodel->numseq < MAXSTUDIOSEQUENCES );
+	assert( pinmodel->numtextures < MAXSTUDIOSKINS );
+
 	m_studioHdr = (studiohdr_t *)Sys_Malloc( pinmodel->length );
 	memcpy( m_studioHdr, buf, pinmodel->length );
 

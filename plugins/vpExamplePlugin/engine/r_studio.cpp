@@ -410,6 +410,9 @@ void StudioRender::R_StudioTransformAuxVert (auxvert_t *av, int bone, vec3_t ver
 
 void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, int normidx, vec3_t normal )
 {
+	if ( FBitSet(m_renderFlags, RFL_NOTEXTURES | RFL_FULLBRIGHT) )
+		return;
+
 	vec3_t norm;
 	VectorRotate( normal, m_bonetransform[bone], norm );
 
@@ -525,10 +528,15 @@ void StudioRender::R_StudioSetupModel (qEntity_t *ent, int bodypart)
 
 	m_bodyPart = (mstudiobodyparts_t *)((byte *)m_studioHdr + m_studioHdr->bodypartindex) + bodypart;
 
+	assert( m_bodyPart->nummodels < MAXSTUDIOMODELS );
+
 	index = ent->m_entityState.m_body / m_bodyPart->base;
 	index = index % m_bodyPart->nummodels;
 
 	m_subModel = (mstudiomodel_t *)((byte *)m_studioHdr + m_bodyPart->modelindex) + index;
+
+	assert( m_subModel->nummesh < MAXSTUDIOMESHES );
+	assert( m_subModel->numverts < MAXSTUDIOVERTS );
 }
 
 #if 0
@@ -860,6 +868,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 	ptexture = (mstudiotexture_t *)((byte *)m_studioHdr + m_studioHdr->textureindex);
 
 	m_mesh = (mstudiomesh_t *)((byte *)m_studioHdr + m_subModel->meshindex);
+	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
 
 	//paux = m_auxverts;
 	//psubmodel_verts = m_subModel->numverts;
@@ -897,11 +906,8 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 	if ( ( m_renderFlags & 0x12 ) == 0x10 && alpha != 255 )
 		PR_Color4ub( 255, 255, 255, alpha );
 
-	for (i=0 ; i<m_subModel->nummesh ; i++)
+	for (i=0 ; i<m_subModel->nummesh ; i++, m_mesh++)
 	{
-		m_mesh = (mstudiomesh_t*)((byte*)m_studioHdr + m_subModel->meshindex + i * sizeof(mstudiomesh_t));
-		ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
-
 		ss = 1.0f / (float)ptexture[m_mesh->skinref].width;
 		st = 1.0f / (float)ptexture[m_mesh->skinref].height;
 
@@ -1123,6 +1129,7 @@ void StudioRender::R_GLStudioDrawPointsWireframe (qEntity_s *ent, qStudioData_s 
 	ptexture = (mstudiotexture_t *)((byte *)m_studioHdr + m_studioHdr->textureindex);
 
 	m_mesh = (mstudiomesh_t *)((byte *)m_studioHdr + m_subModel->meshindex);
+	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
 
 	// We still want to build auxvert even in 2D view
 	for (i=0 ; i<m_subModel->numverts ; i++)
@@ -1130,11 +1137,8 @@ void StudioRender::R_GLStudioDrawPointsWireframe (qEntity_s *ent, qStudioData_s 
 		R_StudioTransformAuxVert (&m_auxverts[i], pvertbone[i], pstudioverts[i]);
 	}
 
-	for (i=0 ; i<m_subModel->nummesh ; i++)
+	for (i=0 ; i<m_subModel->nummesh ; i++, m_mesh++)
 	{
-		m_mesh = (mstudiomesh_t*)((byte*)m_studioHdr + m_subModel->meshindex + i * sizeof(mstudiomesh_t));
-		ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
-
 		ss = 1.0f / (float)ptexture[m_mesh->skinref].width;
 		st = 1.0f / (float)ptexture[m_mesh->skinref].height;
 
