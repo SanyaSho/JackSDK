@@ -24,9 +24,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 
 			"MapReader.cpp"
 
-			"vstdlib_static.cpp"
-
 			"../common/ImageLoader.cpp"
+			"../common/vstdlib_static.cpp"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
@@ -40,9 +39,8 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 
 			"MapReader.h"
 
-			"vstdlib_static.h"
-
 			"../common/ImageLoader.h"
+			"../common/vstdlib_static.h"
 		#}
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
