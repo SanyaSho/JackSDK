@@ -193,6 +193,14 @@ static void Sys_Error( const char *format, ... )
 	vsnprintf( szError, sizeof( szError ), format, argptr );
 	va_end( argptr );
 
+#if 1
+#if defined( WIN32 )
+	OutputDebugString( szError );
+	OutputDebugString( "\n" );
+#else
+	fprintf( stdout, "%s\n", szError );
+#endif
+#else
 #if defined( WIN32 )
 	char szBuf[1024];
 	_snprintf( szBuf, sizeof( szBuf ), "%s", szError );
@@ -203,6 +211,7 @@ static void Sys_Error( const char *format, ... )
 #endif
 
 	exit( 1 );
+#endif
 }
 
 static void *Sys_Malloc( size_t n )
@@ -497,7 +506,7 @@ void InitializeEditorFuncs()
 
 static void Editor_RegisterProfile( mapProfile_t *profileInfo, void *libraryHandle )
 {
-	assert( profileInfo->m_shaderEditorCallbacks && ( profileInfo->m_dataBits & PROFILE_ENABLE_SHADER_EDITOR ) != 0 );
+	assert( profileInfo->m_shaderEditorCallbacks && ( profileInfo->m_dataBits & PROFILE_ENABLE_SHADER_EDITOR ) == 0 );
 
 	Sys_Printf( "  %s (%s)", profileInfo->pluginName, profileInfo->mapFormat );
 }
@@ -791,7 +800,7 @@ static void RunPluginTests()
 		memset( skyShader, 0, sizeof( qShader_t ) );
 
 		skyShader->m_refCount = 1;
-		skyShader->m_framerate = 1.f;
+		skyShader->m_translucency = 1.f;
 		skyShader->m_materialType = 512; // TODO: bitmask
 
 		strncpy( skyShader->m_name, "city", sizeof( skyShader->m_name ) );
@@ -809,7 +818,7 @@ static void RunPluginTests()
 	}
 
 	/* Texture IO */
-	if ( 0 && s_vpLoadTexture ) // vpQuake3
+	if ( 1 && s_vpLoadTexture ) // vpQuake3
 	{
 		int numBytes = 0;
 		byte *buf = Sys_LoadFile( "valve/gfx/env/cityft.tga", &numBytes );
@@ -859,14 +868,41 @@ static void RunPluginTests()
 	/* Model IO */
 	if ( 1 && s_vpLoadModel && s_vpUnloadModel )
 	{
-		byte *buf = Sys_LoadFile( "valve/player.mdl", NULL );
+		int bufSize = 0;
+		byte *buf = Sys_LoadFile( "valve/player.mdl", &bufSize );
 
 		qStudioData_t modelData;
 		memset( &modelData, 0, sizeof( modelData ) );
 
-		bool bOK = s_vpLoadModel( 0, "valve/player.mdl", buf, 0, &modelData );
+		bool bOK = s_vpLoadModel( 0, "valve/player.mdl", buf, bufSize, &modelData );
 		if ( bOK )
 		{
+			//StudioRender_v10 *studioRender = (StudioRender_v10 *)modelData.m_studioInfo;
+			//(void)studioRender;
+
+			Sys_Printf( "vpLoadModel: %d", bOK );
+
+			s_vpUnloadModel( 0, &modelData );
+		}
+
+		Sys_Free( buf );
+	}
+
+	/* Model IO (HLAlpha) */
+	if ( 1 && s_vpLoadModel && s_vpUnloadModel )
+	{
+		int bufSize = 0;
+		byte *buf = Sys_LoadFile( "valve/barney.mdl", &bufSize );
+
+		qStudioData_t modelData;
+		memset( &modelData, 0, sizeof( modelData ) );
+
+		bool bOK = s_vpLoadModel( 0, "valve/barney.mdl", buf, bufSize, &modelData );
+		if ( bOK )
+		{
+			//StudioRender_v6 *studioRender = (StudioRender_v6 *)modelData.m_studioInfo;
+			//(void)studioRender;
+
 			Sys_Printf( "vpLoadModel: %d", bOK );
 
 			s_vpUnloadModel( 0, &modelData );

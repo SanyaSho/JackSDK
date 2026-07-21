@@ -48,4 +48,8 @@ extern void V_QuaternionSlerp (const vec4_t p, vec4_t q, float t, vec4_t &qt);
 extern float V_HalfToFloat( short h );
 #endif
 
+extern void V_ExtractFileExtension( const char *path, char *dest, int destSize );
+
+extern char *V_Strupr( char *start );
+
 #endif // !VSTDLIB_STATIC_H

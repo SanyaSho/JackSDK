@@ -367,24 +367,6 @@ pluginActionDesc_t findPlayerSpawn = {
 };
 
 
-void V_ExtractFileExtension( const char *path, char *dest, int destSize )
-{
-	const char *src = path + strlen( path ) - 1;
-
-	while ( src != path && *( src - 1 ) != '.' )
-		src--;
-
-	if ( src == path )
-	{
-		*dest = '\0';
-		return;
-	}
-
-	src--;
-
-	strncpy( dest, src, destSize );
-	dest[destSize - 1] = '\0';
-}
 
 #if 0
 #define BSPVERSION	29
@@ -911,7 +893,7 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffse
 }
 
 
-#if 1
+#if 0
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
 	return registerIOFormat( 0, "Half-Life Alpha 0.52 MDL", ".mdl", libraryHandle ) != false;
@@ -924,7 +906,7 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMa
 	if ( formatIndex != 0 )
 		return false;
 
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
 	if ( studioRender )
 	{
 		studioRender->GetModelBounds( flags, (vec3_t *)&bboxMin, (vec3_t *)&bboxMax );
@@ -939,11 +921,11 @@ DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 	if ( formatIndex != 0 )
 		return;
 
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
 	if ( studioRender )
 	{
 		delete studioRender;
-		studioData->m_studioInfo = NULL;
+		studioData->m_studioPtr = NULL;
 	}
 }
 
@@ -961,7 +943,7 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 
 	studioRender->GetModelBounds( 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
 
-	studioData->m_studioInfo = studioRender;
+	studioData->m_studioPtr = studioRender;
 	return true;
 }
 
@@ -970,7 +952,7 @@ DLL_EXPORT void vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *
 	if ( formatIndex != 0 )
 		return;
 
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioInfo;
+	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
 	if ( studioRender )
 	{
 		studioRender->R_StudioRenderFinal( entityInfo, studioData, renderFlags );

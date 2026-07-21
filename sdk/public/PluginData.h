@@ -111,6 +111,9 @@ struct qSpriteData_s;
 
 // clang-format off
 
+/*
+ Will be called only if qSpriteData_s has m_spritePtr
+*/
 typedef bool (*vpUnloadSprite_t)( int formatIndex, qSpriteData_s *spriteData );
 
 typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qSpriteData_s *spriteData );
@@ -126,19 +129,35 @@ typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf
 
 typedef struct qSpriteData_s
 {
-	int unkint1;
-	int unkint2;
+	/*
+	 Indicates that the sprite is loaded. Set by the editor after successful vpLoadSprite call
+	*/
+	int m_loaded;
+
+	/*
+	 The sprite wont be free'd after opening a new project if m_refCount is >0
+	*/
+	int m_refCount;
 
 	/*
 	 Internal format declared by vpEnumSpriteFormats
 	*/
 	int m_formatIndex;
 
+	/*
+	 Sprite orientation. See SPR_ defines above
+	*/
 	int m_spriteOrientation;
 
 	struct qShader_s *m_spriteShader;
 
-	char gap2[8];
+	/*
+	 Pointer to an allocated memory (ex. SpriteMgr class instance)
+
+	 Created by: vpLoadSprite
+	 Destroyed by: vpUnloadSprite
+	*/
+	void *m_spritePtr;
 
 	/*
 	 vpUnloadSprite
@@ -170,6 +189,9 @@ typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
 */
 typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
+/*
+ Will be called only if qStudioData_s has m_studioPtr
+*/
 typedef void (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
 typedef bool (*vpLoadModel_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData );
@@ -186,9 +208,9 @@ typedef struct qStudioData_s
 	int m_loaded;
 
 	/*
-	 The model wont be free'd after opening a new file
+	 The model wont be free'd after opening a new project if m_refCount is >0
 	*/
-	int m_persistent;
+	int m_refCount;
 
 	/*
 	 Internal format declared by vpEnumModelFormats
@@ -197,6 +219,7 @@ typedef struct qStudioData_s
 
 	/*
 	 Does this model has transparent textures?
+	 Set this to 1 when loading model textures
 	*/
 	int m_hasTranslucency;
 
@@ -212,7 +235,7 @@ typedef struct qStudioData_s
 	 Created by: vpLoadModel
 	 Destroyed by: vpUnloadModel
 	*/
-	void *m_studioInfo;
+	void *m_studioPtr;
 
 	/*
 	 vpRenderModel, vpGetModelBounds, vpUnloadModel
@@ -233,6 +256,9 @@ struct qParticlesData_s;
 
 // clang-format off
 
+/*
+ Will be called only if qParticlesData_s has m_particlesPtr
+*/
 typedef bool (*vpUnloadParticles_t)( int formatIndex, qParticlesData_s *particlesData );
 
 typedef bool (*vpLoadParticles_t)( int formatIndex, const char *filePath, byte *buf, int bufSize, qParticlesData_s *particlesData );
@@ -243,11 +269,18 @@ typedef bool (*vpRenderParticles_t)( int formatIndex, int editorFlags, qParticle
 
 typedef struct qParticlesData_s
 {
-	int unkint1;
-	int unkint2;
+	/*
+	 Indicates that the particle system is loaded. Set by the editor after successful vpLoadParticles call
+	*/
+	int m_loaded;
 
 	/*
-	 Internal format declared by vpEnumModelFormats
+	 The particle system wont be free'd after opening a new project if m_refCount is >0
+	*/
+	int m_refCount;
+
+	/*
+	 Internal format declared by vpEnumParticlesFormats
 	*/
 	int m_formatIndex;
 
@@ -256,7 +289,13 @@ typedef struct qParticlesData_s
 	vec3_t m_bboxMin;
 	vec3_t m_bboxMax;
 
-	char gap3[8];
+	/*
+	 Pointer to an allocated memory (ex. ParticleMgr class instance)
+
+	 Created by: vpLoadParticles
+	 Destroyed by: vpUnloadParticles
+	*/
+	void *m_particlesPtr;
 
 	vpRenderParticles_t m_pfnRenderParticle;
 	vpUnloadParticles_t m_pfnUnloadParticle;

@@ -27,7 +27,7 @@
 #if defined( ENABLE_STB_IMAGELOADER )
 // stbi_load_from_memory
 #define STB_IMAGE_IMPLEMENTATION
-#include "../vpExamplePlugin/stb_image.h"
+#include "stb_image.h"
 #endif // ENABLE_STB_IMAGELOADER
 
 /*
@@ -138,7 +138,7 @@ bool ImageLoader::LoadImage( const byte *buf, unsigned int bufSize, const char *
 		}
 	}
 
-	shaderStage.m_numColors = 0;
+	shaderStage.unknownInt1 = 0;
 
 	if ( textureDef )
 	{

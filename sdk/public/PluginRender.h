@@ -119,6 +119,18 @@ typedef struct qTexture_s
 COMPILE_TIME_ASSERT( sizeof( qTexture_t ) == SIZEOF_QTEXTURE_S );
 
 
+typedef struct qShaderStageSubData_s
+{
+	int m_unknownInt3; // Set to 3 for SCROLL texture (vpHalfLife)
+
+	char gap7[20];
+
+	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake // Set to -1.f for SCROLL texture (vpHalfLife)
+
+	char gap8[20];
+} qShaderStageSubData_t;
+COMPILE_TIME_ASSERT( sizeof( qShaderStageSubData_t ) == SIZEOF_QSHADERSTAGESUBDATA_S );
+
 typedef struct qShaderStageData_s
 {
 	char gap4[28];
@@ -131,13 +143,10 @@ typedef struct qShaderStageData_s
 
 	char gap6[36];
 
-	int m_unknownInt3;  // Set to 3 for SCROLL texture (vpHalfLife)
+	/* Not sure about this one, vpHalfLife does memset with sizeof( 48 ) on this address */
+	struct qShaderStageSubData_s m_subData;
 
-	char gap7[20];
-
-	float m_unknownFloat1; // Set to 8.f and 16.f by vpQuake // Set to -1.f for SCROLL texture (vpHalfLife)
-
-	char gap8[164];
+	char gap8[144];
 } qShaderStageData_t;
 COMPILE_TIME_ASSERT( sizeof( qShaderStageData_t ) == SIZEOF_QSHADERSTAGEDATA_S );
 
@@ -161,7 +170,7 @@ typedef struct qShaderStage_s
 	/* Texture list (used if texture has multiple frames) */
 	struct qTexture_s *m_textureList;
 
-	int m_numColors; // TODO: this is not a number of colors
+	int unknownInt1;
 
 	/* Stage flags (see above) */
 	int m_shaderStageFlags;
@@ -189,9 +198,27 @@ FORCEINLINE qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *texture
 }
 
 
-#define SHADER_FLAG_BIT6				( 1 << 6 )
+// clang-format off
+
+#define SHADER_FLAG_TRANSLUCENT			( 1 << 1  ) /* Enable translucency support */
+#define SHADER_FLAG_BIT4				( 1 << 4  )
+#define SHADER_FLAG_BIT6				( 1 << 6  )
+#define SHADER_FLAG_BIT12				( 1 << 12 )
 #define SHADER_FLAG_BIT13				( 1 << 13 )
 #define SHADER_FLAG_BROKEN_ANIMATION	( 1 << 24 ) // Used to setup textures with animation
+
+#define MAT_NULL						( 1 << 0  ) /* NULL texture */
+#define MAT_CLIP						( 1 << 1  ) /* CLIP texture */
+#define MAT_HINT						( 1 << 2  ) /* HINT texture */
+#define MAT_TRIGGER						( 1 << 3  ) /* TRIGGER texture */
+// 1 << 4
+#define MAT_UTILITY						( 1 << 5  ) /* A utility texture recognized by the map compilers */
+// 1 << 6
+#define MAT_LIQUID						( 1 << 7  ) /* Any liquid texture */
+// 1 << 8
+#define MAT_SKY							( 1 << 9  ) /* SKY texture */
+
+// clang-format on
 
 typedef struct qShader_s
 {
@@ -217,14 +244,22 @@ typedef struct qShader_s
 
 	int m_surfaceFlags;
 	int m_contentFlags;
+
+	/*
+	 Material type. See MAT_ defines above
+	*/
 	int m_materialType;
+
+	/*
+	 Quake II value
+	*/
 	int m_value;
 
-	int unknownInt1;
+	int unknownInt1; // Texture bitness? Set to 16 by vpHalfLife
 
 	struct qTexture_s *m_texture;
 
-	float m_framerate; // TODO: Is this actually a framerate?
+	float m_translucency;
 
 	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
 

@@ -77,6 +77,7 @@
 
 // PluginRender.h (64Bit)
 #define SIZEOF_QTEXTURE_S				48
+#define SIZEOF_QSHADERSTAGESUBDATA_S	48 /* NOTE: Size is unknown */
 #define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown */
 #define SIZEOF_QSHADERSTAGE_S			384
 #if defined( WIN32 )
@@ -162,6 +163,7 @@
 
 // PluginRender.h (32Bit)
 #define SIZEOF_QTEXTURE_S				40
+#define SIZEOF_QSHADERSTAGESUBDATA_S	48 /* NOTE: Size is unknown */
 #define SIZEOF_QSHADERSTAGEDATA_S		284 /* NOTE: Size is unknown*/
 #define SIZEOF_QSHADERSTAGE_S			344
 #if defined( WIN32 )

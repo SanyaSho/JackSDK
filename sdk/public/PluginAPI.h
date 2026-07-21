@@ -1143,8 +1143,8 @@ typedef struct
 #define DIALOG_MB_ICONINFORMATION	( 1 << 4 )
 #define DIALOG_MB_ICONQUESTION		( 1 << 5 )
 
-#define DIALOG_FILE_OPEN			( 1 << 1 ) /* Will make a dialog open files instead of saving them */
-#define DIALOG_FILE_CONNECT			( 1 << 2 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
+#define DIALOG_FILE_OPEN			( 1 << 0 ) /* Will make a dialog open files instead of saving them */
+#define DIALOG_FILE_CONNECT			( 1 << 1 ) /* Will connect internal Qt signals to the panel when used with DIALOG_FILE_OPEN */
 
 /*
  Dialog_MessageBox

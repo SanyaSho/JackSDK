@@ -152,7 +152,7 @@ int V_ExtractFileBase( const char *source, char *destination, size_t size )
 	if ( length >= size )
 		length = size - 1;
 
-	strncpy_s( destination, size, start, length );
+	strncpy( destination, start, length );
 	destination[length] = '\0';
 
 	return (int)length;
@@ -346,3 +346,46 @@ float V_HalfToFloat( short h )
 	return _mm_cvtss_f32( result );
 }
 #endif
+
+/*
+================
+V_ExtractFileExtension
+================
+*/
+void V_ExtractFileExtension( const char *path, char *dest, int destSize )
+{
+	const char *src = path + strlen( path ) - 1;
+
+	while ( src != path && *( src - 1 ) != '.' )
+		src--;
+
+	if ( src == path )
+	{
+		*dest = '\0';
+		return;
+	}
+
+	src--;
+
+	strncpy( dest, src, destSize );
+	dest[destSize - 1] = '\0';
+}
+
+/*
+================
+V_Strupr
+================
+*/
+char *V_Strupr( char *start )
+{
+	unsigned char *str = (unsigned char *)start;
+	while ( *str )
+	{
+		if ( (unsigned char)( *str - 'a' ) <= ( 'z' - 'a' ) )
+			*str -= 'a' - 'A';
+		else if ( (unsigned char)*str >= 0x80 ) // non-ascii, fall back to CRT
+			*str = toupper( *str );
+		str++;
+	}
+	return start;
+}
