@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#undef NDEBUG
 #include <assert.h>
 #include <algorithm>
 

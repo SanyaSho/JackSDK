@@ -7,6 +7,8 @@
 //=====================================================================================//
 
 #include <stdio.h>
+
+#undef NDEBUG
 #include <assert.h>
 
 #include "PluginMeta.h"
