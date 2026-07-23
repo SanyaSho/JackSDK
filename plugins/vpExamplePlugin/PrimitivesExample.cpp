@@ -29,8 +29,8 @@ static bool Jack_Primitive_CreateBlock( const stPRIMITIVECREATESTRUCT *primCreat
 		{ 2, 3, 5, 4 }, // Front
 		{ 4, 5, 7, 6 }, // Right
 		{ 6, 7, 1, 0 }, // Back
-		{ 1, 7, 5, 3 }, // Top
-		{ 0, 2, 4, 6 }  // Bottom
+		{ 1, 7, 5, 3 }, // coords
+		{ 0, 2, 4, 6 }  // uv
 	};
 	// clang-format on
 
@@ -134,20 +134,14 @@ static bool Jack_Primitive_CreateCylinder( const stPRIMITIVECREATESTRUCT *primCr
 
 	vec2_t radius = ( endUV - startUV ) * 0.5f;
 
-	float topHeight = primCreate->m_endPos[hA];
-	float bottomHeight = primCreate->m_startPos[hA];
+	float coordsHeight = primCreate->m_endPos[hA];
+	float uvHeight = primCreate->m_startPos[hA];
 
-	struct Heights_t
-	{
-		vec3_t top;
-		vec3_t bottom;
-	};
-
-	Heights_t *heights = (Heights_t *)Sys_Malloc( sizeof( Heights_t ) * numFaces );
-	if ( !heights )
+	qVertex_t *vertices = (qVertex_t *)Sys_Malloc( sizeof( qVertex_t ) * numFaces );
+	if ( !vertices )
 		return false;
 
-	// Calculate heights
+	// Calculate vertices
 	for ( int i = 0; i < numFaces; i++ )
 	{
 		float angle = ( 2.f * M_PI * i ) / numFaces;
@@ -161,57 +155,57 @@ static bool Jack_Primitive_CreateCylinder( const stPRIMITIVECREATESTRUCT *primCr
 		V_SinCosPrecise( &s, &c, angle );
 
 
-		// Top ring
-		heights[i].top[uA] = center[uA] + radius.x * c;
-		heights[i].top[vA] = center[vA] + radius.y * s;
-		heights[i].top[hA] = topHeight;
+		// coords ring
+		vertices[i].coords[uA] = center[uA] + radius.x * c;
+		vertices[i].coords[vA] = center[vA] + radius.y * s;
+		vertices[i].coords[hA] = coordsHeight;
 
 		if ( ( primCreate->m_flags & PRIMFLAG_FLOORSNAP ) != 0 )
 		{
 			for ( int j = 0; j < 3; j++ )
 			{
-				heights[i].top[j] = floorf( heights[i].top[j] + 0.5f );
+				vertices[i].coords[j] = floorf( vertices[i].coords[j] + 0.5f );
 			}
 		}
 
 
-		// Bottom ring
-		heights[i].bottom[uA] = heights[i].top[uA];
-		heights[i].bottom[vA] = heights[i].top[vA];
-		heights[i].bottom[hA] = bottomHeight;
+		// uv ring
+		vertices[i].uv[uA] = vertices[i].coords[uA];
+		vertices[i].uv[vA] = vertices[i].coords[vA];
+		vertices[i].uv[hA] = uvHeight;
 
 		if ( ( primCreate->m_flags & PRIMFLAG_FLOORSNAP ) != 0 )
 		{
 			// Dont need to snap U and V again
-			heights[i].bottom[hA] = floorf( heights[i].bottom[hA] + 0.5f );
+			vertices[i].uv[hA] = floorf( vertices[i].uv[hA] + 0.5f );
 		}
 	}
 
 	for ( int i = 0; i < numFaces; i++ )
 	{
-		Sys_SnapVertex( heights[i].top.Base() );
-		Sys_SnapVertex( heights[i].bottom.Base() );
+		Sys_SnapVertex( vertices[i].coords.Base() );
+		Sys_SnapVertex( vertices[i].uv.Base() );
 	}
 
 	qBrush_t *brushDef = Brush_Create( primCreate->m_world, worldSpawn );
 	if ( !brushDef )
 	{
-		Sys_Free( heights );
+		Sys_Free( vertices );
 		return false;
 	}
 
-	// Top face
+	// coords face
 	qFace_t *faceDef = Face_Create( primCreate->m_world, brushDef, &primCreate->m_texDef, numFaces );
 	for ( int i = 0; i < numFaces; i++ )
 	{
-		faceDef->m_vertices[i].coords = heights[i].top;
+		faceDef->m_vertices[i].coords = vertices[i].coords;
 	}
 
-	// Bottom face
+	// uv face
 	faceDef = Face_Create( primCreate->m_world, brushDef, &primCreate->m_texDef, numFaces );
 	for ( int i = 0; i < numFaces; i++ )
 	{
-		faceDef->m_vertices[i].coords = heights[numFaces - 1 - i].bottom;
+		faceDef->m_vertices[i].coords = vertices[numFaces - 1 - i].uv;
 	}
 
 	// Side faces
@@ -219,12 +213,12 @@ static bool Jack_Primitive_CreateCylinder( const stPRIMITIVECREATESTRUCT *primCr
 	{
 		faceDef = Face_Create( primCreate->m_world, brushDef, &primCreate->m_texDef, 4 );
 
-		faceDef->m_vertices[0].coords = heights[i].top;
-		faceDef->m_vertices[1].coords = heights[i].bottom;
+		faceDef->m_vertices[0].coords = vertices[i].coords;
+		faceDef->m_vertices[1].coords = vertices[i].uv;
 
 		int next = ( i + 1 ) % numFaces;
-		faceDef->m_vertices[2].coords = heights[next].bottom;
-		faceDef->m_vertices[3].coords = heights[next].top;
+		faceDef->m_vertices[2].coords = vertices[next].uv;
+		faceDef->m_vertices[3].coords = vertices[next].coords;
 	}
 
 	Entity_Build( worldSpawn, ENT_BLDFLG_BIT1 | ENT_BLDFLG_BIT3 );
@@ -233,7 +227,7 @@ static bool Jack_Primitive_CreateCylinder( const stPRIMITIVECREATESTRUCT *primCr
 	Undo_AddBrush( brushDef );
 	Undo_End( primCreate->m_world );
 
-	Sys_Free( heights );
+	Sys_Free( vertices );
 
 	return true;
 }

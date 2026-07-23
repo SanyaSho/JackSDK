@@ -89,8 +89,11 @@ COMPILE_TIME_ASSERT( sizeof( qTexDef_t ) == SIZEOF_QTEXDEF_S /* Always 128 */ );
 typedef struct qVertex_s
 {
 	vec3_t coords;
-	vec2_t uv;
-	int selectionState;
+	vec3_t uv;
+
+	// There's no proofs that selectionState is the actual field and I couldn't find where it can be used (except for being copied as a part of qVertex_s)
+	//vec2_t uv;
+	//int selectionState;
 } qVertex_t;
 COMPILE_TIME_ASSERT( sizeof( qVertex_t ) == SIZEOF_QVERTEX_S /* Always 24 */ );
 

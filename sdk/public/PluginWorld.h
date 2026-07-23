@@ -259,10 +259,6 @@ typedef struct qWorld_s
 	vec3_t m_vecCordonMin;
 	vec3_t m_vecCordonMax;
 
-#if defined( JACK_64BIT )
-	char qWorld_s_gap5[4];
-#endif // JACK_64BIT
-
 	/* Sky settings */
 	struct qSkyData_s m_skyData;
 } qWorld_t;
