@@ -1,0 +1,853 @@
+//=====================================================================================//
+//
+// Purpose: Half-Life Alpha 0.52 plugin for J.A.C.K.
+//
+// Author(-s): SanyaSho (2026)
+//
+//=====================================================================================//
+
+#include <stdio.h>
+
+// Plugin API
+#include "PluginMeta.h"
+
+#include "DataSerializer.h"
+#include "serializer_map.h"
+
+#include "vstdlib_static.h"
+
+#define MAPVERSION_LEGACY				0
+#define MAPVERSION_VALVE220				220
+#define MAPVERSION						MAPVERSION_LEGACY
+
+/*
+===============
+ExportMAP
+===============
+*/
+bool ExportMAP( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef )
+{
+	MAPSerializer mapSerializer( filePath, seekOffset, readLimit, worldDef, FMODE_PARSERAPI );
+	return mapSerializer.Export();
+}
+
+/*
+===============
+ImportMAP
+===============
+*/
+bool ImportMAP( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef )
+{
+	MAPSerializer mapSerializer( filePath, seekOffset, readLimit, worldDef, FMODE_PARSERAPI );
+	return mapSerializer.Import();
+}
+
+/*
+===============
+MAPSerializer
+===============
+*/
+MAPSerializer::MAPSerializer( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef, int fileMode )
+	: Serializer( filePath, seekOffset, readLimit, worldDef, fileMode )
+{
+	m_mapVersion = 0;
+	m_numInvalidSolid = 0;
+	m_packageList = NULL;
+	m_cordon = false;
+}
+
+/*
+===============
+~MAPSerializer
+===============
+*/
+MAPSerializer ::~MAPSerializer()
+{
+	if ( m_fileHandle )
+	{
+		if ( m_writeMode )
+		{
+			fflush( m_fileHandle );
+		}
+
+		fclose( m_fileHandle );
+		m_fileHandle = NULL;
+	}
+}
+
+/*
+===============
+Export
+===============
+*/
+bool MAPSerializer::Export()
+{
+	if ( !BuildPackageList( m_worldDef, &m_packageList, ';', 1 ) )
+	{
+		return false;
+	}
+
+	if ( !FBitSet( m_worldDef->m_editorFlags, ( 1 << 23 ) ) )
+	{
+		Sys_Printf( "Saving: \"%s\"", m_filePath );
+	}
+
+	if ( !OpenForWrite() )
+	{
+		return false;
+	}
+
+	m_mapVersion = MAPVERSION_VALVE220;
+
+	m_cordon = FBitSet( m_worldDef->m_editorFlags, 0x200000 );
+
+	if ( m_cordon &&
+		( fabs( m_worldDef->m_vecCordonMin.x ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.y ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.z ) < 0.001 ||
+			fabs( m_worldDef->m_vecCordonMax.x ) < 0.001 && fabs( m_worldDef->m_vecCordonMax.y ) < 0.001 && fabs( m_worldDef->m_vecCordonMax.z ) < 0.001 ) )
+	{
+		this->m_cordon = false;
+	}
+
+	bool success = true;
+
+	//
+	// Serialize entities
+	//
+	qEntity_t *entityList = m_worldDef->m_entityList;
+
+	while ( entityList )
+	{
+		if ( !SerializeEntities( entityList ) )
+		{
+			success = false;
+			break;
+		}
+
+		entityList = entityList->next;
+	}
+
+	//
+	// Serialize path nodes
+	//
+	if ( success )
+	{
+		qPath_t *pathList = m_worldDef->m_pathList;
+
+		while ( pathList )
+		{
+			if ( !SerializePathNodes( pathList ) )
+			{
+				success = false;
+				break;
+			}
+
+			pathList = pathList->next;
+		}
+	}
+
+	//
+	// Cleanup packages
+	//
+	if ( m_packageList )
+	{
+		gEditorfuncs.pfnSys_Free( m_packageList );
+		m_packageList = nullptr;
+	}
+
+	return success;
+}
+
+/*
+===============
+Import
+===============
+*/
+bool MAPSerializer::Import()
+{
+	if ( !FBitSet( m_worldDef->m_editorFlags, ( 1 << 23 ) ) )
+	{
+		Sys_Printf( "Loading: \"%s\"", m_filePath );
+	}
+
+	if ( !OpenForRead() )
+	{
+		return false;
+	}
+
+	m_mapVersion = 0;
+
+	while ( m_parser->pfnSC_GetToken( true ) )
+	{
+		m_parser->pfnSC_UnGetToken();
+
+		SerializeEntities( NULL );
+	}
+
+	if ( m_numInvalidSolid != 0 )
+	{
+		Sys_Printf( "%i solids were not loaded due to errors in MAP file", m_numInvalidSolid );
+	}
+
+	return true;
+}
+
+/*
+===============
+SerializeCordon
+===============
+*/
+void MAPSerializer::SerializeCordon()
+{
+	if ( !m_cordon )
+	{
+		return;
+	}
+
+	// TODO
+}
+
+/*
+===============
+SerializeBrushFaces
+===============
+*/
+bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_s *brushDef )
+{
+	vec3_t p0, p1, p2;
+	vec3_t uAxis, vAxis;
+
+	if ( m_writeMode )
+	{
+		p0 = faceDef->m_vertices[0].coords;
+		p1 = faceDef->m_vertices[1].coords;
+		p2 = faceDef->m_vertices[2].coords;
+
+		Sys_SnapVertex( p0.Base() );
+		Sys_SnapVertex( p1.Base() );
+		Sys_SnapVertex( p2.Base() );
+
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+		fprintf( m_fileHandle, "( %s %s %s ) ( %s %s %s ) ( %s %s %s )", Sys_PrintMapCoordVector3D( p0 ), Sys_PrintMapCoordVector3D( p1 ), Sys_PrintMapCoordVector3D( p2 ) );
+#else
+		fprintf( m_fileHandle, "( %g %g %g ) ( %g %g %g ) ( %g %g %g )", Sys_PrintVector3D( p0 ), Sys_PrintVector3D( p1 ), Sys_PrintVector3D( p2 ) );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+
+		uAxis = faceDef->m_texDef.m_UAxis;
+		vAxis = faceDef->m_texDef.m_VAxis;
+
+		Sys_SnapAxis( 4, uAxis.Base() );
+		Sys_SnapAxis( 4, vAxis.Base() );
+
+#if ( MAPVERSION == MAPVERSION_VALVE220 )
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+		fprintf( m_fileHandle, " %s [ %s %s %s %s ] [ %s %s %s %s ] %s %s %s\n",
+			faceDef->m_texDef.m_textureName,
+
+			// [
+			Sys_PrintAxisVector3D( uAxis ),
+			Sys_PrintAxis( faceDef->m_texDef.m_xShift ),
+			// ]
+
+			// [
+			Sys_PrintAxisVector3D( vAxis ),
+			Sys_PrintAxis( faceDef->m_texDef.m_yShift ),
+			// ]
+
+			Sys_PrintValue( faceDef->m_texDef.m_rotate ),
+			Sys_PrintValueVector2D( faceDef->m_texDef.m_scale )
+		);
+#else
+		fprintf( m_fileHandle, " %s [ %g %g %g %g ] [ %g %g %g %g ] %g %g %g\n",
+			faceDef->m_texDef.m_textureName,
+
+			// [
+			Sys_PrintVector3D( uAxis ),
+			faceDef->m_texDef.m_xShift,
+			// ]
+
+			// [
+			Sys_PrintVector3D( vAxis ),
+			faceDef->m_texDef.m_yShift,
+			// ]
+
+			faceDef->m_texDef.m_rotate,
+			Sys_PrintVector2D( faceDef->m_texDef.m_scale )
+		);
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+#elif ( MAPVERSION == MAPVERSION_LEGACY )
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+		fprintf( m_fileHandle, " %s %s %s %s %s %s\n",
+			faceDef->m_texDef.m_textureName,
+
+			Sys_PrintAxis( faceDef->m_texDef.m_xShift ),
+			Sys_PrintAxis( faceDef->m_texDef.m_yShift ),
+
+			Sys_PrintAxis( faceDef->m_texDef.m_rotate ),
+			Sys_PrintValueVector2D( faceDef->m_texDef.m_scale )
+		);
+#else
+		fprintf( m_fileHandle, " %s %g %g %g %g %g\n",
+			faceDef->m_texDef.m_textureName,
+
+			faceDef->m_texDef.m_xShift,
+			faceDef->m_texDef.m_yShift,
+
+			faceDef->m_texDef.m_rotate,
+			Sys_PrintVector2D( faceDef->m_texDef.m_scale )
+		);
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+#else
+		#error
+#endif // ( MAPVERSION == MAPVERSION_VALVE220 )
+
+		return true;
+	}
+	else
+	{
+		m_parser->pfnSC_Parse1DMatrix( 3, p0.Base() );
+		m_parser->pfnSC_Parse1DMatrix( 3, p1.Base() );
+		m_parser->pfnSC_Parse1DMatrix( 3, p2.Base() );
+
+		qPlane_t plane;
+		//CrossProduct( p2 - p1, p0 - p1, plane.normal ); // winbspc
+		CrossProduct( p0 - p1, p2 - p0, plane.normal );
+		VectorNormalize( plane.normal );
+
+		plane.dist = DotProduct( plane.normal, p0 );
+
+		if ( fabs( plane.normal.x ) == 1.0f )
+			plane.alignedAxis = 0;
+		else if ( fabs( plane.normal.y ) == 1.0f )
+			plane.alignedAxis = 1;
+		else if ( fabs( plane.normal.z ) == 1.0f )
+			plane.alignedAxis = 2;
+		else
+			plane.alignedAxis = 3;
+
+		qTexDef_t texDef;
+		memset( &texDef, 0, sizeof( qTexDef_t ) );
+
+		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() | 1 );
+
+		m_parser->pfnSC_GetToken( false );
+		strncpy( texDef.m_textureName, m_parser->pfnSC_Token(), sizeof( texDef.m_textureName ) );
+
+		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() & ~1 );
+
+		V_Strupr( texDef.m_textureName );
+
+		if ( m_mapVersion <= MAPVERSION_LEGACY )
+		{
+			// shiftX shiftY rotation scaleX scaleY
+
+			m_parser->pfnSC_GetToken( false );
+
+			const char *token = m_parser->pfnSC_Token();
+			if ( token[0] == '[' && token[1] == '\0' )
+			{
+				Sys_Warning( "not a version %i file (is it a decompiled BSP output?)", m_mapVersion );
+
+				m_mapVersion = MAPVERSION_VALVE220;
+				m_parser->pfnSC_UnGetToken();
+			}
+			else
+			{
+				texDef.m_xShift = V_Atof( m_parser->pfnSC_Token() );
+
+				m_parser->pfnSC_GetToken( false );
+				texDef.m_yShift = V_Atof( m_parser->pfnSC_Token() );
+
+				m_parser->pfnSC_GetToken( false );
+				texDef.m_rotate = V_Atof( m_parser->pfnSC_Token() );
+
+				m_parser->pfnSC_GetToken( false );
+				texDef.m_scale.x = V_Atof( m_parser->pfnSC_Token() );
+
+				m_parser->pfnSC_GetToken( false );
+				texDef.m_scale.y = V_Atof( m_parser->pfnSC_Token() );
+
+				texDef.m_textureAlignment = TEXALIGN_QUAKE;
+			}
+		}
+
+		if ( m_mapVersion >= MAPVERSION_VALVE220 )
+		{
+			// [ ux uy uz shift ] [ vx vy vz shift ] rotate scaleX scaleY
+
+			// TODO
+			m_parser->pfnSC_GetToken( false );
+
+			// [
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_UAxis.x = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_UAxis.y = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_UAxis.z = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_xShift = V_Atof( m_parser->pfnSC_Token() );
+			// ]
+
+			m_parser->pfnSC_MatchToken( "]" );
+			if ( m_parser->pfnSC_CheckError() )
+			{
+				return false;
+			}
+
+			m_parser->pfnSC_MatchToken( "[" );
+			if ( m_parser->pfnSC_CheckError() )
+			{
+				return false;
+			}
+
+			// [
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_VAxis.x = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_VAxis.y = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_VAxis.z = V_Atof( m_parser->pfnSC_Token() );
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_yShift = V_Atof( m_parser->pfnSC_Token() );
+			// ]
+
+			m_parser->pfnSC_MatchToken( "]" );
+			if ( m_parser->pfnSC_CheckError() )
+			{
+				return false;
+			}
+
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_rotate = V_Atof( m_parser->pfnSC_Token() );
+
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_scale.x = V_Atof( m_parser->pfnSC_Token() );
+
+			m_parser->pfnSC_GetToken( false );
+			texDef.m_scale.y = V_Atof( m_parser->pfnSC_Token() );
+
+			texDef.m_textureAlignment = TEXALIGN_FACE;
+		}
+
+		while ( texDef.m_rotate < 0.0f )
+		{
+			texDef.m_rotate += 360.0f;
+		}
+
+		while ( texDef.m_rotate >= 360.0f )
+		{
+			texDef.m_rotate -= 360.0f;
+		}
+
+		if ( texDef.m_scale.x == 0.0f )
+		{
+			texDef.m_scale.x = 1.0f;
+		}
+
+		if ( texDef.m_scale.y == 0.0f )
+		{
+			texDef.m_scale.y = 1.0f;
+		}
+
+		// Skip all unsupported tokens
+		while ( m_parser->pfnSC_TokenAvailable() )
+		{
+			m_parser->pfnSC_GetToken( false );
+		}
+
+		qFace_t *faceDef = Face_Create( m_worldDef, brushDef, &texDef, 0 );
+		if ( faceDef )
+		{
+			faceDef->m_plane = plane;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+/*
+===============
+SerializeBrushes
+===============
+*/
+bool MAPSerializer::SerializeBrushes( struct qBrush_s *brushDef, struct qEntity_s *entityDef )
+{
+	if ( m_writeMode )
+	{
+		if ( !brushDef->m_faceList )
+		{
+			return false;
+		}
+
+		if ( FBitSet( m_worldDef->m_editorFlags, 0x100000 ) && FBitSet( brushDef->m_editorFlags, 8 ) )
+		{
+			return true;
+		}
+
+		if ( m_cordon && (
+			( brushDef->m_bboxMin.x > m_worldDef->m_vecCordonMax.x - 0.001 ) || ( brushDef->m_bboxMin.y > m_worldDef->m_vecCordonMax.y - 0.001 ) || ( brushDef->m_bboxMin.z > m_worldDef->m_vecCordonMax.z - 0.001 ) ||
+			( brushDef->m_bboxMax.x > m_worldDef->m_vecCordonMin.x + 0.001 ) || ( brushDef->m_bboxMax.y > m_worldDef->m_vecCordonMin.y + 0.001 ) || ( brushDef->m_bboxMax.z > m_worldDef->m_vecCordonMin.z + 0.001 ) ) )
+		{
+			return true;
+		}
+
+		fprintf( m_fileHandle, "%s\n", "{" );
+
+		for ( qFace_t *faceDef = brushDef->m_faceList; faceDef != NULL; faceDef = faceDef->next )
+		{
+			SerializeBrushFaces( faceDef, brushDef );
+		}
+
+		fprintf( m_fileHandle, "%s\n", "}" );
+
+		return true;
+	}
+	else
+	{
+		m_parser->pfnSC_MatchToken( "{" );
+
+		if ( m_parser->pfnSC_CheckError() )
+		{
+			return false;
+		}
+
+		if ( m_parser->pfnSC_CheckError() )
+		{
+			return false;
+		}
+
+		qBrush_t *newBrushDef = Brush_Create( m_worldDef, entityDef );
+		if ( !newBrushDef )
+		{
+			return false;
+		}
+
+		while ( m_parser->pfnSC_GetToken( true ) )
+		{
+			const char *token = m_parser->pfnSC_Token();
+
+			// Exit if we've reached the final '}'
+			if ( token[0] == '}' && token[1] == '\0' )
+			{
+				break;
+			}
+
+			// SC_Parse1DMatrix assumes that we have '(' in the next token
+			m_parser->pfnSC_UnGetToken();
+
+			if ( !SerializeBrushFaces( NULL, newBrushDef ) )
+			{
+				return false;
+			}
+		};
+
+		return true;
+	}
+
+	return false;
+}
+
+/*
+===============
+SerializeEntities
+===============
+*/
+bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
+{
+	vec3_t origin;
+	vec3_t angles;
+
+	if ( m_writeMode )
+	{
+		// TODO: Flags
+		if ( !m_cordon )
+		{
+			fprintf( m_fileHandle, "%s\n", "{" );
+
+			fprintf( m_fileHandle, "\"classname\" \"%s\"\n", entityDef->m_className );
+
+			for ( epair_t *epair = entityDef->epairs; epair != NULL; epair = epair->next )
+			{
+				if ( !epair->key || !epair->value )
+					continue;
+
+				if ( !stricmp( epair->key, entityDef->m_entityKeys[1].key ) )
+					continue;
+
+				fprintf( m_fileHandle, "\"%s\" \"%s\"\n", epair->key, epair->value );
+			}
+
+			// Brush-based entities must have the brush with ORIGIN texture attached to it
+			if ( !entityDef->m_brushList )
+			{
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+				fprintf( m_fileHandle, "\"%s\" \"%s %s %s\"\n", entityDef->m_entityKeys[1].key, Sys_PrintMapCoordVector3D( entityDef->m_vecOrigin ) );
+#else
+				fprintf( m_fileHandle, "\"%s\" \"%g %g %g\"\n", entityDef->m_entityKeys[1].key, Sys_PrintVector3D( entityDef->m_vecOrigin ) );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+			}
+
+			// Main "worldspawn" entity stores information about the resources
+			if ( FBitSet( entityDef->m_editorFlags, EFL_WORLDSPAWN ) )
+			{
+				fprintf( m_fileHandle, "\"mapversion\" \"%i\"\n", m_mapVersion );
+				fprintf( m_fileHandle, "\"wad\" \"%s\"\n", m_packageList );
+				fprintf( m_fileHandle, "\"generator\" \"%s (%s)\"\n", V_VersionString(), "vpHalfLifeAlpha" );
+				SerializeCordon();
+			}
+
+			for ( qBrush_t *brushDef = entityDef->m_brushList; brushDef != NULL; brushDef = brushDef->next )
+			{
+				SerializeBrushes( brushDef, entityDef );
+			}
+
+			fprintf( m_fileHandle, "%s\n", "}" );
+			return true;
+		}
+
+		// TODO: Cordon
+
+		return true;
+	}
+	else
+	{
+		int createFlags = ENT_BLDFLG_FULLBUILD;
+		char classname[512] = { 0 };
+
+		epair_t *epairList = NULL;
+
+		qEntity_t *newEntityDef = NULL;
+
+		//
+		// Find the first block
+		//
+		m_parser->pfnSC_MatchToken( "{" );
+		if ( m_parser->pfnSC_CheckError() )
+		{
+			return false;
+		}
+
+		while ( m_parser->pfnSC_GetToken( true ) )
+		{
+			const char *token = m_parser->pfnSC_Token();
+
+			// Exit if we've reached the final '}'
+			if ( token[0] == '}' && token[1] == '\0' )
+				break;
+
+			// Check if entity has embedded brushes
+			if ( token[0] == '{' && token[1] == '\0' )
+			{
+				ClearBits( createFlags, ENT_BLDFLG_FULLBUILD );
+
+				//
+				// Entity must exists before brushes are created
+				//
+				if ( !newEntityDef )
+				{
+					if ( !classname[0] )
+					{
+						FreeEpairList( epairList );
+						return false;
+					}
+
+					if ( !stricmp( classname, "worldspawn" ) )
+					{
+						SetBits( createFlags, EFL_WORLDSPAWN );
+					}
+
+					newEntityDef = Entity_Create( m_worldDef, classname, origin.Base(), createFlags );
+					if ( !newEntityDef )
+					{
+						FreeEpairList( epairList );
+						return false;
+					}
+
+					newEntityDef->epairs = epairList;
+					newEntityDef->m_vecAngles = angles;
+				}
+
+				// SerializeBrushes assumes that we have '{' in the next token
+				m_parser->pfnSC_UnGetToken();
+
+				if ( !SerializeBrushes( NULL, newEntityDef ) )
+				{
+					++m_numInvalidSolid;
+
+					m_parser->pfnSC_ResetError();
+
+					// Skip to the next entity
+					while ( m_parser->pfnSC_GetToken( true ) )
+					{
+						if ( m_parser->pfnSC_Token()[0] == '}' )
+						{
+							break;
+						}
+					}
+				}
+
+				continue;
+			}
+
+			if ( newEntityDef )
+			{
+				m_parser->pfnSC_ParseError( "epairs are not allowed after brushes" );
+
+				m_parser->pfnSC_ResetError();
+				m_parser->pfnSC_ResetError();
+
+				// Skip to the next entity
+				while ( m_parser->pfnSC_GetToken( true ) )
+				{
+					if ( m_parser->pfnSC_Token()[0] == '}' )
+					{
+						break;
+					}
+				}
+
+				m_parser->pfnSC_UnGetToken();
+				return false;
+			}
+
+			//
+			// Parse key
+			//
+			char key[64] = { 0 };
+			strncpy( key, m_parser->pfnSC_Token(), sizeof( key ) );
+
+			//
+			// Parse value
+			//
+			if ( !m_parser->pfnSC_GetToken( false ) )
+			{
+				FreeEpairList( epairList );
+				return false;
+			}
+			const char *value = m_parser->pfnSC_Token();
+
+			//
+			// Special keys
+			//
+			if ( !stricmp( key, "classname" ) )
+			{
+				strncpy( classname, value, sizeof( classname ) );
+			}
+			else if ( !stricmp( key, "origin" ) )
+			{
+				(void)sscanf( value, "%f %f %f", &origin.x, &origin.y, &origin.z );
+			}
+			else if ( !stricmp( key, "mapversion" ) )
+			{
+				m_mapVersion = V_Atoi( value );
+			}
+			else if ( !stricmp( key, "wad" ) || !stricmp( key, "_generator" ) )
+			{
+				// Skip "wad" and "_generator"
+			}
+			else if ( !stricmp( key, "angles" ) )
+			{
+				(void)sscanf( value, "%f %f %f", &angles.x, &angles.y, &angles.z );
+			}
+			else if ( !stricmp( key, "angle" ) )
+			{
+				float angle = V_Atof( value );
+
+				if ( angle == 1 )
+				{
+					angles.x = -90;
+					angles.y = 0;
+				}
+				else if ( angle == 2 )
+				{
+					angles.x = 90;
+				}
+				else
+				{
+					angles.x = 0;
+					angles.y = angle;
+				}
+
+				angles.z = 0;
+			}
+			else
+			{
+				epairList = AddEpairToList( epairList, key, value );
+			}
+		}
+
+		if ( !newEntityDef )
+		{
+			if ( !classname[0] )
+			{
+				FreeEpairList( epairList );
+				return false;
+			}
+
+			if ( !stricmp( classname, "worldspawn" ) )
+			{
+				SetBits( createFlags, EFL_WORLDSPAWN );
+			}
+
+			newEntityDef = Entity_Create( m_worldDef, classname, origin.Base(), createFlags );
+			if ( !newEntityDef )
+			{
+				FreeEpairList( epairList );
+				return false;
+			}
+
+			newEntityDef->epairs = epairList;
+			newEntityDef->m_vecAngles = angles;
+		}
+
+		Entity_Build( newEntityDef, m_mapVersion >= MAPVERSION_VALVE220 ? 5 : 13 );
+
+		return true;
+	}
+
+	return false;
+}
+
+/*
+===============
+SerializePathNodes
+===============
+*/
+bool MAPSerializer::SerializePathNodes( struct qPath_s *pathList )
+{
+	if ( !m_writeMode )
+	{
+		return true;
+	}
+
+	qNode_t *nodeList = pathList->m_nodeList;
+	if ( !nodeList )
+		return true;
+
+	const char *pathClassname = pathList->m_pathClassname;
+	if ( !pathClassname || !pathClassname[0] )
+		return true;
+
+	if ( m_cordon && (
+		( pathList->m_bboxMin.x > m_worldDef->m_vecCordonMax.x - 0.001 ) || ( pathList->m_bboxMin.y > m_worldDef->m_vecCordonMax.y - 0.001 ) || ( pathList->m_bboxMin.z > m_worldDef->m_vecCordonMax.z - 0.001 ) ||
+		( pathList->m_bboxMax.x > m_worldDef->m_vecCordonMin.x + 0.001 ) || ( pathList->m_bboxMax.y > m_worldDef->m_vecCordonMin.y + 0.001 ) || ( pathList->m_bboxMax.z > m_worldDef->m_vecCordonMin.z + 0.001 ) ) )
+	{
+		return true;
+	}
+
+	// TODO: Per-node cordon check
+
+	for ( qNode_t *nodeDef = nodeList; nodeDef != NULL; nodeDef = nodeDef->next )
+	{
+		fprintf( m_fileHandle, "%s\n", "{" );
+
+		// TODO
+
+		fprintf( m_fileHandle, "%s\n", "}" );
+	}
+
+	// TODO
+
+	return true;
+}

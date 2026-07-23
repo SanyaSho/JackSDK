@@ -7,6 +7,7 @@
 //=====================================================================================//
 
 #include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
@@ -388,4 +389,24 @@ char *V_Strupr( char *start )
 		str++;
 	}
 	return start;
+}
+
+/*
+================
+V_Atoi
+================
+*/
+int V_Atoi( const char *string )
+{
+	return atoi( string );
+}
+
+/*
+================
+V_Atof
+================
+*/
+float V_Atof( const char *string )
+{
+	return (float)atof( string );
 }

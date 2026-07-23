@@ -52,4 +52,7 @@ extern void V_ExtractFileExtension( const char *path, char *dest, int destSize )
 
 extern char *V_Strupr( char *start );
 
+extern int V_Atoi( const char *string );
+extern float V_Atof( const char *string );
+
 #endif // !VSTDLIB_STATIC_H
