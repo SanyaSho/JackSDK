@@ -657,6 +657,7 @@ static bool Editor_RegisterModelFormat( int formatIndex, const char *formatName,
 }
 
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /* Particles IO */
 static vpUnloadParticles_t s_vpUnloadParticles;
 static vpLoadParticles_t s_vpLoadParticles;
@@ -688,6 +689,7 @@ static bool Editor_RegisterParticleFormat( int formatIndex, const char *formatNa
 
 	return true;
 }
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 
 /* Archive IO */
@@ -1081,6 +1083,7 @@ int main( int argc, char **argv )
 			Sys_Printf( "%i model format(s) registered", ret );
 	}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	vpEnumGenericFunction_t pluginEnumParticlesFormats = (vpEnumGenericFunction_t)GetProcAddress( hPluginModule, "vpEnumParticlesFormats" );
 	if ( pluginEnumParticlesFormats )
 	{
@@ -1088,6 +1091,7 @@ int main( int argc, char **argv )
 		if ( ret != 0 )
 			Sys_Printf( "%i sprite format(s) registered", ret );
 	}
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	vpEnumGenericFunction_t pluginEnumArchiveFormats = (vpEnumGenericFunction_t)GetProcAddress( hPluginModule, "vpEnumArchiveFormats" );
 	if ( pluginEnumArchiveFormats )

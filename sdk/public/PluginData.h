@@ -52,7 +52,7 @@ struct qShader_s;
 
  vpEnumSpriteFormats requires vpSetPalette, vpUnloadSprite, vpLoadSprite
  vpEnumModelFormats requires vpSetPalette, vpGetModelFormatFlags, vpGetModelBounds, vpUnloadModel, vpLoadModel and vpRenderModel
- vpEnumParticlesFormats requires vpSetPalette, vpUnloadParticles, vpLoadParticles and vpRenderParticles
+ (Only in Steam Beta) vpEnumParticlesFormats requires vpSetPalette, vpUnloadParticles, vpLoadParticles and vpRenderParticles
 
  vpEnumArchiveFormats requires vpUnloadArchive, vpLoadArchive, vpFindArchiveFile, vpLoadArchiveFile, and vpListArchiveFiles
 */
@@ -247,6 +247,7 @@ typedef struct qStudioData_s
 COMPILE_TIME_ASSERT( sizeof( qStudioData_t ) == SIZEOF_QSTUDIODATA_S );
 
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /*
  Particles data definition.
  Contains some basic info about a particle
@@ -301,6 +302,7 @@ typedef struct qParticlesData_s
 	vpUnloadParticles_t m_pfnUnloadParticle;
 } qParticlesData_t;
 COMPILE_TIME_ASSERT( sizeof( qParticlesData_t ) == SIZEOF_QPARTICLESDATA_S );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 
 /*

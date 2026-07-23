@@ -44,6 +44,7 @@ RENDERFLAGS:
 #include "BaseTypes.h"
 
 
+#if 0
 class CFrustum;
 class CGLState;
 
@@ -63,6 +64,7 @@ typedef struct renditionInfo_s
 	CGLState *m_glState;
 } renditionInfo_t;
 //COMPILE_TIME_ASSERT( sizeof( renditionInfo_t ) == ??? );
+#endif
 
 
 typedef struct viewInfo_s
@@ -173,9 +175,11 @@ typedef struct qShaderStage_s
 	int unknownInt1;
 
 	/* Stage flags (see above) */
-	int m_shaderStageFlags;
+	int m_flags;
 
-	char gap3[8];
+	int m_textureCount;
+
+	char gap3[4];
 
 	float m_framerate;
 
@@ -201,6 +205,7 @@ FORCEINLINE qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *texture
 // clang-format off
 
 #define SHADER_FLAG_TRANSLUCENT			( 1 << 1  ) /* Enable translucency support */
+#define SHADER_FLAG_BIT2				( 1 << 2  )
 #define SHADER_FLAG_BIT4				( 1 << 4  )
 #define SHADER_FLAG_BIT6				( 1 << 6  )
 #define SHADER_FLAG_BIT12				( 1 << 12 )
@@ -220,6 +225,8 @@ FORCEINLINE qTexture_s *AddTextureToList( qTexture_s *&head, qTexture_s *texture
 
 // clang-format on
 
+class CTextureParcel;
+
 typedef struct qShader_s
 {
 	char m_name[64];
@@ -235,12 +242,7 @@ typedef struct qShader_s
 
 	char gap1[4];
 
-	/* A pointer? */
-#if defined( JACK_64BIT )
-	char gap2[8];
-#else
-	char gap2[4];
-#endif // JACK_64BIT
+	CTextureParcel *m_texParcel;
 
 	int m_surfaceFlags;
 	int m_contentFlags;
@@ -359,6 +361,7 @@ typedef struct qStudioDrawData_s
 COMPILE_TIME_ASSERT( sizeof( qStudioDrawData_t ) == SIZEOF_QSTUDIODRAWDATA_S );
 
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /*
  qEntity_s::m_drawData for mod_particles
 */
@@ -380,6 +383,7 @@ typedef struct qParticlesDrawData_s
 	char gap2[8];
 } qParticlesDrawData_t;
 COMPILE_TIME_ASSERT( sizeof( qParticlesDrawData_t ) == SIZEOF_QPARTICLESDRAWDATA_S );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 // clang-format off
 

@@ -56,6 +56,32 @@ FORCEINLINE epair_t *AllocEpair( const char *key, const char *value )
 	return pair;
 }
 
+FORCEINLINE epair_s *AddEpairToList( epair_t *&epairList, const char *key, const char *value )
+{
+	epair_s *last = nullptr;
+
+	for ( epair_s *epair = epairList; epair; epair = epair->next )
+	{
+		if ( !stricmp( epair->key, key ) )
+		{
+			Sys_Free( epair->value ); // if needed
+			epair->value = Sys_AllocString( value );
+			return epair;
+		}
+
+		last = epair;
+	}
+
+	epair_s *epair = AllocEpair( key, value );
+
+	if ( last )
+		last->next = epair;
+	else
+		epairList = epair;
+
+	return epair;
+}
+
 FORCEINLINE void FreeEpairList( epair_t *list )
 {
 	for ( epair_t *pair = list, *next; pair != NULL; pair = next )
@@ -164,7 +190,9 @@ typedef enum modtype_s
 	mod_sprite,
 	mod_decal,
 	mod_studio,
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	mod_particles,
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	mod_unknown
 } modtype_t;
 
@@ -240,35 +268,6 @@ typedef struct qEntity_s
 	void *m_drawData; // This pointer size depends on the m_modelType value. See CMapEntity::rebuildUserData.
 } qEntity_t;
 COMPILE_TIME_ASSERT( sizeof( qEntity_t ) == SIZEOF_QENTITY_S );
-
-FORCEINLINE epair_s *AddEpair( qEntity_s *entity, const char *key, const char *value )
-{
-	if ( !entity )
-		return nullptr;
-
-	epair_s *last = nullptr;
-
-	for ( epair_s *epair = entity->epairs; epair; epair = epair->next )
-	{
-		if ( !stricmp( epair->key, key ) )
-		{
-			Sys_Free( epair->value ); // if needed
-			epair->value = Sys_AllocString( value );
-			return epair;
-		}
-
-		last = epair;
-	}
-
-	epair_s *epair = AllocEpair( key, value );
-
-	if ( last )
-		last->next = epair;
-	else
-		entity->epairs = epair;
-
-	return epair;
-}
 
 // clang-format off
 
