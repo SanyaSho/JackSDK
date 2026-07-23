@@ -255,6 +255,21 @@ extern plugin_funcs_t gEditorfuncs;
 #define Dialog_BeginWait			(gEditorfuncs.dialogfuncs.pfnDialog_BeginWait)
 #define Dialog_EndWait				(gEditorfuncs.dialogfuncs.pfnDialog_EndWait)
 
+/*
+ Utility
+*/
+#define Sys_PrintVector2D( v )			v.x, v.y
+#define Sys_PrintVector3D( v )			v.x, v.y, v.z
+
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+#define Sys_PrintValueVector2D( v )		Sys_PrintValue( v.x ), Sys_PrintValue( v.y )
+#define Sys_PrintValueVector3D( v )		Sys_PrintValue( v.x ), Sys_PrintValue( v.y ), Sys_PrintValue( v.z )
+#define Sys_PrintMapCoordVector2D( v )	Sys_PrintMapCoord( v.x ), Sys_PrintMapCoord( v.y )
+#define Sys_PrintMapCoordVector3D( v )	Sys_PrintMapCoord( v.x ), Sys_PrintMapCoord( v.y ), Sys_PrintMapCoord( v.z )
+#define Sys_PrintAxisVector2D( v )		Sys_PrintAxis( v.x ), Sys_PrintAxis( v.y )
+#define Sys_PrintAxisVector3D( v )		Sys_PrintAxis( v.x ), Sys_PrintAxis( v.y ), Sys_PrintAxis( v.z )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+
 // clang-format on
 
 #endif // !PLUGINEDITORFUNCTIONS_H
