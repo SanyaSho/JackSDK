@@ -28,6 +28,32 @@ typedef struct qPlane_s
 } qPlane_t;
 COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == SIZEOF_QPLANE_S /* Always 20 */ );
 
+FORCEINLINE void PlaneFromPoints( const vec3_t &p0, const vec3_t &p1, const vec3_t &p2, struct qPlane_s &planeOut )
+{
+	//CrossProduct( p2 - p1, p0 - p1, planeOut.normal ); // winbspc
+	CrossProduct( p0 - p1, p2 - p0, planeOut.normal );
+	VectorNormalize( planeOut.normal );
+
+	planeOut.dist = DotProduct( planeOut.normal, p0 );
+
+	if ( fabs( planeOut.normal.x ) == 1.f )
+	{
+		planeOut.alignedAxis = 0;
+	}
+	else if ( fabs( planeOut.normal.y ) == 1.f )
+	{
+		planeOut.alignedAxis = 1;
+	}
+	else if ( fabs( planeOut.normal.z ) == 1.f )
+	{
+		planeOut.alignedAxis = 2;
+	}
+	else
+	{
+		planeOut.alignedAxis = 3;
+	}
+}
+
 
 #define TEXALIGN_NONE			(      0 )
 #define TEXALIGN_WORLD			( 1 << 0 )

@@ -20,6 +20,18 @@
 #define MAPVERSION_VALVE220				220
 #define MAPVERSION						MAPVERSION_LEGACY
 
+//#define FINE_OUTPUT
+
+#if defined( FINE_OUTPUT )
+#define EXTRA_TAB						"\t"
+#else
+#define EXTRA_TAB
+#endif // FINE_OUTPUT
+
+#if defined( FINE_OUTPUT )
+static int s_entCnt = 0;
+#endif // FINE_OUTPUT
+
 /*
 ===============
 ExportMAP
@@ -63,6 +75,10 @@ MAPSerializer::MAPSerializer( const char *filePath, size_t seekOffset, size_t re
 */
 MAPSerializer ::~MAPSerializer()
 {
+#if defined( FINE_OUTPUT )
+	s_entCnt = 0;
+#endif // FINE_OUTPUT
+
 	if ( m_fileHandle )
 	{
 		if ( m_writeMode )
@@ -227,9 +243,9 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 		Sys_SnapVertex( p2.Base() );
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-		fprintf( m_fileHandle, "( %s %s %s ) ( %s %s %s ) ( %s %s %s )", Sys_PrintMapCoordVector3D( p0 ), Sys_PrintMapCoordVector3D( p1 ), Sys_PrintMapCoordVector3D( p2 ) );
+		fprintf( m_fileHandle, EXTRA_TAB EXTRA_TAB "( %s %s %s ) ( %s %s %s ) ( %s %s %s )", Sys_PrintMapCoordVector3D( p0 ), Sys_PrintMapCoordVector3D( p1 ), Sys_PrintMapCoordVector3D( p2 ) );
 #else
-		fprintf( m_fileHandle, "( %g %g %g ) ( %g %g %g ) ( %g %g %g )", Sys_PrintVector3D( p0 ), Sys_PrintVector3D( p1 ), Sys_PrintVector3D( p2 ) );
+		fprintf( m_fileHandle, EXTRA_TAB EXTRA_TAB "( %g %g %g ) ( %g %g %g ) ( %g %g %g )", Sys_PrintVector3D( p0 ), Sys_PrintVector3D( p1 ), Sys_PrintVector3D( p2 ) );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 		uAxis = faceDef->m_texDef.m_UAxis;
@@ -309,30 +325,17 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 		m_parser->pfnSC_Parse1DMatrix( 3, p2.Base() );
 
 		qPlane_t plane;
-		//CrossProduct( p2 - p1, p0 - p1, plane.normal ); // winbspc
-		CrossProduct( p0 - p1, p2 - p0, plane.normal );
-		VectorNormalize( plane.normal );
-
-		plane.dist = DotProduct( plane.normal, p0 );
-
-		if ( fabs( plane.normal.x ) == 1.0f )
-			plane.alignedAxis = 0;
-		else if ( fabs( plane.normal.y ) == 1.0f )
-			plane.alignedAxis = 1;
-		else if ( fabs( plane.normal.z ) == 1.0f )
-			plane.alignedAxis = 2;
-		else
-			plane.alignedAxis = 3;
+		PlaneFromPoints( p0, p1, p2, plane );
 
 		qTexDef_t texDef;
 		memset( &texDef, 0, sizeof( qTexDef_t ) );
 
-		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() | 1 );
+		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() | PFL_NOERRORS );
 
 		m_parser->pfnSC_GetToken( false );
 		strncpy( texDef.m_textureName, m_parser->pfnSC_Token(), sizeof( texDef.m_textureName ) );
 
-		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() & ~1 );
+		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() & ~PFL_NOERRORS );
 
 		V_Strupr( texDef.m_textureName );
 
@@ -493,14 +496,14 @@ bool MAPSerializer::SerializeBrushes( struct qBrush_s *brushDef, struct qEntity_
 			return true;
 		}
 
-		fprintf( m_fileHandle, "%s\n", "{" );
+		fprintf( m_fileHandle, "%s\n", EXTRA_TAB "{" );
 
 		for ( qFace_t *faceDef = brushDef->m_faceList; faceDef != NULL; faceDef = faceDef->next )
 		{
 			SerializeBrushFaces( faceDef, brushDef );
 		}
 
-		fprintf( m_fileHandle, "%s\n", "}" );
+		fprintf( m_fileHandle, "%s\n", EXTRA_TAB "}" );
 
 		return true;
 	}
@@ -564,9 +567,13 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 		// TODO: Flags
 		if ( !m_cordon )
 		{
+#if defined( FINE_OUTPUT )
+			fprintf( m_fileHandle, "// entity %i\n", s_entCnt++ );
+#endif // FINE_OUTPUT
+
 			fprintf( m_fileHandle, "%s\n", "{" );
 
-			fprintf( m_fileHandle, "\"classname\" \"%s\"\n", entityDef->m_className );
+			fprintf( m_fileHandle, EXTRA_TAB "\"classname\" \"%s\"\n", entityDef->m_className );
 
 			for ( epair_t *epair = entityDef->epairs; epair != NULL; epair = epair->next )
 			{
@@ -576,25 +583,25 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 				if ( !stricmp( epair->key, entityDef->m_entityKeys[1].key ) )
 					continue;
 
-				fprintf( m_fileHandle, "\"%s\" \"%s\"\n", epair->key, epair->value );
+				fprintf( m_fileHandle, EXTRA_TAB "\"%s\" \"%s\"\n", epair->key, epair->value );
 			}
 
 			// Brush-based entities must have the brush with ORIGIN texture attached to it
 			if ( !entityDef->m_brushList )
 			{
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-				fprintf( m_fileHandle, "\"%s\" \"%s %s %s\"\n", entityDef->m_entityKeys[1].key, Sys_PrintMapCoordVector3D( entityDef->m_vecOrigin ) );
+				fprintf( m_fileHandle, EXTRA_TAB "\"%s\" \"%s %s %s\"\n", entityDef->m_entityKeys[1].key, Sys_PrintMapCoordVector3D( entityDef->m_vecOrigin ) );
 #else
-				fprintf( m_fileHandle, "\"%s\" \"%g %g %g\"\n", entityDef->m_entityKeys[1].key, Sys_PrintVector3D( entityDef->m_vecOrigin ) );
+				fprintf( m_fileHandle, EXTRA_TAB "\"%s\" \"%g %g %g\"\n", entityDef->m_entityKeys[1].key, Sys_PrintVector3D( entityDef->m_vecOrigin ) );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 			}
 
 			// Main "worldspawn" entity stores information about the resources
 			if ( FBitSet( entityDef->m_editorFlags, EFL_WORLDSPAWN ) )
 			{
-				fprintf( m_fileHandle, "\"mapversion\" \"%i\"\n", m_mapVersion );
-				fprintf( m_fileHandle, "\"wad\" \"%s\"\n", m_packageList );
-				fprintf( m_fileHandle, "\"generator\" \"%s (%s)\"\n", V_VersionString(), "vpHalfLifeAlpha" );
+				fprintf( m_fileHandle, EXTRA_TAB "\"mapversion\" \"%i\"\n", m_mapVersion );
+				fprintf( m_fileHandle, EXTRA_TAB "\"wad\" \"%s\"\n", m_packageList );
+				fprintf( m_fileHandle, EXTRA_TAB "\"generator\" \"%s (%s)\"\n", V_VersionString(), "vpHalfLifeAlpha" );
 				SerializeCordon();
 			}
 
@@ -604,6 +611,11 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			}
 
 			fprintf( m_fileHandle, "%s\n", "}" );
+
+#if defined( FINE_OUTPUT )
+			fprintf( m_fileHandle, "\n" );
+#endif // FINE_OUTPUT
+
 			return true;
 		}
 
