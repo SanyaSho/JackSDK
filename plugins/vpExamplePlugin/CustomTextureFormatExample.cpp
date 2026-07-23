@@ -44,13 +44,14 @@ Extensions of those formats must be set as supported in the game profile.
 */
 DLL_EXPORT int vpEnumTextureFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
-	int i = 0;
-	for ( i = 0; i < ARRAYSIZE( g_textureFormat ); i++ )
+	int c = 0;
+
+	for ( int i = 0; i < ARRAYSIZE( g_textureFormat ); i++ )
 	{
-		i += registerIOFormat( g_textureFormat[i].m_formatIndex, g_textureFormat[i].m_formatName, g_textureFormat[i].m_formatExtension, libraryHandle ) ? 1 : 0;
+		c += registerIOFormat( g_textureFormat[i].m_formatIndex, g_textureFormat[i].m_formatName, g_textureFormat[i].m_formatExtension, libraryHandle ) ? 1 : 0;
 	}
 
-	return i;
+	return c;
 }
 
 /*
