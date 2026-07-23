@@ -56,17 +56,17 @@ EDITORFLAGS:
 // clang-format off
 
 // 1 << 0
-#define EFL_SELECTED				( 1 << 1 ) /* Object is selected. This flag cannot be set manually when creating/building entities */
-#define EFL_DIRTY					( 1 << 2 ) /* Object was modified */
-#define EFL_HIDDEN					( 1 << 3 ) /* Object is hidden */
-#define EFL_TRANSPARENT				( 1 << 4 ) /* Entity is transparent */
-#define EFL_WORLDSPAWN				( 1 << 5 ) /* A worldspawn */
-#define EFL_INVENTORYITEM			( 1 << 6 ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
-#define EFL_PATHWAY					( 1 << 7 ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
+#define EFL_SELECTED				( 1 << 1  ) /* Object is selected. This flag cannot be set manually when creating/building entities */
+#define EFL_DIRTY					( 1 << 2  ) /* Object was modified */
+#define EFL_HIDDEN					( 1 << 3  ) /* Object is hidden */
+#define EFL_TRANSPARENT				( 1 << 4  ) /* Entity is transparent */
+#define EFL_WORLDSPAWN				( 1 << 5  ) /* A worldspawn */
+#define EFL_INVENTORYITEM			( 1 << 6  ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
+#define EFL_PATHWAY					( 1 << 7  ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
 // 1 << 8
-#define EFL_IGNORE					( 1 << 9 ) /* "Ignore" flag (Brushes and Paths only) */
+#define EFL_IGNORE					( 1 << 9  ) /* "Ignore" flag (Brushes and Paths only) */
 // 1 << 20
-// 1 << 21
+#define EFL_CORDON					( 1 << 21 )
 // 1 << 23
 
 // clang-format on
@@ -127,6 +127,8 @@ typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 
 
 /* Parser API */
+#define PFL_NOERRORS				( 1 << 0 )
+
 typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
 typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int offset, int size );
 typedef char *		(*pfnEditor_SC_Token)					();
@@ -134,12 +136,12 @@ typedef long		(*pfnEditor_SC_Line)					();
 typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
 typedef bool		(*pfnEditor_SC_CheckError)				();
 typedef void		(*pfnEditor_SC_ResetError)				();
-typedef bool		(*pfnEditor_SC_GetToken)				( bool nextLine );
-typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool nextLine );
+typedef bool		(*pfnEditor_SC_GetToken)				( bool crossLine );
+typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool crossLine );
 typedef void		(*pfnEditor_SC_UnGetToken)				();
 typedef bool		(*pfnEditor_SC_TokenAvailable)			();
 typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
-typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool nextLine );
+typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool crossLine );
 typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
 typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, float *rgflMatrix );
 typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, float *rgflMatrix );
@@ -265,23 +267,101 @@ typedef enum : unsigned int
 	GLS_POLYGON_OFFSET					= 0x01000000
 } glState_e;
 
+/*
+ PR_PointSize
+ Specifies the diameter of rasterized points.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPointSize.xhtml
+
+ size - Diameter.
+*/
 typedef void		(*pfnEditor_PR_PointSize)				( float size );
+
+/*
+ PR_LineWidth
+ Specifies the width of rasterized lines.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLineWidth.xhtml
+
+ width - Width.
+*/
 typedef void		(*pfnEditor_PR_LineWidth)				( float width );
+
+/*
+ PR_BindShader
+ Binds a shaderDef to the requested viewport.
+
+ shaderDef - Shader definition.
+*/
 typedef void		(*pfnEditor_PR_BindShader)				( qShader_s *shaderDef );
+
+/*
+ PR_BindTexture
+ Binds a textureDef to the requested viewport. Called automatically inside PR_BindShader.
+
+ textureDef - Texture definition.
+*/
 typedef void		(*pfnEditor_PR_BindTexture)				( qTexture_s *textureDef );
 typedef void		(*pfnEditor_PR_Begin)					( primType_e primType );
 typedef void		(*pfnEditor_PR_End)						();
+
+/*
+ PR_Color4ub
+ Sets the render color.
+
+ r, g, b, a - Color from 0 to 255.
+*/
 typedef void		(*pfnEditor_PR_Color4ub)				( byte r, byte g, byte b, byte a );
+
+/*
+ PR_Color4ubv
+ Sets the render color.
+
+ cbColor - Pointer to rgba_t::data or a uchar[4] array.
+*/
 typedef void		(*pfnEditor_PR_Color4ubv)				( const byte *cbColor );
 typedef void		(*pfnEditor_PR_TexCoord2f)				( float x, float y );
 typedef void		(*pfnEditor_PR_TexCoord2fv)				( const float *rgflTexCoord );
 typedef void		(*pfnEditor_PR_Normal3fv)				( const float *rgflNormal );
 typedef void		(*pfnEditor_PR_Vertex3fv)				( const float *rgflVertex );
+
+/*
+ PR_GetState
+ Returns current state bits.
+*/
 typedef unsigned int(*pfnEditor_PR_GetState)				();
+
+/*
+ PR_SetState
+ Allows to manipulate with various OpenGL parameters.
+
+ Function definition: https://github.com/id-Software/Quake-III-Arena/blob/master/code/renderer/tr_backend.c#L203
+
+ glState - For state flags see glState_e enumeration above.
+*/
 typedef void		(*pfnEditor_PR_SetState)				( unsigned int glState );
+
+/*
+ PR_GetViewInfo
+ Returns current camera positon and angles.
+
+ viewInfo - Pointer to viewInfo_s.
+*/
 typedef void		(*pfnEditor_PR_GetViewInfo)				( viewInfo_s *viewInfo );
+
+/*
+ PR_GetMinAlpha
+ Returns minimal alpha value for calculating optimal lighting.
+*/
 typedef float		(*pfnEditor_PR_GetMinAlpha)				();
-typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgfl ); // ???
+
+/*
+ PR_CalcLighting
+ Calculates the shadowing for a normal
+
+ rgflNormal - Vertex normal.
+*/
+typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgflNormal );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
@@ -337,6 +417,7 @@ typedef struct
 
  dest - Output buffer.
  n - Size of the buffer in bytes.
+ Returns true on success, false on failure.
 */
 typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
 
@@ -348,6 +429,7 @@ typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
 
  dest - Output buffer.
  n - Size of the buffer in bytes.
+ Returns true on success, false on failure.
 */
 typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 
@@ -359,12 +441,21 @@ typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
 
  dest - Output buffer.
  n - Size of the buffer in bytes.
+ Returns true on success, false on failure.
 */
 typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
 typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
+
+/*
+ Sys_FileExists
+ Checks if filePath exists.
+
+ filePath - Path to a file.
+ Returns true on success, false on failure.
+*/
 typedef bool		(*pfnEditor_Sys_FileExists)				( const char *filePath );
 typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *filePath, int *readBytes );
 typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
