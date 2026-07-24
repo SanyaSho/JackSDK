@@ -52,6 +52,7 @@ typedef struct qOverlay_s
 	/* Shader used to render this overlay */
 	struct qShader_s *m_shaderInfo;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	struct qPlane_s m_plane;
@@ -85,8 +86,11 @@ typedef struct qPatchData_s
 
 	vec3_t position;
 	vec3_t normal;
-	vec2_t uv;
-	int unkint1;
+	vec3_t uv;
+
+	// Same as with qVertex_s, there's no proof of unkint1 being used anywhere except for copying from another struct
+	//vec2_t uv;
+	//int unkint1;
 } qPatchData_t;
 COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == SIZEOF_QPATCHDATA_S ); // NOTE: The size is unknown
 
@@ -115,6 +119,7 @@ typedef struct qPatch_s
 	int m_numRows;
 	qPatchData_t m_data[32 /*column*/][32 /*row*/];
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal data used to draw the patch */
@@ -178,6 +183,7 @@ typedef struct qBrush_s
 	/* Used as a lock to tell renderer to not redraw the brush */
 	int render_unkint;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal brush ID */
@@ -254,6 +260,7 @@ typedef struct qWorld_s
 
 	struct qSky_s *m_sky;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	vec3_t m_vecCordonMin;

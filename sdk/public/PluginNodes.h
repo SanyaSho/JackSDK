@@ -47,6 +47,7 @@ typedef struct qNode_s
 	/* Used as a lock to tell renderer to not redraw the node */
 	int render_unkint;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Index of the node on a path */

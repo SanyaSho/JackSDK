@@ -246,6 +246,7 @@ typedef struct qEntity_s
 	/* Entity SpawnFlags */
 	int m_spawnflags;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal entity ID */

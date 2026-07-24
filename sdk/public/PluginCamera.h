@@ -41,6 +41,7 @@ typedef struct qCamera_s
 	/* World this camera belongs to */
 	struct qWorld_s *m_ownerWorld;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal camera ID */

@@ -42,6 +42,7 @@ typedef struct qPath_s
 	char *m_pathClassname;
 	int m_pathDirection;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal path ID */

@@ -131,6 +131,7 @@ typedef struct qFace_s
 
 	char gap2[4];
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal face ID */

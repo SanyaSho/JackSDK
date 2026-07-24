@@ -130,7 +130,7 @@ typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 #define PFL_NOERRORS				( 1 << 0 )
 
 typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
-typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int offset, int size );
+typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int size, int parseFlags );
 typedef char *		(*pfnEditor_SC_Token)					();
 typedef long		(*pfnEditor_SC_Line)					();
 typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
@@ -229,27 +229,31 @@ typedef enum
 
 typedef enum : unsigned int
 {
-	// src blend
-	GLS_SRCBLEND_ZERO					= 0x00000001,
-	GLS_SRCBLEND_ONE					= 0x00000002,
-	GLS_SRCBLEND_DST_COLOR				= 0x00000003,
-	GLS_SRCBLEND_ONE_MINUS_DST_COLOR	= 0x00000004,
-	GLS_SRCBLEND_SRC_ALPHA				= 0x00000005,
-	GLS_SRCBLEND_ONE_MINUS_SRC_ALPHA	= 0x00000006,
-	GLS_SRCBLEND_DST_ALPHA				= 0x00000007,
-	GLS_SRCBLEND_ONE_MINUS_DST_ALPHA	= 0x00000008,
-	GLS_SRCBLEND_ALPHA_SATURATE			= 0x00000009,
-	GLS_SRCBLEND_SRC_COLOR				= 0x0000000A,
+	// src blend (diff & GLS_SRCBLEND_BITS)
+	GLS_SRCBLEND_ZERO					= 0x00000001, // srcFactor = GL_ZERO;
+	GLS_SRCBLEND_ONE					= 0x00000002, // srcFactor = GL_ONE;
+	GLS_SRCBLEND_DST_COLOR				= 0x00000003, // srcFactor = GL_DST_COLOR;
+	GLS_SRCBLEND_ONE_MINUS_DST_COLOR	= 0x00000004, // srcFactor = GL_ONE_MINUS_DST_COLOR;
+	GLS_SRCBLEND_SRC_ALPHA				= 0x00000005, // srcFactor = GL_SRC_ALPHA;
+	GLS_SRCBLEND_ONE_MINUS_SRC_ALPHA	= 0x00000006, // srcFactor = GL_ONE_MINUS_SRC_ALPHA;
+	GLS_SRCBLEND_DST_ALPHA				= 0x00000007, // srcFactor = GL_DST_ALPHA;
+	GLS_SRCBLEND_ONE_MINUS_DST_ALPHA	= 0x00000008, // srcFactor = GL_ONE_MINUS_DST_ALPHA;
+	GLS_SRCBLEND_ALPHA_SATURATE			= 0x00000009, // srcFactor = GL_SRC_ALPHA_SATURATE;
+	GLS_SRCBLEND_SRC_COLOR				= 0x0000000A, // srcFactor = GL_SRC_COLOR;
+	GLS_SRCBLEND_BITS					= 0x0000000F, // INTERNAL USAGE ONLY
 
-	// dst blend
-	GLS_DSTBLEND_ZERO					= 0x00000010,
-	GLS_DSTBLEND_ONE					= 0x00000020,
-	GLS_DSTBLEND_SRC_COLOR				= 0x00000030,
-	GLS_DSTBLEND_ONE_MINUS_SRC_COLOR	= 0x00000040,
-	GLS_DSTBLEND_SRC_ALPHA				= 0x00000050,
-	GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA	= 0x00000060,
-	GLS_DSTBLEND_DST_ALPHA				= 0x00000070,
-	GLS_DSTBLEND_ONE_MINUS_DST_ALPHA	= 0x00000080,
+	// dst blend (diff & GLS_DSTBLEND_BITS)
+	GLS_DSTBLEND_ZERO					= 0x00000010, // dstFactor = GL_ZERO;
+	GLS_DSTBLEND_ONE					= 0x00000020, // dstFactor = GL_ONE;
+	GLS_DSTBLEND_SRC_COLOR				= 0x00000030, // dstFactor = GL_SRC_COLOR;
+	GLS_DSTBLEND_ONE_MINUS_SRC_COLOR	= 0x00000040, // dstFactor = GL_ONE_MINUS_SRC_COLOR;
+	GLS_DSTBLEND_SRC_ALPHA				= 0x00000050, // dstFactor = GL_SRC_ALPHA;
+	GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA	= 0x00000060, // dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+	GLS_DSTBLEND_DST_ALPHA				= 0x00000070, // dstFactor = GL_DST_ALPHA;
+	GLS_DSTBLEND_ONE_MINUS_DST_ALPHA	= 0x00000080, // dstFactor = GL_ONE_MINUS_DST_ALPHA;
+	GLS_DSTBLEND_BITS					= 0x000000F0, // INTERNAL USAGE ONLY
+
+	// glBlendFunc( srcFactor, dstFactor );
 
 	GLS_DEPTHWRITE						= 0x00000100,
 
@@ -259,13 +263,14 @@ typedef enum : unsigned int
 	GLS_ATEST_LT_80						= 0x00020000,
 	GLS_ATEST_GE_80						= 0x00030000,
 	GLS_ATEST_ALWAYS					= 0x00040000,
+	GLS_ATEST_BITS						= 0x00070000, // INTERNAL USAGE ONLY
 
 	GLS_CULL_NONE						= 0x00100000,
 	GLS_CULL_FRONT						= 0x00200000,
 	GLS_CULL_BACK						= 0x00300000,
 
 	GLS_POLYGON_OFFSET					= 0x01000000
-} glState_e;
+} glStateBits_e;
 
 /*
  PR_PointSize
@@ -337,9 +342,9 @@ typedef unsigned int(*pfnEditor_PR_GetState)				();
 
  Function definition: https://github.com/id-Software/Quake-III-Arena/blob/master/code/renderer/tr_backend.c#L203
 
- glState - For state flags see glState_e enumeration above.
+ stateBits - For state bits see glStateBits_e enumeration above.
 */
-typedef void		(*pfnEditor_PR_SetState)				( unsigned int glState );
+typedef void		(*pfnEditor_PR_SetState)				( unsigned int stateBits );
 
 /*
  PR_GetViewInfo
@@ -457,7 +462,24 @@ typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
  Returns true on success, false on failure.
 */
 typedef bool		(*pfnEditor_Sys_FileExists)				( const char *filePath );
+
+/*
+ Sys_LoadFile
+ Reads filePath into a buffer.
+
+ filePath - Path to a file.
+ readBytes - Number of bytes read. (Can be NULL)
+ Returns filePath data.
+*/
 typedef byte *		(*pfnEditor_Sys_LoadFile)				( const char *filePath, int *readBytes );
+
+/*
+ Sys_CreatePath
+ Creates a new directory on path.
+
+ path - Path to a directory.
+ Returns true on success, false on failure.
+*/
 typedef bool		(*pfnEditor_Sys_CreatePath)				( const char *path );
 
 typedef struct

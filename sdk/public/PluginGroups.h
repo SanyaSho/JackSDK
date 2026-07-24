@@ -45,6 +45,7 @@ typedef struct qGroup_s
 	/* World this entity belongs to */
 	struct qWorld_s *m_ownerWorld;
 
+	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
 	/* Internal group ID */
