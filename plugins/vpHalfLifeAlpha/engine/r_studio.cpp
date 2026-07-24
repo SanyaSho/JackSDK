@@ -10,15 +10,19 @@ extern vec3_t			lightspot;
 #endif // !PLUGINSDK
 
 #if 0
-int r_dointerp;
+int r_dointerp = 1;
 #endif
 
-//float bonetransform[MAXSTUDIOBONES][3][4];
+// Model to world transformation
+float rotationmatrix[3][4];
+
+// Concatenated bone and light transforms
+float bonetransform[MAXSTUDIOBONES][3][4];
 #if 0
 float lighttransform[MAXSTUDIOBONES][3][4];
 #endif
 
-//int chrome[MAXSTUDIOVERTS][2];
+int chrome[MAXSTUDIOVERTS][2];
 
 #if 0
 int r_ambientlight;
@@ -29,23 +33,25 @@ colorVec r_icolormix;
 
 #if 0
 studiohdr_t *pstudiohdr;
+#endif
 mstudiobodyparts_t *pbodypart;
 mstudiomodel_t *psubmodel;
 mstudiomesh_t *pmesh;
 
+#if 0
 int smodels_total;
-int psubmodel_verts;
 #endif
+int r_anumverts;
 
-//auxvert_t auxverts[MAXSTUDIOVERTS];
-#if 0
+// Vert data, position and lighting
+auxvert_t auxverts[MAXSTUDIOVERTS];
 vec3_t lightvalues[MAXSTUDIOVERTS];
-#endif
 
-//auxvert_t *pauxverts;
+auxvert_t *pauxverts;
+
+vec3_t *pvlightvalues;
+
 #if 0
-vec_t *pvlightvalues;
-
 vec3_t shadevector;
 #endif
 
@@ -59,19 +65,19 @@ qboolean R_StudioCheckBBox (void)
 StudioRender::StudioRender()
 {
 	m_studioHdr = NULL;
-	m_bodyPart = NULL;
-	m_subModel = NULL;
-	m_mesh = NULL;
+	//pbodypart = NULL;
+	//psubmodel = NULL;
+	//pmesh = NULL;
 
 	m_textureList = NULL;
 
 	m_renderFlags = 0;
 
-	memset( &m_bonetransform, 0, sizeof( m_bonetransform ) );
-	memset( &m_rootbonetransform, 0, sizeof( m_rootbonetransform ) );
-	memset( &m_auxverts, 0, sizeof( m_auxverts ) );
-	memset( &m_chrome, 0, sizeof( m_chrome ) );
-	memset( &m_vlightvalues, 0, sizeof( m_vlightvalues ) );
+	//memset( &bonetransform, 0, sizeof( bonetransform ) );
+	//memset( &m_rootbonetransform, 0, sizeof( m_rootbonetransform ) );
+	//memset( &m_auxverts, 0, sizeof( m_auxverts ) );
+	//memset( &m_chrome, 0, sizeof( m_chrome ) );
+	//memset( &m_vlightvalues, 0, sizeof( m_vlightvalues ) );
 }
 
 StudioRender::~StudioRender()
@@ -389,13 +395,13 @@ void StudioRender::R_StudioSetupBones (qEntity_s *ent, qStudioData_s *studioData
 
 		if (pbones[i].parent == -1)
 		{
-			//memcpy (m_bonetransform[i], bonematrix, sizeof(bonematrix));
+			//memcpy (bonetransform[i], bonematrix, sizeof(bonematrix));
 			////memcpy (lighttransform[i], bonematrix, sizeof(bonematrix));
-			V_ConcatTransforms (m_rootbonetransform, bonematrix, m_bonetransform[i]);
+			V_ConcatTransforms (rotationmatrix, bonematrix, bonetransform[i]);
 		}
 		else
 		{
-			V_ConcatTransforms (m_bonetransform[pbones[i].parent], bonematrix, m_bonetransform[i]);
+			V_ConcatTransforms (bonetransform[pbones[i].parent], bonematrix, bonetransform[i]);
 			//V_ConcatTransforms (lighttransform[pbones[i].parent], bonematrix, lighttransform[i]);
 		}
 	}
@@ -403,9 +409,9 @@ void StudioRender::R_StudioSetupBones (qEntity_s *ent, qStudioData_s *studioData
 
 void StudioRender::R_StudioTransformAuxVert (auxvert_t *av, int bone, vec3_t vert)
 {
-	av->fv[0] = DotProduct (vert, m_bonetransform[bone][0]) + m_bonetransform[bone][0][3];
-	av->fv[1] = DotProduct (vert, m_bonetransform[bone][1]) + m_bonetransform[bone][1][3];
-	av->fv[2] = DotProduct (vert, m_bonetransform[bone][2]) + m_bonetransform[bone][2][3];
+	av->fv[0] = DotProduct (vert, bonetransform[bone][0]) + bonetransform[bone][0][3];
+	av->fv[1] = DotProduct (vert, bonetransform[bone][1]) + bonetransform[bone][1][3];
+	av->fv[2] = DotProduct (vert, bonetransform[bone][2]) + bonetransform[bone][2][3];
 }
 
 void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, int normidx, vec3_t normal )
@@ -414,7 +420,7 @@ void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int fl
 		return;
 
 	vec3_t norm;
-	VectorRotate( normal, m_bonetransform[bone], norm );
+	VectorRotate( normal, bonetransform[bone], norm );
 
 	float scale = ent->m_entityState.m_scale;
 	if ( scale != 1.f )
@@ -428,13 +434,13 @@ void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int fl
 	{
 		vec3_t tmp = norm;
 		PR_CalcLighting( tmp.Base() );
-		m_vlightvalues[normidx] = *tmp.Base();
+		pvlightvalues[normidx] = tmp.Base();
 	}
 #endif
 
 	if ( FBitSet(flags, STUDIO_NF_CHROME) )
 	{
-		int index = (int)(lv - m_vlightvalues);
+		int index = (int)((byte *)lv - (byte *)pvlightvalues);
 
 		float v = ( gViewinfo.b.x * norm.x + gViewinfo.b.y * norm.y + gViewinfo.b.z * norm.z ) * 2.0f;
 
@@ -442,9 +448,9 @@ void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int fl
 		float t = v * norm.z - gViewinfo.b.z;
 
 		// calc s coord
-		m_chrome[index][0] = (int)((s + 1.0f) * 32.0f);
+		chrome[index][0] = (int)((s + 1.0f) * 32.0f);
 		// calc t coord
-		m_chrome[index][1] = (int)((t + 1.0f) * 32.0f);
+		chrome[index][1] = (int)((t + 1.0f) * 32.0f);
 	}
 }
 
@@ -483,7 +489,7 @@ void R_StudioLighting (float *lv, int bone, int flags, vec_t *normal)
 
 	if ((flags & STUDIO_NF_CHROME) != 0)
 	{
-		int index = (int)(lv - pvlightvalues);
+		int index = (int)((byte *)lv - (byte *)pvlightvalues);
 
 		float v = (vpn[0] * lx + vpn[1] * ly + vpn[2] * lz) * 2.0f;
 
@@ -526,17 +532,17 @@ void StudioRender::R_StudioSetupModel (qEntity_t *ent, int bodypart)
 		bodypart = 0;
 	}
 
-	m_bodyPart = (mstudiobodyparts_t *)((byte *)m_studioHdr + m_studioHdr->bodypartindex) + bodypart;
+	pbodypart = (mstudiobodyparts_t *)((byte *)m_studioHdr + m_studioHdr->bodypartindex) + bodypart;
 
-	assert( m_bodyPart->nummodels < MAXSTUDIOMODELS );
+	assert( pbodypart->nummodels < MAXSTUDIOMODELS );
 
-	index = ent->m_entityState.m_body / m_bodyPart->base;
-	index = index % m_bodyPart->nummodels;
+	index = ent->m_entityState.m_body / pbodypart->base;
+	index = index % pbodypart->nummodels;
 
-	m_subModel = (mstudiomodel_t *)((byte *)m_studioHdr + m_bodyPart->modelindex) + index;
+	psubmodel = (mstudiomodel_t *)((byte *)m_studioHdr + pbodypart->modelindex) + index;
 
-	assert( m_subModel->nummesh < MAXSTUDIOMESHES );
-	assert( m_subModel->numverts < MAXSTUDIOVERTS );
+	assert( psubmodel->nummesh < MAXSTUDIOMESHES );
+	assert( psubmodel->numverts < MAXSTUDIOVERTS );
 }
 
 #if 0
@@ -664,10 +670,9 @@ void StudioRender::R_StudioRenderFinal (qEntity_s *ent, qStudioData_s *studioDat
 
 	//smodels_total++;
 
-	//pauxverts = auxverts;
-#if 0
-	pvlightvalues = lightvalues->Base();
-#endif
+	pauxverts = auxverts;
+	pvlightvalues = lightvalues;
+
 	// TODO
 	//dword_CD921C = // ?
 
@@ -794,9 +799,9 @@ void StudioRender::R_StudioRenderFinal (qEntity_s *ent, qStudioData_s *studioDat
 				PR_Color4ub(1 * 255, 0.7 * 255, 0, 255);
 
 				PR_Begin(PRIMTYPE_LINES);
-				float parentPos[3] = { m_bonetransform[pbones[i].parent][0][3], m_bonetransform[pbones[i].parent][1][3], m_bonetransform[pbones[i].parent][2][3] };
+				float parentPos[3] = { bonetransform[pbones[i].parent][0][3], bonetransform[pbones[i].parent][1][3], bonetransform[pbones[i].parent][2][3] };
 				PR_Vertex3fv(parentPos);
-				float bonePos[3] = { m_bonetransform[i][0][3], m_bonetransform[i][1][3], m_bonetransform[i][2][3] };
+				float bonePos[3] = { bonetransform[i][0][3], bonetransform[i][1][3], bonetransform[i][2][3] };
 				PR_Vertex3fv(bonePos);
 				PR_End();
 
@@ -805,10 +810,10 @@ void StudioRender::R_StudioRenderFinal (qEntity_s *ent, qStudioData_s *studioDat
 				PR_Begin(PRIMTYPE_POINTS);
 				if ( pbones[pbones[i].parent].parent != -1 )
 				{
-					float newParentPos[3] = { m_bonetransform[pbones[i].parent][0][3], m_bonetransform[pbones[i].parent][1][3], m_bonetransform[pbones[i].parent][2][3] };
+					float newParentPos[3] = { bonetransform[pbones[i].parent][0][3], bonetransform[pbones[i].parent][1][3], bonetransform[pbones[i].parent][2][3] };
 					PR_Vertex3fv( newParentPos );
 				}
-				float newBonePos[3] = { m_bonetransform[i][0][3], m_bonetransform[i][1][3], m_bonetransform[i][2][3] };
+				float newBonePos[3] = { bonetransform[i][0][3], bonetransform[i][1][3], bonetransform[i][2][3] };
 				PR_Vertex3fv(newBonePos);
 				PR_End();
 			}
@@ -818,7 +823,7 @@ void StudioRender::R_StudioRenderFinal (qEntity_s *ent, qStudioData_s *studioDat
 				PR_PointSize(5.0f);
 				PR_Color4ub(0.8f * 255, 0, 0, 255);
 				PR_Begin(PRIMTYPE_POINTS);
-				float bonePos[3] = { m_bonetransform[i][0][3], m_bonetransform[i][1][3], m_bonetransform[i][2][3] };
+				float bonePos[3] = { bonetransform[i][0][3], bonetransform[i][1][3], bonetransform[i][2][3] };
 				PR_Vertex3fv( bonePos );
 				PR_End();
 			}
@@ -851,39 +856,39 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 	vec3_t				*pstudioverts, *pstudionorms;
 	mstudiotexture_t	*ptexture;
 	mstudiotrivert_t	*ptricmds;
-	//auxvert_t			*paux;
+	auxvert_t			*av;
 	float				*lv;
 	int					flags;
 	float				ss, st;
 	float				l;
 	int					i, j, t, k;
 
-	pvertbone = (byte *)m_studioHdr + m_subModel->vertinfoindex;
-	pnormbone = (byte *)m_studioHdr + m_subModel->norminfoindex;
+	pvertbone = (byte *)m_studioHdr + psubmodel->vertinfoindex;
+	pnormbone = (byte *)m_studioHdr + psubmodel->norminfoindex;
 
-	pmodeldata = (mstudiomodeldata_t *)((byte *)m_studioHdr + m_subModel->modeldataindex);
+	pmodeldata = (mstudiomodeldata_t *)((byte *)m_studioHdr + psubmodel->modeldataindex);
 	pstudioverts = (vec3_t *)((byte *)m_studioHdr + pmodeldata->vertindex);
 	pstudionorms = (vec3_t *)((byte *)m_studioHdr + pmodeldata->normindex);
 
 	ptexture = (mstudiotexture_t *)((byte *)m_studioHdr + m_studioHdr->textureindex);
 
-	m_mesh = (mstudiomesh_t *)((byte *)m_studioHdr + m_subModel->meshindex);
-	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
+	pmesh = (mstudiomesh_t *)((byte *)m_studioHdr + psubmodel->meshindex);
+	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + pmesh->triindex);
 
-	//paux = m_auxverts;
-	//psubmodel_verts = m_subModel->numverts;
+	r_anumverts = psubmodel->numverts;
 
-	for (i=0 ; i<m_subModel->numverts ; i++)
+	for (i=0 ; i<r_anumverts ; i++)
 	{
-		R_StudioTransformAuxVert (&m_auxverts[i], pvertbone[i], pstudioverts[i]);
+		av = &pauxverts[i];
+		R_StudioTransformAuxVert (av, pvertbone[i], pstudioverts[i]);
 	}
 
-	lv = m_vlightvalues;
-	for (i=0 ; i<m_subModel->nummesh ; i++)
+	lv = (float *)pvlightvalues;
+	for (i=0 ; i<psubmodel->nummesh ; i++)
 	{
-		flags = ptexture[m_mesh[i].skinref].flags;
+		flags = ptexture[pmesh[i].skinref].flags;
 
-		for (j=0 ; j<m_mesh[i].numnorms ; j++, lv++, pstudionorms++, pnormbone++)
+		for (j=0 ; j<pmesh[i].numnorms ; j++, lv++, pstudionorms++, pnormbone++)
 		{
 			R_StudioLighting (ent, lv, *pnormbone, flags, j, pstudionorms->Base());
 		}
@@ -906,20 +911,20 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 	if ( ( m_renderFlags & 0x12 ) == 0x10 && alpha != 255 )
 		PR_Color4ub( 255, 255, 255, alpha );
 
-	for (i=0 ; i<m_subModel->nummesh ; i++, m_mesh++)
+	for (i=0 ; i<psubmodel->nummesh ; i++, pmesh++)
 	{
-		ss = 1.0f / (float)ptexture[m_mesh->skinref].width;
-		st = 1.0f / (float)ptexture[m_mesh->skinref].height;
+		ss = 1.0f / (float)ptexture[pmesh->skinref].width;
+		st = 1.0f / (float)ptexture[pmesh->skinref].height;
 
 #if 1
 		PR_SetState( renderFlags | GLS_DEPTHWRITE );
-		PR_BindShader( m_textureList[ptexture[m_mesh->skinref].index] );
+		PR_BindShader( m_textureList[ptexture[pmesh->skinref].index] );
 #else
-		GL_Bind (ptexture[m_mesh->skinref].index);
+		GL_Bind (ptexture[pmesh->skinref].index);
 #endif
 
 #if 1
-		for (t=0 ; t<m_mesh->numtris ; t++, ptricmds += 3)
+		for (t=0 ; t<pmesh->numtris ; t++, ptricmds += 3)
 		{
 			PR_Begin( PRIMTYPE_TRIANGLES );
 
@@ -929,18 +934,18 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 				if ( !FBitSet(m_renderFlags, RFL_NOTEXTURES | RFL_FULLBRIGHT) )
 				{
 #if 0
-					l = m_vlightvalues[ptricmds[k].normindex] * 255.f;
+					l = (*pvlightvalues)[ptricmds[k].normindex] * 255.f;
 					PR_Color4ub( (byte)l, (byte)l, (byte)l, alpha );
 #else
 					PR_Color4ub( 255, 255, 255, alpha );
 #endif
 				}
 
-				if ((ptexture[m_mesh->skinref].flags & STUDIO_NF_CHROME) != 0)
+				if ((ptexture[pmesh->skinref].flags & STUDIO_NF_CHROME) != 0)
 				{
 					PR_TexCoord2f(
-						m_chrome[ptricmds[k].normindex][0] * ss,
-						m_chrome[ptricmds[k].normindex][1] * st
+						chrome[ptricmds[k].normindex][0] * ss,
+						chrome[ptricmds[k].normindex][1] * st
 					);
 				}
 				else
@@ -952,7 +957,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 				}
 
 				PR_Vertex3fv(
-					m_auxverts[ptricmds[k].vertindex].fv
+					pauxverts[ptricmds[k].vertindex].fv
 				);
 			}
 
@@ -971,7 +976,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					chrome[ptricmds[0].normindex][0] * ss,
 					chrome[ptricmds[0].normindex][1] * st
 				);
-				l = pvlightvalues[ptricmds[0].normindex];
+				l = (*pvlightvalues)[ptricmds[0].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -991,7 +996,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					chrome[ptricmds[1].normindex][0] * ss,
 					chrome[ptricmds[1].normindex][1] * st
 				);
-				l = pvlightvalues[ptricmds[1].normindex];
+				l = (*pvlightvalues)[ptricmds[1].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -1011,7 +1016,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					chrome[ptricmds[2].normindex][0] * ss,
 					chrome[ptricmds[2].normindex][1] * st
 				);
-				l = pvlightvalues[ptricmds[2].normindex];
+				l = (*pvlightvalues)[ptricmds[2].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -1041,7 +1046,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					(float)ptricmds[0].s * ss,
 					(float)ptricmds[0].t * st
 				);
-				l = pvlightvalues[ptricmds[0].normindex];
+				l = (*pvlightvalues)[ptricmds[0].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -1061,7 +1066,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					(float)ptricmds[1].s * ss,
 					(float)ptricmds[1].t * st
 				);
-				l = pvlightvalues[ptricmds[1].normindex];
+				l = (*pvlightvalues)[ptricmds[1].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -1081,7 +1086,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 					(float)ptricmds[2].s * ss,
 					(float)ptricmds[2].t * st
 				);
-				l = pvlightvalues[ptricmds[2].normindex];
+				l = (*pvlightvalues)[ptricmds[2].normindex];
 				glColor4f (
 					plight->color[0] * l,
 					plight->color[1] * l,
@@ -1120,29 +1125,29 @@ void StudioRender::R_GLStudioDrawPointsWireframe (qEntity_s *ent, qStudioData_s 
 	float				ss, st;
 	int					i, t, k;
 
-	pvertbone = (byte *)m_studioHdr + m_subModel->vertinfoindex;
-	pnormbone = (byte *)m_studioHdr + m_subModel->norminfoindex;
+	pvertbone = (byte *)m_studioHdr + psubmodel->vertinfoindex;
+	pnormbone = (byte *)m_studioHdr + psubmodel->norminfoindex;
 	
-	pmodeldata = (mstudiomodeldata_t *)((byte *)m_studioHdr + m_subModel->modeldataindex);
+	pmodeldata = (mstudiomodeldata_t *)((byte *)m_studioHdr + psubmodel->modeldataindex);
 	pstudioverts = (vec3_t *)((byte *)m_studioHdr + pmodeldata->vertindex);
 
 	ptexture = (mstudiotexture_t *)((byte *)m_studioHdr + m_studioHdr->textureindex);
 
-	m_mesh = (mstudiomesh_t *)((byte *)m_studioHdr + m_subModel->meshindex);
-	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + m_mesh->triindex);
+	pmesh = (mstudiomesh_t *)((byte *)m_studioHdr + psubmodel->meshindex);
+	ptricmds = (mstudiotrivert_t*)((byte*)m_studioHdr + pmesh->triindex);
 
 	// We still want to build auxvert even in 2D view
-	for (i=0 ; i<m_subModel->numverts ; i++)
+	for (i=0 ; i<psubmodel->numverts ; i++)
 	{
-		R_StudioTransformAuxVert (&m_auxverts[i], pvertbone[i], pstudioverts[i]);
+		R_StudioTransformAuxVert (&auxverts[i], pvertbone[i], pstudioverts[i]);
 	}
 
-	for (i=0 ; i<m_subModel->nummesh ; i++, m_mesh++)
+	for (i=0 ; i<psubmodel->nummesh ; i++, pmesh++)
 	{
-		ss = 1.0f / (float)ptexture[m_mesh->skinref].width;
-		st = 1.0f / (float)ptexture[m_mesh->skinref].height;
+		ss = 1.0f / (float)ptexture[pmesh->skinref].width;
+		st = 1.0f / (float)ptexture[pmesh->skinref].height;
 
-		for (t=0 ; t < m_mesh->numtris ; t++, ptricmds += 3)
+		for (t=0 ; t < pmesh->numtris ; t++, ptricmds += 3)
 		{
 			PR_Begin( PRIMTYPE_TRIANGLES );
 
@@ -1154,7 +1159,7 @@ void StudioRender::R_GLStudioDrawPointsWireframe (qEntity_s *ent, qStudioData_s 
 				);
 
 				PR_Vertex3fv(
-					m_auxverts[ptricmds[k].vertindex].fv
+					auxverts[ptricmds[k].vertindex].fv
 				);
 			}
 
@@ -1231,6 +1236,6 @@ void StudioRender::R_RotateForEntity( qEntity_t *ent, bool doscale /* = false */
 
 		scale,
 
-		m_rootbonetransform
+		rotationmatrix
 	);
 }

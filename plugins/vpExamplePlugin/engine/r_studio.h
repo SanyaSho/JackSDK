@@ -66,19 +66,10 @@ public:
 
 private:
 	studiohdr_t *m_studioHdr;
-	mstudiobodyparts_t *m_bodyPart;
-	mstudiomodel_t *m_subModel;
-	mstudiomesh_t *m_mesh;
 
 	qShader_t **m_textureList;
 
 	int m_renderFlags;
-
-	float m_bonetransform[MAXSTUDIOBONES][3][4];
-	float m_rootbonetransform[3][4]; // Position and angles of the root bone
-	auxvert_t m_auxverts[MAXSTUDIOVERTS];
-	int m_chrome[MAXSTUDIOVERTS][2];
-	float m_vlightvalues[MAXSTUDIOVERTS];
 };
 
 #endif // R_STUDIO_H
