@@ -32,6 +32,8 @@ function( install_library )
 
 	if( ${IS_64BIT} )
 		set( ARGS_INSTALL_OUTNAME "${ARGS_INSTALL_OUTNAME}x64" )
+	else()
+		set( ARGS_INSTALL_OUTNAME "${ARGS_INSTALL_OUTNAME}x86" )
 	endif()
 
 	set_target_properties( ${ARGS_TARGET} PROPERTIES PREFIX "" )
@@ -41,9 +43,13 @@ function( install_library )
 	if( ARGS_EXECUTABLE )
 		set_target_properties( ${ARGS_TARGET} PROPERTIES
 			VS_DEBUGGER_COMMAND		"${ARGS_INSTALL_DEST}/${ARGS_INSTALL_OUTNAME}"
-			VS_DEBUGGER_COMMAND_ARGUMENTS	"-novid -console +developer 5" # always run game with console and developer enabled
 			VS_DEBUGGER_WORKING_DIRECTORY	"${ARGS_INSTALL_DEST}"
 		)
+	#else()
+	#	set_target_properties( ${ARGS_TARGET} PROPERTIES
+	#		VS_DEBUGGER_COMMAND		"E:\\SteamLibrary\\steamapps\\common\\JACK\\jack.exe"
+	#		VS_DEBUGGER_WORKING_DIRECTORY	"E:\\SteamLibrary\\steamapps\\common\\JACK"
+	#	)
 	endif()
 
 	if( MSVC )
@@ -57,6 +63,7 @@ function( install_library )
 		install(
 			FILES $<TARGET_PDB_FILE:${ARGS_TARGET}>
 			DESTINATION ${ARGS_INSTALL_DEST}
+			OPTIONAL
 		)
 	else()
 		install(
@@ -67,17 +74,5 @@ function( install_library )
 				    GROUP_READ GROUP_EXECUTE			# chmod 755
 				    WORLD_READ WORLD_EXECUTE			#
 		)
-
-		if( NOT ARGS_NO_STRIP )
-			# DBG
-			install(
-				FILES "$<TARGET_FILE:${ARGS_TARGET}>.dbg"
-				DESTINATION ${ARGS_INSTALL_DEST}
-
-				PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE	#
-					    GROUP_READ GROUP_EXECUTE			# chmod 755
-					    WORLD_READ WORLD_EXECUTE			#
-			)
-		endif()
 	endif()
 endfunction()
