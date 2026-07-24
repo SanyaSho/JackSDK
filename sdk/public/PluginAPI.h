@@ -1211,7 +1211,7 @@ typedef void		(*pfnEditor_VisGroup_Remove)			( const qWorld_s *worldDef, unsigne
 typedef void		(*pfnEditor_VisGroup_Modify)			( const qWorld_s *worldDef, unsigned int visGroupIndex, const char *visGroupName, unsigned int alterVisGroupIndex, const byte *cbColor );
 typedef int			(*pfnEditor_VisGroup_GetCount)			( const qWorld_s *worldDef );
 typedef int			(*pfnEditor_VisGroup_GetIndex)			( const qWorld_s *worldDef, unsigned int visGroupIndex );
-typedef void		(*pfnEditor_VisGroup_GetData)			( const qWorld_s *worldDef, int visGroupIndex, char *visGroupNameOut, int visGroupNameOutSize, unsigned int *, int *, byte *cbColorOut );
+typedef bool		(*pfnEditor_VisGroup_GetData)			( const qWorld_s *worldDef, int visGroupIndex, char *visGroupNameOut, int visGroupNameOutSize, unsigned int *, int *, byte *cbColorOut );
 typedef void		(*pfnEditor_VisGroup_RebuildIdents)		( const qWorld_s *worldDef );
 
 typedef struct
