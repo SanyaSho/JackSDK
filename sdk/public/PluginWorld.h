@@ -86,11 +86,9 @@ typedef struct qPatchData_s
 
 	vec3_t position;
 	vec3_t normal;
-	vec3_t uv;
+	vec2_t uv;
 
-	// Same as with qVertex_s, there's no proof of unkint1 being used anywhere except for copying from another struct
-	//vec2_t uv;
-	//int unkint1;
+	int m_flags;
 } qPatchData_t;
 COMPILE_TIME_ASSERT( sizeof( qPatchData_t ) == SIZEOF_QPATCHDATA_S ); // NOTE: The size is unknown
 
@@ -120,19 +118,22 @@ typedef struct qPatch_s
 	qPatchData_t m_data[32 /*column*/][32 /*row*/];
 
 	/* Editor flags. See head of PluginAPI.h for more info */
+	/* If you want to check if this patch is selected use m_ownerBrush->m_editorFlags instead */
 	int m_editorFlags;
 
 	/* Internal data used to draw the patch */
-	char gap5[4];
+	unsigned int m_glVertexCount;
 	unsigned int m_glBackGeometryCount;
 	unsigned int m_glPointsCount;
-	char gap6[16];
+	unsigned int m_glFrontGeometryCount;
+	const void *m_glVertices;
 	const void *m_glBackGeometryIndices;
 	const void *m_glPointsIndices;
+	const void *m_glFrontGeometryIndices;
 #if defined( JACK_64BIT )
-	char gap7[24];
+	char gap7[16];
 #else
-	char gap7[4];
+	char gap7[8];
 #endif // JACK_64BIT
 } qPatch_t;
 COMPILE_TIME_ASSERT( sizeof( qPatch_t ) == SIZEOF_QPATCH_S );
