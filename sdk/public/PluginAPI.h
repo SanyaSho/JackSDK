@@ -365,8 +365,9 @@ typedef float		(*pfnEditor_PR_GetMinAlpha)				();
  Calculates the shadowing for a normal
 
  rgflNormal - Vertex normal.
+ Returns the brightness of this normal.
 */
-typedef void		(*pfnEditor_PR_CalcLighting)			( const float *rgflNormal );
+typedef float		(*pfnEditor_PR_CalcLighting)			( const float *rgflNormal );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
