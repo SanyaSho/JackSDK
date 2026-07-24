@@ -120,100 +120,10 @@ typedef float		(*pfnEditor_Sys_FloatTime)				();
 #define SYS_OPTION_IGNOREGROUPING	4
 #define SYS_OPTION_TOOLSCORDON		5
 
-typedef long		(*pfnEditor_Sys_GetOption)				( int option );
+typedef int			(*pfnEditor_Sys_GetOption)				( int option );
 typedef void		(*pfnEditor_Sys_SetOption)				( int option, int value );
 
 typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
-
-
-/* Parser API */
-#define PFL_NOERRORS				( 1 << 0 )
-
-typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
-typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int size, int parseFlags );
-typedef char *		(*pfnEditor_SC_Token)					();
-typedef long		(*pfnEditor_SC_Line)					();
-typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
-typedef bool		(*pfnEditor_SC_CheckError)				();
-typedef void		(*pfnEditor_SC_ResetError)				();
-typedef bool		(*pfnEditor_SC_GetToken)				( bool crossLine );
-typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool crossLine );
-typedef void		(*pfnEditor_SC_UnGetToken)				();
-typedef bool		(*pfnEditor_SC_TokenAvailable)			();
-typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
-typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool crossLine );
-typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
-typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, float *rgflMatrix );
-typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, float *rgflMatrix );
-typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, float *rgflMatrix );
-typedef void		(*pfnEditor_SC_EndOfParsing)			();
-typedef void		(*pfnEditor_SC_SetParseFlags)			( int parseFlags );
-typedef int			(*pfnEditor_SC_GetParseFlags)			();
-typedef long		(*pfnEditor_SC_GetBlockSize)			();
-typedef char *		(*pfnEditor_SC_CopyBlock)				(); // MUST BE Sys_Free'D
-typedef void		(*pfnEditor_SC_SkipBlock)				();
-typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
-typedef bool		(*pfnEditor_SC_ShouldQuote)				( const char *token );
-
-#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
-typedef struct
-{
-	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
-	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
-	pfnEditor_SC_Token pfnSC_Token;
-	pfnEditor_SC_Line pfnSC_Line;
-	pfnEditor_SC_ParseError pfnSC_ParseError;
-	pfnEditor_SC_CheckError pfnSC_CheckError;
-	pfnEditor_SC_ResetError pfnSC_ResetError;
-	pfnEditor_SC_GetToken pfnSC_GetToken;
-	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
-	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
-	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
-	pfnEditor_SC_MatchToken pfnSC_MatchToken;
-	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
-	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
-	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
-	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
-	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
-	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
-	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
-	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
-	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
-	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
-	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
-	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
-	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
-} parser_api_t;
-#else
-typedef struct
-{
-	pfnEditor_SC_Token pfnSC_Token;
-	pfnEditor_SC_Line pfnSC_Line;
-	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
-	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
-	pfnEditor_SC_CheckError pfnSC_CheckError;
-	pfnEditor_SC_ParseError pfnSC_ParseError;
-	pfnEditor_SC_ResetError pfnSC_ResetError;
-	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
-	pfnEditor_SC_GetToken pfnSC_GetToken;
-	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
-	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
-	pfnEditor_SC_MatchToken pfnSC_MatchToken;
-	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
-	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
-	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
-	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
-	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
-	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
-	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
-	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
-	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
-	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
-	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
-	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
-	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
-} parser_api_t;
-#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 
 /* Rendering API */
@@ -362,10 +272,10 @@ typedef float		(*pfnEditor_PR_GetMinAlpha)				();
 
 /*
  PR_CalcLighting
- Calculates the shadowing for a normal
+ Calculates the brightness of a normal
 
  rgflNormal - Vertex normal.
- Returns the brightness of this normal.
+ Returns the brightness of a normal.
 */
 typedef float		(*pfnEditor_PR_CalcLighting)			( const float *rgflNormal );
 
@@ -411,6 +321,96 @@ typedef struct
 	pfnEditor_PR_CalcLighting pfnPR_CalcLighting;
 	pfnEditor_PR_GetMinAlpha pfnPR_GetMinAlpha;
 } rendering_api_t;
+#endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+
+
+/* Parser API */
+#define PFL_NOERRORS				( 1 << 0 )
+
+typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
+typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int size, int parseFlags );
+typedef char *		(*pfnEditor_SC_Token)					();
+typedef int			(*pfnEditor_SC_Line)					();
+typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
+typedef bool		(*pfnEditor_SC_CheckError)				();
+typedef void		(*pfnEditor_SC_ResetError)				();
+typedef bool		(*pfnEditor_SC_GetToken)				( bool crossLine );
+typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool crossLine );
+typedef void		(*pfnEditor_SC_UnGetToken)				();
+typedef bool		(*pfnEditor_SC_TokenAvailable)			();
+typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
+typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool crossLine );
+typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
+typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, float *rgflMatrix );
+typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, float *rgflMatrix );
+typedef void		(*pfnEditor_SC_EndOfParsing)			();
+typedef void		(*pfnEditor_SC_SetParseFlags)			( int parseFlags );
+typedef int			(*pfnEditor_SC_GetParseFlags)			();
+typedef int			(*pfnEditor_SC_GetBlockSize)			();
+typedef char *		(*pfnEditor_SC_CopyBlock)				(); // MUST BE Sys_Free'D
+typedef void		(*pfnEditor_SC_SkipBlock)				();
+typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
+typedef bool		(*pfnEditor_SC_ShouldQuote)				( const char *token );
+
+#if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
+typedef struct
+{
+	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
+	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
+	pfnEditor_SC_Token pfnSC_Token;
+	pfnEditor_SC_Line pfnSC_Line;
+	pfnEditor_SC_ParseError pfnSC_ParseError;
+	pfnEditor_SC_CheckError pfnSC_CheckError;
+	pfnEditor_SC_ResetError pfnSC_ResetError;
+	pfnEditor_SC_GetToken pfnSC_GetToken;
+	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
+	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
+	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
+	pfnEditor_SC_MatchToken pfnSC_MatchToken;
+	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
+	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
+	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
+	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
+	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
+	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
+	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
+	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
+	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
+	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
+	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
+	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
+	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
+} parser_api_t;
+#else
+typedef struct
+{
+	pfnEditor_SC_Token pfnSC_Token;
+	pfnEditor_SC_Line pfnSC_Line;
+	pfnEditor_SC_ParseFromFile pfnSC_ParseFromFile;
+	pfnEditor_SC_ParseFromMemory pfnSC_ParseFromMemory;
+	pfnEditor_SC_CheckError pfnSC_CheckError;
+	pfnEditor_SC_ParseError pfnSC_ParseError;
+	pfnEditor_SC_ResetError pfnSC_ResetError;
+	pfnEditor_SC_SafeGetToken pfnSC_SafeGetToken;
+	pfnEditor_SC_GetToken pfnSC_GetToken;
+	pfnEditor_SC_TokenAvailable pfnSC_TokenAvailable;
+	pfnEditor_SC_UnGetToken pfnSC_UnGetToken;
+	pfnEditor_SC_MatchToken pfnSC_MatchToken;
+	pfnEditor_SC_SafeMatchToken pfnSC_SafeMatchToken;
+	pfnEditor_SC_Parse3DMatrix pfnSC_Parse3DMatrix;
+	pfnEditor_SC_Parse2DMatrix pfnSC_Parse2DMatrix;
+	pfnEditor_SC_Parse1DMatrix pfnSC_Parse1DMatrix;
+	pfnEditor_SC_SkipRestOfLine pfnSC_SkipRestOfLine;
+	pfnEditor_SC_EndOfParsing pfnSC_EndOfParsing;
+	pfnEditor_SC_GetParseFlags pfnSC_GetParseFlags;
+	pfnEditor_SC_SetParseFlags pfnSC_SetParseFlags;
+	pfnEditor_SC_ShouldQuote pfnSC_ShouldQuote;
+	pfnEditor_SC_CopyBlock pfnSC_CopyBlock;
+	pfnEditor_SC_SkipBlock pfnSC_SkipBlock;
+	pfnEditor_SC_SkipLineOrBlock pfnSC_SkipLineOrBlock;
+	pfnEditor_SC_GetBlockSize pfnSC_GetBlockSize;
+} parser_api_t;
 #endif // JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 
 
@@ -593,7 +593,7 @@ typedef void		(*pfnEditor_Entity_Build)				( qEntity_s *entityDef, int entityBui
 
 /*
  Entity_SetColor
- Sets entity's render color.
+ Sets entity render color.
 
  entityDef - Entity definition.
  cbColor - Pointer to rgba_t::data or a uchar[4] array.
@@ -602,7 +602,7 @@ typedef void		(*pfnEditor_Entity_SetColor)			( qEntity_s *entityDef, const byte 
 
 /*
  Entity_GetColor
- Returns entity's render color.
+ Returns entity render color.
 
  entityDef - Entity definition.
  cbColorOut - Pointer to rgba_t or a uchar[4] array.
@@ -611,7 +611,7 @@ typedef void		(*pfnEditor_Entity_GetColor)			( qEntity_s *entityDef, byte *cbCol
 
 /*
  Entity_AddToVisGroup
- Adds an entity to the visgroup.
+ Adds entity to the visgroup.
 
  worldDef - World definition.
  entityDef - Entity definition.
@@ -621,7 +621,7 @@ typedef void		(*pfnEditor_Entity_AddToVisGroup)		( qWorld_s *worldDef, qEntity_s
 
 /*
  Entity_RemoveFromVisGroup
- Removes an entity from the visgroup.
+ Removes entity from the visgroup.
 
  worldDef - World definition.
  entityDef - Entity definition.
@@ -635,13 +635,13 @@ typedef void		(*pfnEditor_Entity_RemoveFromVisGroup)	( qWorld_s *worldDef, qEnti
 
  entityDef - Entity definition.
 */
-typedef long		(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
+typedef int			(*pfnEditor_Entity_GetVisGroupCount)	( qEntity_s *entityDef );
 
 /*
  Entity_GetVisGroupIdent
  TODO: Write docs for this!
 */
-typedef long		(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
+typedef int			(*pfnEditor_Entity_GetVisGroupIdent)	( qEntity_s *entityDef, int visGroupId );
 
 /*
  Entity_FindByClassname
@@ -705,14 +705,76 @@ typedef struct
 
 
 /* Brush API */
+
+/*
+ Brush_Create
+ Use this function to create a brush. Each brush must be attached to some sort of entity (worldspawn for example).
+
+ worldDef - Current world definition (can be obtained using Global_GetCurrentWorld).
+ entityDef - Entity definition.
+*/
 typedef qBrush_s *	(*pfnEditor_Brush_Create)				( qWorld_s *worldDef, qEntity_s *entityDef );
+
+/*
+ Brush_Destroy
+ Destroys the brush.
+
+ worldDef - Current world definition (can be obtained using Global_GetCurrentWorld).
+ brushDef - Brush definition.
+*/
 typedef void		(*pfnEditor_Brush_Destroy)				( qWorld_s *worldDef, qBrush_s *brushDef );
+
+/*
+ Brush_SetColor
+ Sets brush render color.
+
+ brushDef - Brush definition.
+ cbColor - Pointer to rgba_t::data or a uchar[4] array.
+*/
 typedef void		(*pfnEditor_Brush_SetColor)				( qBrush_s *brushDef, const byte *cbColor );
+
+/*
+ Brush_GetColor
+ Returns brush render color.
+
+ brushDef - Brush definition.
+ cbColorOut - Pointer to rgba_t or a uchar[4] array.
+*/
 typedef void		(*pfnEditor_Brush_GetColor)				( qBrush_s *brushDef, byte *cbColorOut );
+
+/*
+ Brush_AddToVisGroup
+ Adds a brush to the visgroup.
+
+ worldDef - World definition.
+ brushDef - Brush definition.
+ visGroupId - An ID of a VisGroup. VisGroup ID can be obtained from VisGroup_Add.
+*/
 typedef void		(*pfnEditor_Brush_AddToVisGroup)		( qWorld_s *worldDef, qBrush_s *brushDef, unsigned int visGroupId );
+
+/*
+ Brush_RemoveFromVisGroup
+ Removes brush from the visgroup.
+
+ worldDef - World definition.
+ brushDef - Brush definition.
+ visGroupId - An ID of a VisGroup. VisGroup ID can be obtained from VisGroup_Add.
+*/
 typedef void		(*pfnEditor_Brush_RemoveFromVisGroup)	( qWorld_s *worldDef, qBrush_s *brushDef, unsigned int visGroupId );
-typedef long		(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
-typedef long		(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int visGroupId );
+
+/*
+ Brush_GetVisGroupCount
+ Returns a count of visgroups that brush belongs to.
+
+ brushDef - Brush definition.
+*/
+typedef int			(*pfnEditor_Brush_GetVisGroupCount)		( qBrush_s *brushDef );
+
+/*
+ Brush_GetVisGroupIdent
+ TODO: Write docs for this!
+*/
+typedef int			(*pfnEditor_Brush_GetVisGroupIdent)		( qBrush_s *brushDef, int visGroupId );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE
 typedef struct
@@ -874,7 +936,22 @@ typedef struct
 #endif
 
 /* Overlay API */
+
+/*
+ Overlay_Create
+ Creates an empty overlay definition.
+
+ worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+ texDef - Texture information used by this overlay. Applied to each face of the overlay.
+*/
 typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
+
+/*
+ Overlay_Destroy
+ Destroys the overlay.
+
+ overlayDef - Overlay definition.
+*/
 typedef void		(*pfnEditor_Overlay_Destroy)			( qOverlay_s *overlayDef );
 
 typedef struct
@@ -1070,7 +1147,7 @@ typedef struct
 
 
 /* Shader API */
-typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *shaderName );
+typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *hashName );
 typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *hashName, const char *shaderName, int shaderFlags );
 typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderDef );
 typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderDef, qShaderStage_s *shaderStage );
@@ -1079,7 +1156,7 @@ typedef void		(*pfnEditor_Shader_Finish)				( qShader_s *shaderDef );
 typedef qTexture_s *(*pfnEditor_Shader_LookupTexture)		( const char *hashName );
 typedef qTexture_s *(*pfnEditor_Shader_GetWhiteTexture)		();
 typedef qTexture_s *(*pfnEditor_Shader_GetBlackTexture)		();
-typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderDef, const char *shaderName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
+typedef qTexture_s *(*pfnEditor_Shader_UploadTexture)		( qShader_s *shaderDef, const char *textureName, unsigned int pixelFormat, unsigned int textureFormat, int textureNumChannels, int textureWidth, int textureHeight, bool, byte *textureData );
 typedef void		(*pfnEditor_Shader_DestroyTexture)		( qTexture_s *textureHandle );
 
 #if JACK_API_VERSION == API_VERSION_HLFX_FREEWARE

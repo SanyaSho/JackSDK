@@ -33,6 +33,25 @@ extern plugin_funcs_t gEditorfuncs;
 
 #define Steam_SetAchievemnt			(gEditorfuncs.pfnSteam_SetAchievemnt)
 
+/* Rendering API*/
+#define PR_PointSize				(gEditorfuncs.renderingfuncs.pfnPR_PointSize)
+#define PR_LineWidth				(gEditorfuncs.renderingfuncs.pfnPR_LineWidth)
+#define PR_BindShader				(gEditorfuncs.renderingfuncs.pfnPR_BindShader)
+#define PR_BindTexture				(gEditorfuncs.renderingfuncs.pfnPR_BindTexture)
+#define PR_Begin					(gEditorfuncs.renderingfuncs.pfnPR_Begin)
+#define PR_End						(gEditorfuncs.renderingfuncs.pfnPR_End)
+#define PR_Color4ub					(gEditorfuncs.renderingfuncs.pfnPR_Color4ub)
+#define PR_Color4ubv				(gEditorfuncs.renderingfuncs.pfnPR_Color4ubv)
+#define PR_TexCoord2f				(gEditorfuncs.renderingfuncs.pfnPR_TexCoord2f)
+#define PR_TexCoord2fv				(gEditorfuncs.renderingfuncs.pfnPR_TexCoord2fv)
+#define PR_Normal3fv				(gEditorfuncs.renderingfuncs.pfnPR_Normal3fv)
+#define PR_Vertex3fv				(gEditorfuncs.renderingfuncs.pfnPR_Vertex3fv)
+#define PR_GetState					(gEditorfuncs.renderingfuncs.pfnPR_GetState)
+#define PR_SetState					(gEditorfuncs.renderingfuncs.pfnPR_SetState)
+#define PR_GetViewInfo				(gEditorfuncs.renderingfuncs.pfnPR_GetViewInfo)
+#define PR_GetMinAlpha				(gEditorfuncs.renderingfuncs.pfnPR_GetMinAlpha)
+#define PR_CalcLighting				(gEditorfuncs.renderingfuncs.pfnPR_CalcLighting)
+
 /* Parser API */
 #define SC_ParseFromFile			(gEditorfuncs.parserfuncs.pfnSC_ParseFromFile)
 #define SC_ParseFromMemory			(gEditorfuncs.parserfuncs.pfnSC_ParseFromMemory)
@@ -59,25 +78,6 @@ extern plugin_funcs_t gEditorfuncs;
 #define SC_SkipBlock				(gEditorfuncs.parserfuncs.pfnSC_SkipBlock)
 #define SC_SkipLineOrBlock			(gEditorfuncs.parserfuncs.pfnSC_SkipLineOrBlock)
 #define SC_ShouldQuote				(gEditorfuncs.parserfuncs.pfnSC_ShouldQuote)
-
-/* Rendering API*/
-#define PR_PointSize				(gEditorfuncs.renderingfuncs.pfnPR_PointSize)
-#define PR_LineWidth				(gEditorfuncs.renderingfuncs.pfnPR_LineWidth)
-#define PR_BindShader				(gEditorfuncs.renderingfuncs.pfnPR_BindShader)
-#define PR_BindTexture				(gEditorfuncs.renderingfuncs.pfnPR_BindTexture)
-#define PR_Begin					(gEditorfuncs.renderingfuncs.pfnPR_Begin)
-#define PR_End						(gEditorfuncs.renderingfuncs.pfnPR_End)
-#define PR_Color4ub					(gEditorfuncs.renderingfuncs.pfnPR_Color4ub)
-#define PR_Color4ubv				(gEditorfuncs.renderingfuncs.pfnPR_Color4ubv)
-#define PR_TexCoord2f				(gEditorfuncs.renderingfuncs.pfnPR_TexCoord2f)
-#define PR_TexCoord2fv				(gEditorfuncs.renderingfuncs.pfnPR_TexCoord2fv)
-#define PR_Normal3fv				(gEditorfuncs.renderingfuncs.pfnPR_Normal3fv)
-#define PR_Vertex3fv				(gEditorfuncs.renderingfuncs.pfnPR_Vertex3fv)
-#define PR_GetState					(gEditorfuncs.renderingfuncs.pfnPR_GetState)
-#define PR_SetState					(gEditorfuncs.renderingfuncs.pfnPR_SetState)
-#define PR_GetViewInfo				(gEditorfuncs.renderingfuncs.pfnPR_GetViewInfo)
-#define PR_GetMinAlpha				(gEditorfuncs.renderingfuncs.pfnPR_GetMinAlpha)
-#define PR_CalcLighting				(gEditorfuncs.renderingfuncs.pfnPR_CalcLighting)
 
 /* FileSystem API */
 #define Sys_GetBaseDirectory		(gEditorfuncs.filesystemfuncs.pfnSys_GetBaseDirectory)

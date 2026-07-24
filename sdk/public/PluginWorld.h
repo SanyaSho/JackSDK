@@ -172,10 +172,10 @@ typedef struct qBrush_s
 	/* Owner entity of this brush (ex. worldspawn) */
 	struct qEntity_s *m_ownerEntity;
 
-	/* Patch attached to this brush */
+	/* Patch attached to this brush (m_extraDataType == 1) */
 	struct qPatch_s *m_patch;
 
-	/* Overlay attached to this brush */
+	/* Overlay attached to this brush (m_extraDataType == 2) */
 	struct qOverlay_s *m_overlay;
 
 	/* List of decals touching this brush */

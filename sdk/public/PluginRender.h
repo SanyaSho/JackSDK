@@ -172,7 +172,7 @@ typedef struct qShaderStage_s
 	/* Texture list (used if texture has multiple frames) */
 	struct qTexture_s *m_textureList;
 
-	int unknownInt1;
+	int unknownInt1;// Set to 101 in vpHalfLife if decaltype is 2
 
 	/* Stage flags (see above) */
 	int m_flags;
@@ -242,6 +242,7 @@ typedef struct qShader_s
 
 	char gap1[4];
 
+	/* Internal */
 	CTextureParcel *m_texParcel;
 
 	int m_surfaceFlags;
@@ -263,7 +264,7 @@ typedef struct qShader_s
 
 	float m_translucency;
 
-	int unknownInt2; // Set to 101 in vpHalfLife if "framerate" is < 1
+	int unknownInt2; // Set to 101 in vpHalfLife if shader translucency is < 1
 
 	/* A pointer? */
 #if defined( JACK_64BIT )
