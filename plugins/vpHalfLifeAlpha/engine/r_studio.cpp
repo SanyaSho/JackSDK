@@ -414,33 +414,25 @@ void StudioRender::R_StudioTransformAuxVert (auxvert_t *av, int bone, vec3_t ver
 	av->fv[2] = DotProduct (vert, bonetransform[bone][2]) + bonetransform[bone][2][3];
 }
 
-void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, int normidx, vec3_t normal )
+void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, vec3_t normal )
 {
-	if ( FBitSet(m_renderFlags, RFL_NOTEXTURES | RFL_FULLBRIGHT) )
+	// Don't update lighting and calculate chrome if we're in "3D Filled Polygons" mode
+	if ( FBitSet(m_renderFlags, RFL_NOTEXTURES) )
 		return;
 
 	vec3_t norm;
 	VectorRotate( normal, bonetransform[bone], norm );
 
+	// Scale the normal if needed
 	float scale = ent->m_entityState.m_scale;
 	if ( scale != 1.f )
 	{
 		norm *= scale;
 	}
 
-#if 0
-	// Don't want to update the lighting in fullbright mode
-	if ( !FBitSet(m_renderFlags, RFL_NOTEXTURES | RFL_FULLBRIGHT) )
-	{
-		vec3_t tmp = norm;
-		PR_CalcLighting( tmp.Base() );
-		pvlightvalues[normidx] = tmp.Base();
-	}
-#endif
-
 	if ( FBitSet(flags, STUDIO_NF_CHROME) )
 	{
-		int index = (int)((byte *)lv - (byte *)pvlightvalues);
+		int index = (int)(((byte *)lv - (byte *)pvlightvalues) / 4);
 
 		float v = ( gViewinfo.b.x * norm.x + gViewinfo.b.y * norm.y + gViewinfo.b.z * norm.z ) * 2.0f;
 
@@ -451,6 +443,12 @@ void StudioRender::R_StudioLighting( qEntity_t *ent, float *lv, int bone, int fl
 		chrome[index][0] = (int)((s + 1.0f) * 32.0f);
 		// calc t coord
 		chrome[index][1] = (int)((t + 1.0f) * 32.0f);
+	}
+
+	// Don't want to update the lighting in fullbright mode
+	if ( !FBitSet(m_renderFlags, RFL_FULLBRIGHT) )
+	{
+		*lv = PR_CalcLighting( norm.Base() );
 	}
 }
 
@@ -489,7 +487,7 @@ void R_StudioLighting (float *lv, int bone, int flags, vec_t *normal)
 
 	if ((flags & STUDIO_NF_CHROME) != 0)
 	{
-		int index = (int)((byte *)lv - (byte *)pvlightvalues);
+		int index = (int)(((byte *)lv - (byte *)pvlightvalues) / 4);
 
 		float v = (vpn[0] * lx + vpn[1] * ly + vpn[2] * lz) * 2.0f;
 
@@ -890,7 +888,7 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 
 		for (j=0 ; j<pmesh[i].numnorms ; j++, lv++, pstudionorms++, pnormbone++)
 		{
-			R_StudioLighting (ent, lv, *pnormbone, flags, j, pstudionorms->Base());
+			R_StudioLighting (ent, lv, *pnormbone, flags, pstudionorms->Base());
 		}
 	}
 
@@ -933,12 +931,8 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 				// Don't want to update the lighting in fullbright mode
 				if ( !FBitSet(m_renderFlags, RFL_NOTEXTURES | RFL_FULLBRIGHT) )
 				{
-#if 0
 					l = (*pvlightvalues)[ptricmds[k].normindex] * 255.f;
 					PR_Color4ub( (byte)l, (byte)l, (byte)l, alpha );
-#else
-					PR_Color4ub( 255, 255, 255, alpha );
-#endif
 				}
 
 				if ((ptexture[pmesh->skinref].flags & STUDIO_NF_CHROME) != 0)

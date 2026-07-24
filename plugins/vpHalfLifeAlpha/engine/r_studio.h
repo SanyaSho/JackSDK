@@ -54,7 +54,7 @@ public:
 	void R_StudioCalcRotations( vec3_t *pos, vec4_t *q, int sequence, float f );
 	void R_StudioSetupBones( qEntity_s *ent, qStudioData_s *studioData );
 	void R_StudioTransformAuxVert( auxvert_t *av, int bone, vec3_t vert );
-	void R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, int normidx, vec3_t normal );
+	void R_StudioLighting( qEntity_t *ent, float *lv, int bone, int flags, vec3_t normal );
 	void R_StudioSetupModel( qEntity_t *ent, int bodypart );
 	void R_StudioRenderFinal( qEntity_s *ent, qStudioData_s *studioData, int renderFlags /*, alight_t *plight*/ );
 	void R_GLStudioDrawPoints( qEntity_s *ent, qStudioData_s *studioData /*, alight_t *plight*/ );
