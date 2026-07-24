@@ -766,22 +766,24 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			{
 				float angle = V_Atof( value );
 
-				if ( angle == 1 )
+				if ( angle == -1 ) // Up
 				{
-					angles.x = -90;
-					angles.y = 0;
+					angles[PITCH] = -90;
+					angles[YAW] = 0;
+					angles[ROLL] = 0;
 				}
-				else if ( angle == 2 )
+				else if ( angle == -2 ) // Down
 				{
-					angles.x = 90;
+					angles[PITCH] = 90;
+					angles[YAW] = 0;
+					angles[ROLL] = 0;
 				}
 				else
 				{
-					angles.x = 0;
-					angles.y = angle;
+					angles[PITCH] = 0;
+					angles[YAW] = angle;
+					angles[ROLL] = 0;
 				}
-
-				angles.z = 0;
 			}
 			else
 			{
