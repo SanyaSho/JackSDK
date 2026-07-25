@@ -65,19 +65,10 @@ qboolean R_StudioCheckBBox (void)
 StudioRender::StudioRender()
 {
 	m_studioHdr = NULL;
-	//pbodypart = NULL;
-	//psubmodel = NULL;
-	//pmesh = NULL;
 
 	m_textureList = NULL;
 
 	m_renderFlags = 0;
-
-	//memset( &bonetransform, 0, sizeof( bonetransform ) );
-	//memset( &m_rootbonetransform, 0, sizeof( m_rootbonetransform ) );
-	//memset( &m_auxverts, 0, sizeof( m_auxverts ) );
-	//memset( &m_chrome, 0, sizeof( m_chrome ) );
-	//memset( &m_vlightvalues, 0, sizeof( m_vlightvalues ) );
 }
 
 StudioRender::~StudioRender()
@@ -906,8 +897,10 @@ void StudioRender::R_GLStudioDrawPoints (qEntity_s *ent, qStudioData_s *studioDa
 		renderFlags = ent->m_renderMode.m_renderFlags;
 	}
 
-	if ( ( m_renderFlags & 0x12 ) == 0x10 && alpha != 255 )
+	if ( ( m_renderFlags & RFL_NOTEXTURES | RFL_FULLBRIGHT ) == RFL_FULLBRIGHT && alpha != 255 )
+	{
 		PR_Color4ub( 255, 255, 255, alpha );
+	}
 
 	for (i=0 ; i<psubmodel->nummesh ; i++, pmesh++)
 	{

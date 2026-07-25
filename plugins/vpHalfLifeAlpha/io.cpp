@@ -36,9 +36,6 @@
 #include "stb_image_write.h"
 #endif // EXTRACT_TO_PNG_ON_LOAD
 
-// vpEnumExportFormats requires vpExport
-// vpEnumImportFormats requires vpImport
-
 // clang-format off
 struct formatList_t
 {
@@ -291,16 +288,15 @@ struct textureTranslucencyList_t
 {
 	const char *name; /* Not NULL-safe */
 	float translucency;
-	char gap[4]; /* Unknown */
 } g_textureTranslucencyList[] =
 {
-	{ "AAATRIGGER", 0.5, 0 },
-	{ "CLIP", 0.5, 0 },
-	{ "ORIGIN", 0.5, 0 },
-	{ "HINT", 0.5, 0 },
-	{ "SKIP", 0.5, 0 },
-	{ "BEVEL", 0.5, 0 },
-	{ "TRIGGER", 0.5, 0 }
+	{ "AAATRIGGER", 0.5 },
+	{ "CLIP", 0.5 },
+	{ "ORIGIN", 0.5 },
+	{ "HINT", 0.5 },
+	{ "SKIP", 0.5 },
+	{ "BEVEL", 0.5 },
+	{ "TRIGGER", 0.5 }
 };
 // clang-format on
 
