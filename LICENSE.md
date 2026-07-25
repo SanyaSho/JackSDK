@@ -5,7 +5,8 @@ This repository contains code under multiple licenses.
 - Unless otherwise noted, all files are licensed under the MIT License.
 - Files in the `sdk/GLEW` directory are using a mix of Modified BSD license, Mesa 3-D license (MIT) and Khronos license (MIT). See `sdk/GLEW/LICENSE.txt` for the full license text and terms.
 - Files in the `sdk/public` directory are licensed under the GNU Lesser General Public License v2.1 or later. See `sdk/LICENSE.md` for the full license text and terms.
-- StudioRender (`plugins/vpExamplePlugin/engine`, `plugins/vpHalfLifeAlpha/engine`) uses header files distributed under the HALF-LIFE 1 SDK LICENSE. See `plugins/vpExamplePlugin/engine/LICENSE.txt` or `plugins/vpHalfLifeAlpha/engine/LICENSE.txt` for the full license text and terms.
+- Files in the `plugins/vpExamplePlugin/assimp` directory are licensed under a Open Asset Import Library license. See `plugins/vpExamplePlugin/assimp/LICENSE.md` for the full license text and terms.
+- StudioRender (`plugins/vpHalfLifeAlpha/engine`) uses header files distributed under the HALF-LIFE 1 SDK LICENSE. See `plugins/vpHalfLifeAlpha/engine/LICENSE.txt` for the full license text and terms.
 
 Copyright 2026 SanyaSho
 

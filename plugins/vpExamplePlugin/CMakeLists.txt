@@ -7,12 +7,14 @@
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 include( "${SRCDIR}/sdk/JackPluginSDK.cmake" )
+include( "${CMAKE_CURRENT_LIST_DIR}/assimp/assimp.cmake" )
 
 set( EXAMPLEPLUGIN_SOURCE_FILES )
 BEGIN_SRC( EXAMPLEPLUGIN_SOURCE_FILES "Source Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			"AssimpStudioRender.cpp"
 			"CustomSpriteFormatExample.cpp"
 			"CustomTextureFormatExample.cpp"
 
@@ -35,6 +37,7 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 	SRC_GRP(
 		SOURCES
 		#{
+			"AssimpStudioRender.h"
 			#"DoomWadLoader.h"
 
 			"MapReader.h"
@@ -45,35 +48,9 @@ BEGIN_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 	)
 END_SRC( EXAMPLEPLUGIN_HEADER_FILES "Header Files" )
 
-set( GOLDSRC_SOURCE_FILES )
-BEGIN_SRC( GOLDSRC_SOURCE_FILES "GoldSrc Source Files" )
-	SRC_GRP(
-		SOURCES
-		#{
-			"engine/mathlib.cpp"
-			"engine/l_studio.cpp"
-			"engine/r_studio.cpp"
-		#}
-	)
-END_SRC( GOLDSRC_SOURCE_FILES "GoldSrc Source Files" )
-
-set( GOLDSRC_HEADER_FILES )
-BEGIN_SRC( GOLDSRC_HEADER_FILES "GoldSrc Header Files" )
-	SRC_GRP(
-		SOURCES
-		#{
-			"engine/mathlib.h"
-			"engine/quakedef.h"
-			"engine/r_studio.h"
-			"engine/studio.h"
-		#}
-	)
-END_SRC( GOLDSRC_HEADER_FILES "GoldSrc Header Files" )
-
 add_library(
 	exampleplugin MODULE
 	${EXAMPLEPLUGIN_SOURCE_FILES} ${EXAMPLEPLUGIN_HEADER_FILES}
-	${GOLDSRC_SOURCE_FILES} ${GOLDSRC_HEADER_FILES}
 )
 
 install_library(
@@ -87,6 +64,8 @@ target_include_directories(
 
 	"."
 	"../common"
+
+	"assimp/include"
 )
 
 target_compile_definitions(
@@ -104,3 +83,4 @@ target_compile_definitions(
 
 target_use_jackpluginsdk( exampleplugin )
 
+target_use_assimp( exampleplugin "${CMAKE_CURRENT_LIST_DIR}/assimp" )

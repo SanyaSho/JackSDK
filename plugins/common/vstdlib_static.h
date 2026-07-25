@@ -32,7 +32,9 @@ extern void V_StripExtension( char *in );
 		}                                           \
 	} while ( 0 )
 
-extern int V_ExtractFileBase( const char *source, char *destination, size_t size );
+extern size_t V_ExtractFileBase( const char *source, char *destination, size_t size );
+
+extern size_t V_ExtractFilePath( const char *path, char *outBuf, size_t outBufSize );
 
 extern void V_ConcatTransforms (const float in1[3][4], const float in2[3][4], float out[3][4]);
 

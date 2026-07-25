@@ -5,6 +5,8 @@
 #include <signal.h>
 #endif // !WIN32
 
+#include "GL/glew.h"
+
 // class ImageLoader
 #include "ImageLoader.h"
 
@@ -32,7 +34,7 @@
 
 //#include "DoomWadLoader.h"
 
-#include "engine/r_studio.h"
+#include "AssimpStudioRender.h"
 
 plugin_funcs_t gEditorfuncs;
 
@@ -748,7 +750,7 @@ mapProfile_t profile =
 	".wad",
 	".pak",
 	".spr;.png;.gif", /* vpEnumSpriteFormats */ //".spr",
-	".mdl",
+	".mdl;.md3;.smd;.md5mesh;.lwo", /* vpEnumModelFormats */ //".mdl",
 	".wav",
 	".aur",
 	"",
@@ -892,21 +894,36 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffse
 	//return 0;
 }
 
+// clang-format off
+struct formatList_t
+{
+	int m_formatIndex;
+	const char *m_formatDesctiption;
+	const char *m_formatExtension;
+} g_modelList[] =
+{
+	{ 0, "(Assimp) Quake III Arena Model (MD3)", ".md3" },
+	{ 1, "(Assimp) StudioModel Data (SMD)", ".smd" },
+	{ 2, "(Assimp) DOOM 3 Model (MD5)", ".md5mesh" },
+	{ 2, "(Assimp) LightWave 3D (LWO)", ".lwo" },
+};
+// clang-format on
 
-#if 0
 DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *libraryHandle )
 {
-	return registerIOFormat( 0, "Half-Life Alpha 0.52 MDL", ".mdl", libraryHandle ) != false;
-	return 1;
+	int c = 0;
+
+	for ( int i = 0; i < ARRAYSIZE( g_modelList ); i++ )
+	{
+		c += registerIOFormat( g_modelList[i].m_formatIndex, g_modelList[i].m_formatDesctiption, g_modelList[i].m_formatExtension, libraryHandle ) ? 1 : 0;
+	}
+
+	return c;
 }
-#endif // 0
 
 DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	if ( formatIndex != 0 )
-		return false;
-
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
 	if ( studioRender )
 	{
 		studioRender->GetModelBounds( flags, (vec3_t *)&bboxMin, (vec3_t *)&bboxMax );
@@ -918,10 +935,7 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMa
 
 DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 {
-	if ( formatIndex != 0 )
-		return;
-
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
 	if ( studioRender )
 	{
 		delete studioRender;
@@ -931,11 +945,8 @@ DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 
 DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, int bufSize, qStudioData_s *studioData )
 {
-	if ( formatIndex != 0 )
-		return false;
-
-	StudioRender *studioRender = new StudioRender();
-	if ( !studioRender->Mod_LoadStudioModel( filePath, buf, bufSize, studioData ) )
+	AssimpStudioRender *studioRender = new AssimpStudioRender();
+	if ( !studioRender->LoadModel( filePath, buf, bufSize, g_modelList[formatIndex].m_formatExtension++, studioData ) )
 	{
 		delete studioRender;
 		return false;
@@ -949,13 +960,10 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 
 DLL_EXPORT void vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	if ( formatIndex != 0 )
-		return;
-
-	StudioRender *studioRender = (StudioRender *)studioData->m_studioPtr;
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
 	if ( studioRender )
 	{
-		studioRender->R_StudioRenderFinal( entityInfo, studioData, renderFlags );
+		studioRender->RenderModel( entityInfo, studioData, renderFlags );
 	}
 }
 

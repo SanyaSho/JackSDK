@@ -104,7 +104,7 @@ void V_StripExtension( char *in )
 V_ExtractFileBase
 ================
 */
-int V_ExtractFileBase( const char *source, char *destination, size_t size )
+size_t V_ExtractFileBase( const char *source, char *destination, size_t size )
 {
 	if ( !source || !source[0] || !destination || size == 0 )
 		return 0;
@@ -156,7 +156,40 @@ int V_ExtractFileBase( const char *source, char *destination, size_t size )
 	strncpy( destination, start, length );
 	destination[length] = '\0';
 
-	return (int)length;
+	return length;
+}
+
+size_t V_ExtractFilePath( const char *path, char *outBuf, size_t outBufSize )
+{
+	if ( !path || !*path )
+		return 0;
+
+	if ( !outBuf || outBufSize == 0 )
+		return 0;
+
+	const char *slash = strrchr( path, '/' );
+	const char *backslash = strrchr( path, '\\' );
+
+	const char *last = slash;
+
+	if ( !last || ( backslash && backslash > last ) )
+		last = backslash;
+
+	if ( !last )
+	{
+		outBuf[0] = '\0';
+		return 0;
+	}
+
+	size_t len = static_cast<size_t>( last - path );
+
+	if ( len >= outBufSize )
+		len = outBufSize - 1;
+
+	memcpy( outBuf, path, len );
+	outBuf[len] = '\0';
+
+	return len;
 }
 
 /*
