@@ -1209,20 +1209,16 @@ void StudioRender::R_RotateForEntity( qEntity_t *ent, bool doscale /* = false */
 {
 	float scale = 1.f;
 	if ( doscale )
+	{
 		scale = ent->m_entityState.m_scale;
+	}
 
-	vec3_t origin = ent->m_vecOrigin;
 	vec3_t angles = ent->m_vecAngles;
 
-	V_BuildTransformStudioMatrix(
-		angles[YAW],
-		FBitSet(m_renderFlags, RFL_INVERTSTUDIOPITCH) ? angles[PITCH] * -1.f : angles[PITCH],
-		angles[ROLL],
+	if ( FBitSet( m_renderFlags, RFL_INVERTSTUDIOPITCH ) )
+	{
+		angles[PITCH] *= -1;
+	}
 
-		origin.Base(),
-
-		scale,
-
-		rotationmatrix
-	);
+	V_BuildTransformStudioMatrix( angles[YAW], angles[PITCH], angles[ROLL], ent->m_vecOrigin.Base(), scale, rotationmatrix );
 }

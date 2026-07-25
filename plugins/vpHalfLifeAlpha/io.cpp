@@ -761,7 +761,7 @@ DLL_EXPORT bool vpGetModelFormatFlags( int formatIndex )
 vpGetModelBounds
 ===============
 */
-DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
+DLL_EXPORT bool vpGetModelBounds( int formatIndex, vec3_t *bboxMin, vec3_t *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
 	if ( formatIndex != 0 )
 		return false;
@@ -769,7 +769,7 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, float *bboxMin, float *bboxMa
 	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_studioPtr );
 	if ( studioRender )
 	{
-		studioRender->GetModelBounds( flags, (vec3_t *)&bboxMin, (vec3_t *)&bboxMax );
+		studioRender->GetModelBounds( flags, bboxMin, bboxMax );
 		return true;
 	}
 

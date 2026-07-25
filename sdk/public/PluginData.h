@@ -200,7 +200,7 @@ typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
  0x40 - has 0x8000 in GDClass
  0x80 - StudioInvertPitchScale
 */
-typedef bool (*vpGetModelBounds_t)( int formatIndex, float *bboxMin, float *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
+typedef bool (*vpGetModelBounds_t)( int formatIndex, vec3_t *bboxMin, vec3_t *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 /*
  Will be called only if qStudioData_s has m_studioPtr
