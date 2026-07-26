@@ -769,7 +769,7 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, vec3_t *bboxMin, vec3_t *bbox
 	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_studioPtr );
 	if ( studioRender )
 	{
-		studioRender->GetModelBounds( flags, bboxMin, bboxMax );
+		studioRender->GetModelBounds( entityInfo, flags, bboxMin, bboxMax );
 		return true;
 	}
 
@@ -811,7 +811,7 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 		return false;
 	}
 
-	studioRender->GetModelBounds( 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
+	studioRender->GetModelBounds( NULL, 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
 
 	studioData->m_studioPtr = studioRender;
 	return true;

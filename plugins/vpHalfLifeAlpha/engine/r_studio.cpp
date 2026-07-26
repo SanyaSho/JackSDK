@@ -1199,10 +1199,102 @@ void GLR_StudioDrawShadow()
 }
 #endif
 
-void StudioRender::GetModelBounds( int flags, vec3_t *bboxMin, vec3_t *bboxMax )
+void StudioRender::GetModelBounds( qEntity_t *ent, int flags, vec3_t *bboxMin, vec3_t *bboxMax )
 {
-	*bboxMin = vec3_t( -16, -16, 0 );
-	*bboxMax = vec3_t( 16, 16, 72 );
+	if ( !ent )
+	{
+		if ( bboxMin )
+			*bboxMin = vec3_t( -16, -16, 0 );
+		if ( bboxMax )
+			*bboxMax = vec3_t( 16, 16, 72 );
+		return;
+	}
+
+	mstudioseqdesc_t	*pseqdesc;
+	mstudiobone_t		*pbones;
+	double				dfdt, f;
+	int					i, j, k;
+
+	mstudiobodyparts_t	*pbodypart;
+	mstudiomodel_t		*psubmodel;
+
+	byte				*pvertbone;
+	mstudiomodeldata_t	*pmodeldata;
+	vec3_t				*pstudioverts;
+
+	static vec3_t		pos[MAXSTUDIOBONES];
+	static vec4_t		q[MAXSTUDIOBONES];
+	float				bonematrix[3][4];
+
+	//R_RotateForEntity (ent, !FBitSet(m_renderFlags, RFL_DISABLESCALING));
+
+	int sequence = ent->m_entityState.m_sequence;
+
+	if ( sequence < 0 || sequence >= m_studioHdr->numseq )
+		sequence = 0;
+
+	pseqdesc = (mstudioseqdesc_t *)((byte *)m_studioHdr + m_studioHdr->seqindex) + sequence;
+
+	qStudioDrawData_t *drawData = (qStudioDrawData_t *)ent->m_drawData;
+
+	// Make the model loop current sequence
+	if ( FBitSet(m_renderFlags, RFL_ANIMATEMODELS) )
+		f = fmodf( drawData->m_frametime * pseqdesc->fps, pseqdesc->numframes );
+	else
+		f = 0;
+
+	R_StudioCalcRotations (pos, q, sequence, f);
+
+	pbones = (mstudiobone_t *)((byte *)m_studioHdr + m_studioHdr->boneindex);
+	for (i=0 ; i < m_studioHdr->numbones ; i++)
+	{
+		V_QuaternionMatrix (q[i], bonematrix);
+
+		bonematrix[0][3] = pos[i][0];
+		bonematrix[1][3] = pos[i][1];
+		bonematrix[2][3] = pos[i][2];
+
+		if (pbones[i].parent == -1)
+		{
+			memcpy (bonetransform[i], bonematrix, sizeof(bonematrix));
+			////memcpy (lighttransform[i], bonematrix, sizeof(bonematrix));
+			//V_ConcatTransforms (rotationmatrix, bonematrix, bonetransform[i]);
+		}
+		else
+		{
+			V_ConcatTransforms (bonetransform[pbones[i].parent], bonematrix, bonetransform[i]);
+			//V_ConcatTransforms (lighttransform[pbones[i].parent], bonematrix, lighttransform[i]);
+		}
+	}
+
+	vec3_t mins( FLT_MAX, FLT_MAX, FLT_MAX );
+	vec3_t maxs( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+
+	pbodypart = (mstudiobodyparts_t *)((byte *)m_studioHdr + m_studioHdr->bodypartindex);
+	for (i=0 ; i < m_studioHdr->numbodyparts ; i++, pbodypart++)
+	{
+		psubmodel = (mstudiomodel_t *)((byte *)m_studioHdr + pbodypart->modelindex);
+		for (j=0 ; j < pbodypart->nummodels ; j++, psubmodel++)
+		{
+			pvertbone = (byte *)m_studioHdr + psubmodel->vertinfoindex;
+
+			pmodeldata = (mstudiomodeldata_t *)((byte *)m_studioHdr + psubmodel->modeldataindex);
+			pstudioverts = (vec3_t *)((byte *)m_studioHdr + pmodeldata->vertindex);
+
+			for (k=0 ; k < psubmodel->numverts; k++)
+			{
+				vec3_t modelPos;
+				VectorTransform( pstudioverts[k], bonetransform[pvertbone[k]], modelPos );
+
+				V_AddPointToBounds( modelPos, mins, maxs );
+			}
+		}
+	}
+
+	if ( bboxMin )
+		*bboxMin = mins;
+	if ( bboxMax )
+		*bboxMax = maxs;
 }
 
 void StudioRender::R_RotateForEntity( qEntity_t *ent, bool doscale /* = false */ )
@@ -1220,5 +1312,5 @@ void StudioRender::R_RotateForEntity( qEntity_t *ent, bool doscale /* = false */
 		angles[PITCH] *= -1;
 	}
 
-	V_BuildTransformStudioMatrix( angles[YAW], angles[PITCH], angles[ROLL], ent->m_vecOrigin.Base(), scale, rotationmatrix );
+	V_BuildTransformStudioMatrix( angles[YAW], angles[PITCH], angles[ROLL], ent->m_vecOrigin, scale, rotationmatrix );
 }

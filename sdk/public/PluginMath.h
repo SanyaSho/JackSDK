@@ -170,7 +170,7 @@ FORCEINLINE void CrossProduct( const vec3_t &a, const vec3_t &b, vec3_t &result 
 	result.z = a.x * b.y - a.y * b.x;
 }
 
-FORCEINLINE vec_t DotProduct( const vec3_t &a, const vec3_t &b )
+FORCEINLINE float DotProduct( const vec3_t &a, const vec3_t &b )
 {
 	return ( a.x * b.x + a.y * b.y + a.z * b.z );
 }
@@ -187,6 +187,13 @@ FORCEINLINE void VectorRotate( const vec3_t &in1, const float mat[3][4], vec3_t 
 	out[0] = DotProduct( in1, mat[0] );
 	out[1] = DotProduct( in1, mat[1] );
 	out[2] = DotProduct( in1, mat[2] );
+}
+
+FORCEINLINE void VectorTransform( const vec3_t &in1, const float mat[3][4], vec3_t &out )
+{
+	out[0] = DotProduct( in1, mat[0] ) + mat[0][3];
+	out[1] = DotProduct( in1, mat[1] ) + mat[1][3];
+	out[2] = DotProduct( in1, mat[2] ) + mat[2][3];
 }
 
 #endif // !PLUGINMATH_H

@@ -60,7 +60,7 @@ public:
 	void R_GLStudioDrawPoints( qEntity_s *ent, qStudioData_s *studioData /*, alight_t *plight*/ );
 	void R_GLStudioDrawPointsWireframe( qEntity_s *ent, qStudioData_s *studioData /*, alight_t *plight*/ );
 
-	void GetModelBounds( int flags, vec3_t *bboxMin, vec3_t *bboxMax );
+	void GetModelBounds( qEntity_t *ent, int flags, vec3_t *bboxMin, vec3_t *bboxMax );
 
 	void R_RotateForEntity( qEntity_t *ent, bool doscale = false );
 

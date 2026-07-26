@@ -13,6 +13,7 @@
 #include <memory.h>
 #include <assert.h>
 #include <math.h>
+#include <algorithm>
 
 #if 0
 #include <immintrin.h>
@@ -230,7 +231,7 @@ void V_ConcatTransforms (const float in1[3][4], const float in2[3][4], float out
 V_BuildTransformStudioMatrix
 ================
 */
-void V_BuildTransformStudioMatrix( float yaw, float pitch, float roll, float *rgflOrigin, float scale, float matrix[3][4] )
+void V_BuildTransformStudioMatrix( float yaw, float pitch, float roll, const vec3_t &origin, float scale, float matrix[3][4] )
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
@@ -261,9 +262,9 @@ void V_BuildTransformStudioMatrix( float yaw, float pitch, float roll, float *rg
 	matrix[1][2] = (sp*crsy-srcy)*scale;
 	matrix[2][2] = (cr*cp)*scale;
 
-	matrix[0][3] = rgflOrigin[0];
-	matrix[1][3] = rgflOrigin[1];
-	matrix[2][3] = rgflOrigin[2];
+	matrix[0][3] = origin[0];
+	matrix[1][3] = origin[1];
+	matrix[2][3] = origin[2];
 }
 
 /*
@@ -442,4 +443,21 @@ V_Atof
 float V_Atof( const char *string )
 {
 	return (float)atof( string );
+}
+
+/*
+================
+V_AddPointToBounds
+================
+*/
+void V_AddPointToBounds( const vec3_t &point, vec3_t &mins, vec3_t &maxs )
+{
+	mins.x = std::min( mins.x, point.x );
+	maxs.x = std::max( maxs.x, point.x );
+
+	mins.y = std::min( mins.y, point.y );
+	maxs.y = std::max( maxs.y, point.y );
+
+	mins.z = std::min( mins.z, point.z );
+	maxs.z = std::max( maxs.z, point.z );
 }

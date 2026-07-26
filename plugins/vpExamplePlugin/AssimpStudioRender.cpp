@@ -167,15 +167,8 @@ void AssimpStudioRender::GetModelBounds( int flags, vec3_t *bboxMin, vec3_t *bbo
 
 		for ( int j = 0; j < mesh->mNumVertices; j++ )
 		{
-			const aiVector3D &p = mesh->mVertices[j];
-
-			mins.x = std::min( mins.x, p.x );
-			mins.y = std::min( mins.y, p.y );
-			mins.z = std::min( mins.z, p.z );
-
-			maxs.x = std::max( maxs.x, p.x );
-			maxs.y = std::max( maxs.y, p.y );
-			maxs.z = std::max( maxs.z, p.z );
+			// Doing this cast is fine because aiVector3D has the same memory layout as vec3_t
+			V_AddPointToBounds( *(vec3_t *)&mesh->mVertices[j], mins, maxs );
 		}
 	}
 
@@ -275,5 +268,5 @@ void AssimpStudioRender::R_RotateForEntity( qEntity_t *ent )
 		angles[PITCH] *= -1.f;
 	}
 
-	V_BuildTransformStudioMatrix( angles[YAW], angles[PITCH], angles[ROLL], ent->m_vecOrigin.Base(), scale, s_rotationmatrix );
+	V_BuildTransformStudioMatrix( angles[YAW], angles[PITCH], angles[ROLL], ent->m_vecOrigin, scale, s_rotationmatrix );
 }

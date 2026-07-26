@@ -38,7 +38,7 @@ extern size_t V_ExtractFilePath( const char *path, char *outBuf, size_t outBufSi
 
 extern void V_ConcatTransforms (const float in1[3][4], const float in2[3][4], float out[3][4]);
 
-extern void V_BuildTransformStudioMatrix( float yaw, float pitch, float roll, float *rgflOrigin, float scale, float matrix[3][4] );
+extern void V_BuildTransformStudioMatrix( float yaw, float pitch, float roll, const vec3_t &origin, float scale, float matrix[3][4] );
 
 extern void V_AngleQuaternion (const vec3_t angles, vec4_t &quaternion);
 
@@ -56,5 +56,7 @@ extern char *V_Strupr( char *start );
 
 extern int V_Atoi( const char *string );
 extern float V_Atof( const char *string );
+
+extern void V_AddPointToBounds( const vec3_t &point, vec3_t &mins, vec3_t &maxs );
 
 #endif // !VSTDLIB_STATIC_H
