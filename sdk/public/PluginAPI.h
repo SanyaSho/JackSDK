@@ -118,10 +118,37 @@ typedef void		(*pfnEditor_Sys_Warning)				( const char *format, ... );
 /* String must not contain an ending newline */
 typedef void		(*pfnEditor_Sys_Error)					( const char *format, ... );
 
+/*
+ Sys_Malloc (calloc( 1, size ))
+ Allocates a memory for an array.
+
+ size - Memory space size.
+*/
 typedef void *		(*pfnEditor_Sys_Malloc)					( size_t size );
+
+/*
+ Sys_Free (ptr != 0 -> free( ptr ))
+ Frees the memory space pointer to by ptr.
+
+ ptr - Memory space pointer.
+*/
 typedef void		(*pfnEditor_Sys_Free)					( void *ptr );
 
+/*
+ Sys_AllocString
+ Alloces a memory with a size of length( src ) + 1 and appends the string into it.
+
+ src - String pointer.
+*/
 typedef char *		(*pfnEditor_Sys_AllocString)			( const char *src ); // MUST BE Sys_Free'D
+
+/*
+ TempBuffer_GetSpace
+ Allocates a temporary memory.
+
+ buffer - Buffer index. (0;5]
+ size - Memory space size.
+*/
 typedef void *		(*pfnEditor_TempBuffer_GetSpace)		( int buffer, size_t size );
 
 typedef float		(*pfnEditor_Sys_FloatTime)				();
@@ -136,6 +163,12 @@ typedef float		(*pfnEditor_Sys_FloatTime)				();
 typedef int			(*pfnEditor_Sys_GetOption)				( int option );
 typedef void		(*pfnEditor_Sys_SetOption)				( int option, int value );
 
+/*
+ Steam_SetAchievement
+ Gives a Steam achivement to the current Steam user.
+
+ achIdx - Internal achievement index.
+*/
 typedef void		(*pfnEditor_Steam_SetAchievemnt)		( int achIdx );
 
 
@@ -182,11 +215,17 @@ typedef enum : unsigned int
 
 	GLS_DEPTHFUNC_EQUAL					= 0x00001000,
 
-	GLS_ATEST_GT_0						= 0x00010000,
-	GLS_ATEST_LT_80						= 0x00020000,
-	GLS_ATEST_GE_80						= 0x00030000,
-	GLS_ATEST_ALWAYS					= 0x00040000,
+	// (diff & GLS_ATEST_BITS)
+	GLS_ATEST_GT_0						= 0x00010000, // alphaFunc = GL_GREATER; alphaFuncRef = 0.0f;
+	GLS_ATEST_LT_80						= 0x00020000, // alphaFunc = GL_LESS; alphaFuncRef = 0.5f;
+	GLS_ATEST_GE_80						= 0x00030000, // alphaFunc = GL_GEQUAL; alphaFuncRef = 0.5f;
+	GLS_ATEST_ALWAYS					= 0x00040000, // alphaFunc = GL_GEQUAL; alphaFuncRef = 0.2f;
 	GLS_ATEST_BITS						= 0x00070000, // INTERNAL USAGE ONLY
+
+	// If bit in range of GLS_ATEST_BITS but is non of the already defined bits - glDisable( GL_ALPHA_TEST );
+	// Otherwise - glEnable( GL_ALPHA_TEST );
+
+	// glAlphaFunc( alphaFunc, alphaFuncRef );
 
 	GLS_CULL_NONE						= 0x00100000,
 	GLS_CULL_FRONT						= 0x00200000,
@@ -341,27 +380,184 @@ typedef struct
 #define PFL_NOERRORS				( 1 << 0 )
 
 typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
-typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *file, int size, int parseFlags );
-typedef char *		(*pfnEditor_SC_Token)					();
+typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *buf, int bufSize, int parseFlags );
+
+/*
+ SC_Token
+ Returns the recently parsed token.
+*/
+typedef const char *(*pfnEditor_SC_Token)					();
+
+/*
+ SC_Line
+ Returns the current line where the token is at.
+*/
 typedef int			(*pfnEditor_SC_Line)					();
+
+/*
+ SC_ParseError
+ Throw a parsing error and stop the parser.
+*/
 typedef void		(*pfnEditor_SC_ParseError)				( const char *format, ... );
+
+/*
+ SC_CheckError
+ Checks if any errors occured when parsing the data.
+ Returns true if yes, false if no.
+*/
 typedef bool		(*pfnEditor_SC_CheckError)				();
+
+/*
+ SC_ResetError
+ Resets the error state which allows you to continue parsing the data.
+*/
 typedef void		(*pfnEditor_SC_ResetError)				();
+
+/*
+ SC_GetToken
+ Gets the next token on the line.
+
+ crossLine - Look for the token on the next line.
+ Returns true on success, false on failure.
+*/
 typedef bool		(*pfnEditor_SC_GetToken)				( bool crossLine );
+
+/*
+ SC_SafeGetToken
+ Gets the next token on the line.
+
+ crossLine - Look for the token on the next line.
+ Returns true on success, false on failure.
+*/
 typedef bool		(*pfnEditor_SC_SafeGetToken)			( bool crossLine );
+
+/*
+ SC_UnGetToken
+ Signals that the current token was not used, and should be reported for the next SC_GetToken.
+
+ Note that calling
+ SC_GetToken( true );
+ SC_UnGetToken();
+ SC_GetToken( false );
+
+ could cross a line boundary.
+*/
 typedef void		(*pfnEditor_SC_UnGetToken)				();
+
+/*
+ SC_TokenAvailable
+ Returns true of there is another token on the line.
+*/
 typedef bool		(*pfnEditor_SC_TokenAvailable)			();
+
+/*
+ SC_MatchToken
+ Checks if the next token is "token".
+
+ token - Token to check.
+*/
 typedef void		(*pfnEditor_SC_MatchToken)				( const char *token );
+
+/*
+ SC_SafeMatchToken
+ Checks if the next token is "token".
+
+ token - Token to check.
+ crossLine - ???.
+*/
 typedef void		(*pfnEditor_SC_SafeMatchToken)			( const char *token, bool crossLine );
-typedef bool		(*pfnEditor_SC_SkipRestOfLine)			();
+
+/*
+ SC_SkipRestOfLine
+ Skips everything else of the line.
+*/
+typedef void		(*pfnEditor_SC_SkipRestOfLine)			();
+
+/*
+ SC_Parse1DMatrix
+ Parses a one-dimensional array of floats.
+ "( float[columns] )"
+
+ Example:
+ ( 1.0, 2.0, 3.0 )
+
+ columns - Number of columns to parse.
+ rgflMatrix - Output buffer. Must contain space for columns floats.
+*/
 typedef void		(*pfnEditor_SC_Parse1DMatrix)			( int columns, float *rgflMatrix );
+
+/*
+ SC_Parse2DMatrix
+ Parses a two-dimensional matrix stored as rows of columns.
+ "( ( float[columns] ) [rows] )"
+
+ Example:
+ (
+ 	( 1.0, 2.0, 3.0 )
+ 	( 4.0, 5.0, 6.0 )
+ )
+
+ rows - Number of rows to parse.
+ columns - Number of columns to parse.
+ rgflMatrix - Output buffer. Must contain space for rows * columns floats.
+
+ Data is stored row-major: matrix[row][column] == rgflMatrix[row * columns + column]
+*/
 typedef void		(*pfnEditor_SC_Parse2DMatrix)			( int rows, int columns, float *rgflMatrix );
+
+/*
+ SC_Parse3DMatrix
+ Parses a three-dimensional matrix stored as layers of rows of columns.
+ "( ( ( float[columns] ) [rows] ) [layers] )"
+
+ Example:
+ (
+ 	(
+ 		( 1.0, 2.0, 3.0 )
+ 		( 4.0, 5.0, 6.0 )
+ 	)
+ 	(
+ 		( 1.0, 2.0, 3.0 )
+ 		( 4.0, 5.0, 6.0 )
+ 	)
+ )
+
+ depth - Number of layers to parse.
+ rows - Number of rows to parse.
+ columns - Number of columns to parse.
+ rgflMatrix - Output buffer. Must contain space for layers * rows * columns floats.
+
+ Data is stored: matrix[layer][row][column] == rgflMatrix[layer * rows * columns + row * columns + column]
+*/
 typedef void		(*pfnEditor_SC_Parse3DMatrix)			( int depth, int rows, int columns, float *rgflMatrix );
+
+/*
+ SC_EndOfParsing
+ Stops parsing the current tokenlist and clears the buffer.
+*/
 typedef void		(*pfnEditor_SC_EndOfParsing)			();
+
+/*
+ SC_SetParseFlags
+ Sets the parser behavior flags.
+
+ parseFlags - Behvaior flags.
+*/
 typedef void		(*pfnEditor_SC_SetParseFlags)			( int parseFlags );
+
+/*
+ SC_GetParseFlags
+ Returns the parser behavior flags.
+*/
 typedef int			(*pfnEditor_SC_GetParseFlags)			();
 typedef int			(*pfnEditor_SC_GetBlockSize)			();
-typedef char *		(*pfnEditor_SC_CopyBlock)				(); // MUST BE Sys_Free'D
+
+/*
+ SC_CopyBlock
+ Returns the tokens left on the line.
+ Returned value must be Sys_Free when not needed anymore.
+*/
+typedef char *		(*pfnEditor_SC_CopyBlock)				();
 typedef void		(*pfnEditor_SC_SkipBlock)				();
 typedef void		(*pfnEditor_SC_SkipLineOrBlock)			();
 typedef bool		(*pfnEditor_SC_ShouldQuote)				( const char *token );
@@ -560,6 +756,10 @@ typedef struct
 */
 typedef char *		(*pfnEditor_V_VersionString)			();
 
+/*
+ Sys_GetTextureGamma
+ Returns the texture brightness set in the current gameconfig.
+*/
 typedef float		(*pfnEditor_Sys_GetTextureGamma)		();
 
 
