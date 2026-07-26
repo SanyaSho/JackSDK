@@ -412,7 +412,7 @@ static void PluginAction_ExtractTextures_Command()
 PluginAction_ExtractTextures
 ===============
 */
-static void PluginAction_ExtractTextures()
+static void PluginAction_ExtractTextures( int state )
 {
 	Dialog_Begin( "Extract Half-Life Textures" );
 	Dialog_InitInternalCommand( "E&xtract", PluginAction_ExtractTextures_Command );
@@ -431,6 +431,7 @@ pluginActionDesc_t g_actionExtractTextures = {
 #if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 	0,
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
+	0,
 	0,
 	PluginAction_ExtractTextures
 };

@@ -31,7 +31,7 @@ static void ControlsTest_InternalCommand()
 #define TEST_MSGBOX_YESNO ( 1 << 2 )
 #define TEXT_MSGBOX_CONTROLS ( 1 << 3 )
 
-void MessageBoxTest()
+void MessageBoxTest( int state )
 {
 	int mask = Dialog_CheckOptions( "Dialog_CheckOptions", "Select which tests will be executed", "MessageBox (Normal)|MessageBox (OK/Cancel)|MessageBox (Yes/No)|Controls" );
 

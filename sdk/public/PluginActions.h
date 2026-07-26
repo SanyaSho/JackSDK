@@ -70,14 +70,18 @@ typedef struct pluginActionDesc_s
 	const char *m_actionCategory;
 
 #if JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
-	int m_unknown;
+	/* Unknown. Must be set to 0 */
+	size_t m_unknown;
 #endif // JACK_API_VERSION <= API_VERSION_STEAM_PUBLIC
 
 	/* Action flags (see defines above) */
-	uint64 m_actionFlags;
+	unsigned int m_actionFlags;
+
+	/* First argument of m_dispatchFunc */
+	unsigned int m_state;
 
 	/* Function called after action interaction */
-	void (*m_dispatchFunc)();
+	void (*m_dispatchFunc)( int state );
 } pluginActionDesc_t;
 COMPILE_TIME_ASSERT( sizeof( pluginActionDesc_t ) == SIZEOF_PLUGINACTIONDESC_T );
 
