@@ -206,7 +206,8 @@ typedef enum modtype_s
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	mod_particles,
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	mod_unknown
+
+	mod_max
 } modtype_t;
 
 class CMapEntity;

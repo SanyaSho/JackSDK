@@ -815,7 +815,7 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			newEntityDef->m_vecAngles = angles;
 		}
 
-		Entity_Build( newEntityDef, m_mapVersion >= MAPVERSION_VALVE220 ? 5 : 13 );
+		Entity_Build( newEntityDef, m_mapVersion >= MAPVERSION_VALVE220 ? ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS : ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS | ENT_BLDFLG_BIT3 );
 
 		return true;
 	}
