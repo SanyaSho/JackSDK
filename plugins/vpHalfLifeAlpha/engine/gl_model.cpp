@@ -138,7 +138,7 @@ static void * Mod_LoadSpriteGroup (void * pin, mspriteframe_t **ppframe, int fra
 }
 
 
-static int s_orientationTable[5] = { SPR_FACING_UPRIGHT, SPR_VP_PARALLEL_UPRIGHT, SPR_ORIENTED, SPR_VP_PARALLEL, SPR_VP_PARALLEL_ORIENTED };
+static int s_orientationTable[5] = { FACING_UPRIGHT, VP_PARALLEL_UPRIGHT, ORIENTED, VP_PARALLEL, VP_PARALLEL_ORIENTED };
 
 /*
 =================
@@ -188,7 +188,7 @@ bool Mod_LoadSpriteModel (const char *filePath, byte *buf, qSpriteData_t *sprite
 
 	psprite = (msprite_t *)Sys_Malloc (size + palsize);
 
-	spriteData->m_spritePtr = psprite;
+	spriteData->m_dataPtr = psprite;
 
 	psprite->type = LittleLong (pin->type);
 	psprite->maxwidth = LittleLong (pin->width);

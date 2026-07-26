@@ -125,7 +125,7 @@ struct qSpriteData_s;
 // clang-format off
 
 /*
- Will be called only if qSpriteData_s has m_spritePtr
+ Will be called only if qSpriteData_s has m_dataPtr
 */
 typedef bool (*vpUnloadSprite_t)( int formatIndex, qSpriteData_s *spriteData );
 
@@ -134,11 +134,14 @@ typedef bool (*vpLoadSprite_t)( int formatIndex, const char *filePath, byte *buf
 // clang-format on
 
 /* Sprite orientation (Quake/Half-Life) */
-#define SPR_ORIENTED				0
-#define SPR_VP_PARALLEL				1
-#define SPR_VP_PARALLEL_UPRIGHT		2
-#define SPR_FACING_UPRIGHT			3
-#define SPR_VP_PARALLEL_ORIENTED	4
+typedef enum
+{
+	ORIENTED = 0,
+	VP_PARALLEL,
+	VP_PARALLEL_UPRIGHT,
+	FACING_UPRIGHT,
+	VP_PARALLEL_ORIENTED
+} spriteOrientation_e;
 
 typedef struct qSpriteData_s
 {
@@ -170,7 +173,7 @@ typedef struct qSpriteData_s
 	 Created by: vpLoadSprite
 	 Destroyed by: vpUnloadSprite
 	*/
-	void *m_spritePtr;
+	void *m_dataPtr;
 
 	/*
 	 vpUnloadSprite
@@ -203,7 +206,7 @@ typedef bool (*vpGetModelFormatFlags_t)( int formatIndex );
 typedef bool (*vpGetModelBounds_t)( int formatIndex, vec3_t *bboxMin, vec3_t *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo );
 
 /*
- Will be called only if qStudioData_s has m_studioPtr
+ Will be called only if qStudioData_s has m_dataPtr
 */
 typedef void (*vpUnloadModel_t)( int formatIndex, qStudioData_s *studioData );
 
@@ -248,7 +251,7 @@ typedef struct qStudioData_s
 	 Created by: vpLoadModel
 	 Destroyed by: vpUnloadModel
 	*/
-	void *m_studioPtr;
+	void *m_dataPtr;
 
 	/*
 	 vpRenderModel, vpGetModelBounds, vpUnloadModel
@@ -271,7 +274,7 @@ struct qParticlesData_s;
 // clang-format off
 
 /*
- Will be called only if qParticlesData_s has m_particlesPtr
+ Will be called only if qParticlesData_s has m_dataPtr
 */
 typedef bool (*vpUnloadParticles_t)( int formatIndex, qParticlesData_s *particlesData );
 
@@ -309,7 +312,7 @@ typedef struct qParticlesData_s
 	 Created by: vpLoadParticles
 	 Destroyed by: vpUnloadParticles
 	*/
-	void *m_particlesPtr;
+	void *m_dataPtr;
 
 	vpRenderParticles_t m_pfnRenderParticle;
 	vpUnloadParticles_t m_pfnUnloadParticle;
@@ -327,10 +330,13 @@ struct qArchiveData_s;
 
 // clang-format off
 
+/*
+ Will be called only if qArchiveData_s has m_dataPtr
+*/
 typedef void (*vpUnloadArchive_t)( int formatIndex, qArchiveData_s *archiveData );
 
-/* filePath must be a full path to an archive */
-typedef bool (*vpLoadArchive_t)( int formatIndex, const char *filePath, qArchiveData_s *outArchiveData );
+/* filePath must be a full path to the archive */
+typedef bool (*vpLoadArchive_t)( int formatIndex, const char *filePath, qArchiveData_s *archiveData );
 
 /* filePath accepts a full path to the file inside an archive */
 typedef bool (*vpFindArchiveFile_t)( int formatIndex, qArchiveData_s *archiveData, const char *filePath );
@@ -345,31 +351,42 @@ typedef bool (*vpListArchiveFiles_t)( int formatIndex, qArchiveData_s *archiveDa
 
 // clang-format on
 
-struct unknownArchiveStruct_t
+struct GCList_t
 {
-	char gap[16];
+	GCList_t *next;
+	struct CGameConfig *m_gameConfig;
 };
-//COMPILE_TIME_ASSERT( sizeof( unknownArchiveStruct_t ) == ??? );
+COMPILE_TIME_ASSERT( sizeof( GCList_t ) == SIZEOF_GCLIST_T );
 
 typedef struct qArchiveData_s
 {
-	int unkint1;
-	int unkint2;
+	/*
+	 Indicates that the archive is loaded. Set by the editor after successful vpLoadArchive call
+	*/
+	int m_loaded;
+
+	/*
+	 Number of CGameConfig owners of this archive
+	*/
+	int m_refCount;
 
 	/*
 	 Internal format declared by vpEnumModelFormats
 	*/
 	int m_formatIndex;
 
-	unknownArchiveStruct_t *m_unknownArchiveStruct;
+	/*
+	 List of CGameConfig instances with this archive loaded
+	*/
+	GCList_t *m_ownerList;
 
 	/*
-	 Pointer to an allocated memory (ex. pak_t)
+	 Pointer to an allocated memory (ex. pak_t struct )
 
 	 Created by: pfnLoadArchive
 	 Destroyed by: pfnUnloadArchive
 	*/
-	void *m_archiveData;
+	void *m_dataPtr;
 
 	/*
 	 vpFindArchiveFile, vpLoadArchvie, vpListArchiveFiles, vpUnloadArchive

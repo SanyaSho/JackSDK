@@ -55,7 +55,7 @@ static bool LoadSprite_PNG( const char *filePath, byte *buf, int bufSize, qSprit
 		return false;
 	}
 
-	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
+	outSpriteData->m_spriteOrientation = ORIENTED;
 
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );
@@ -103,7 +103,7 @@ static bool LoadSprite_GIF( const char *filePath, byte *buf, int bufSize, qSprit
 		return false;
 	}
 
-	outSpriteData->m_spriteOrientation = SPR_ORIENTED;
+	outSpriteData->m_spriteOrientation = ORIENTED;
 
 	/* Create the shader */
 	qShader_s *spriteShader = Shader_Create( filePath, NULL, 0 );

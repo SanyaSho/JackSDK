@@ -714,10 +714,10 @@ DLL_EXPORT void vpUnloadSprite( int formatIndex, qSpriteData_s *spriteData )
 	if ( formatIndex != 0 )
 		return;
 
-	if ( spriteData->m_spritePtr )
+	if ( spriteData->m_dataPtr )
 	{
-		Sys_Free( spriteData->m_spritePtr );
-		spriteData->m_spritePtr = NULL;
+		Sys_Free( spriteData->m_dataPtr );
+		spriteData->m_dataPtr = NULL;
 	}
 }
 
@@ -766,7 +766,7 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, vec3_t *bboxMin, vec3_t *bbox
 	if ( formatIndex != 0 )
 		return false;
 
-	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_studioPtr );
+	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		studioRender->GetModelBounds( entityInfo, flags, bboxMin, bboxMax );
@@ -786,11 +786,11 @@ DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 	if ( formatIndex != 0 )
 		return;
 
-	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_studioPtr );
+	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		delete studioRender;
-		studioData->m_studioPtr = NULL;
+		studioData->m_dataPtr = NULL;
 	}
 }
 
@@ -813,7 +813,7 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 
 	studioRender->GetModelBounds( NULL, 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
 
-	studioData->m_studioPtr = studioRender;
+	studioData->m_dataPtr = studioRender;
 	return true;
 }
 
@@ -827,7 +827,7 @@ DLL_EXPORT void vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *
 	if ( formatIndex != 0 )
 		return;
 
-	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_studioPtr );
+	StudioRender *studioRender = reinterpret_cast<StudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		studioRender->R_StudioRenderFinal( entityInfo, studioData, renderFlags );

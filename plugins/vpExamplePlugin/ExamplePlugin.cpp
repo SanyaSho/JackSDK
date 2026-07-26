@@ -923,7 +923,7 @@ DLL_EXPORT int vpEnumModelFormats( pfnRegisterIOFormat registerIOFormat, void *l
 
 DLL_EXPORT bool vpGetModelBounds( int formatIndex, vec3_t *bboxMin, vec3_t *bboxMax, unsigned int flags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		studioRender->GetModelBounds( flags, bboxMin, bboxMax );
@@ -935,11 +935,11 @@ DLL_EXPORT bool vpGetModelBounds( int formatIndex, vec3_t *bboxMin, vec3_t *bbox
 
 DLL_EXPORT void vpUnloadModel( int formatIndex, qStudioData_s *studioData )
 {
-	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		delete studioRender;
-		studioData->m_studioPtr = NULL;
+		studioData->m_dataPtr = NULL;
 	}
 }
 
@@ -954,13 +954,13 @@ DLL_EXPORT bool vpLoadModel( int formatIndex, const char *filePath, byte *buf, i
 
 	studioRender->GetModelBounds( 0, &studioData->m_bboxMin, &studioData->m_bboxMax );
 
-	studioData->m_studioPtr = studioRender;
+	studioData->m_dataPtr = studioRender;
 	return true;
 }
 
 DLL_EXPORT void vpRenderModel( int formatIndex, int renderFlags, qStudioData_s *studioData, qEntity_s *entityInfo )
 {
-	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_studioPtr );
+	AssimpStudioRender *studioRender = reinterpret_cast<AssimpStudioRender *>( studioData->m_dataPtr );
 	if ( studioRender )
 	{
 		studioRender->RenderModel( entityInfo, studioData, renderFlags );
