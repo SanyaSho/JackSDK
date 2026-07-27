@@ -266,7 +266,7 @@ typedef enum : unsigned int
  PR_PointSize
  Specifies the diameter of rasterized points.
 
- Read more: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPointSize.xhtml
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glPointSize.xml
 
  size - Diameter.
 */
@@ -276,7 +276,7 @@ typedef void		(*pfnEditor_PR_PointSize)				( float size );
  PR_LineWidth
  Specifies the width of rasterized lines.
 
- Read more: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLineWidth.xhtml
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glLineWidth.xml
 
  width - Width.
 */
@@ -297,7 +297,19 @@ typedef void		(*pfnEditor_PR_BindShader)				( qShader_s *shaderDef );
  textureDef - Texture definition.
 */
 typedef void		(*pfnEditor_PR_BindTexture)				( qTexture_s *textureDef );
+
+/*
+ PR_Begin
+ Begins the draw command sequence. Internally uses glDrawArray.
+
+ primType - Primitive type. See primType_e enum for more.
+*/
 typedef void		(*pfnEditor_PR_Begin)					( primType_e primType );
+
+/*
+ PR_End
+ Ends the draw command sequence.
+*/
 typedef void		(*pfnEditor_PR_End)						();
 
 /*
@@ -315,9 +327,45 @@ typedef void		(*pfnEditor_PR_Color4ub)				( byte r, byte g, byte b, byte a );
  cbColor - Pointer to rgba_t::data or a uchar[4] array.
 */
 typedef void		(*pfnEditor_PR_Color4ubv)				( const byte *cbColor );
-typedef void		(*pfnEditor_PR_TexCoord2f)				( float x, float y );
+
+/*
+ PR_TexCoord2f
+ Sets the current texture coordinates.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glTexCoord.xml
+
+ s, t - Texture coordinates.
+*/
+typedef void		(*pfnEditor_PR_TexCoord2f)				( float s, float t );
+
+/*
+ PR_TexCoord2fv
+ Sets the current texture coordinates.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glTexCoord.xml
+
+ rgflTexCoord - Pointer to an array of two elements, which in turn specify s and t texture coordinates.
+*/
 typedef void		(*pfnEditor_PR_TexCoord2fv)				( const float *rgflTexCoord );
+
+/*
+ PR_Normal3fv
+ Sets the current normal vector.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glNormal.xml
+
+ rgflNormal - Pointer to an array of three elements: the x, y and z coordinates of the new current normal.
+*/
 typedef void		(*pfnEditor_PR_Normal3fv)				( const float *rgflNormal );
+
+/*
+ PR_Vertex3fv
+ Specifies a vertex.
+
+ Read more: https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glVertex.xml
+
+ rgflVertex - Pointer to an array of three elements. The elemenets of a three-element array are: x, y and z.
+*/
 typedef void		(*pfnEditor_PR_Vertex3fv)				( const float *rgflVertex );
 
 /*
