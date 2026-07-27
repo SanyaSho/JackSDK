@@ -1,0 +1,97 @@
+name: Build (Freeware; Steam Public; Steam Beta)
+
+on: push
+
+jobs:
+  ##
+  ## Windows
+  ##
+  build_windows:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        api_level:
+          - name: "J.A.C.K. 1.1.3773 Freeware"
+            builddir: "freeware"
+            level: 10
+          - name: "J.A.C.K. 1.1.3773"
+            builddir: "steampublic"
+            level: 100
+          - name: "J.A.C.K. 1.2.4603"
+            builddir: "steambeta"
+            level: 121
+
+    name: (Win32) Building plugins for ${{ matrix.api_level.name }}
+
+    runs-on:
+      - windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: |
+          cmake -S . -B build_${{ matrix.api_level.builddir }} -DOVERRIDE_API_VERSION=${{ matrix.api_level.level }} -DCMAKE_INSTALL_PREFIX="out"
+
+      - name: Build and Install
+        run: |
+          cmake --build build_${{ matrix.api_level.builddir }} --config Release --parallel
+          cmake --install build_${{ matrix.api_level.builddir }} --config Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: JackSDK_win32_${{ matrix.api_level.builddir }}-${{ github.sha }}
+          path: out
+
+  ##
+  ## Linux
+  ##
+  build_linux:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        api_level:
+          - name: "J.A.C.K. 1.1.3773 Freeware"
+            builddir: "freeware"
+            level: 10
+          - name: "J.A.C.K. 1.1.3773"
+            builddir: "steampublic"
+            level: 100
+          - name: "J.A.C.K. 1.2.4603"
+            builddir: "steambeta"
+            level: 121
+
+    name: (Linux) Building plugins for ${{ matrix.api_level.name }}
+
+    runs-on:
+      - ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt install libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
+
+      - name: Configure
+        run: |
+          cmake -S . -B build_${{ matrix.api_level.builddir }} -DOVERRIDE_API_VERSION=${{ matrix.api_level.level }} -DCMAKE_INSTALL_PREFIX="out"
+
+      - name: Build and Install
+        run: |
+          cmake --build build_${{ matrix.api_level.builddir }} --config Release --parallel
+          cmake --install build_${{ matrix.api_level.builddir }} --config Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: JackSDK_linux_${{ matrix.api_level.builddir }}-${{ github.sha }}
+          path: out
+
