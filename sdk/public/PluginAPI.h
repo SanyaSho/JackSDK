@@ -66,6 +66,34 @@ EDITORFLAGS:
 1<<23 - Used by map serializer and map parser inside some of the plugins. Disables some Sys_Printf calls if set
 */
 
+/*
+GGClass Flags (FGD):
+
+1<<0  - Has "size"
+1<<1  - Has "offset"
+1<<2  - Has "color"
+1<<3  - Has "sprite"
+1<<4  - Has "studio"
+1<<5  - Has "particles"
+1<<6  - Has "instance"
+1<<7  - Has "decal"
+1<<8  - Has "angle" (flags)
+1<<9  - Has "light" (flags)
+1<<10 - Has "body"
+1<<11 - Has "skin"
+1<<12 - Has "sequence"
+1<<13 - Has "noscale" (flags)
+1<<14 - Has "bobparms"
+1<<15 - Has "eccentricfix" (flags)
+1<<16 - ???
+1<<17 - Has "item" (flags)
+1<<18 - Has "path" (flags)
+1<<19 - Has "radius" (flags)
+1<<20 - Has "alpha" (flags)
+1<<21 - Has "flare" (flags)
+1<<22 - Has "spline" (flags)
+*/
+
 // clang-format off
 
 // 1 << 0
@@ -74,8 +102,8 @@ EDITORFLAGS:
 #define EFL_HIDDEN					( 1 << 3  ) /* Object is hidden */
 #define EFL_TRANSPARENT				( 1 << 4  ) /* Entity is transparent */
 #define EFL_WORLDSPAWN				( 1 << 5  ) /* A worldspawn */
-#define EFL_INVENTORYITEM			( 1 << 6  ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 0x20000 (CMapEntity::changeClass) */
-#define EFL_PATHWAY					( 1 << 7  ) /* Entity "path_*" / "*Path*" or an fgd entity with 0x40000 (CMapEntity::changeClass) */
+#define EFL_INVENTORYITEM			( 1 << 6  ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 1<<17 (CMapEntity::changeClass) */
+#define EFL_PATHWAY					( 1 << 7  ) /* Entity "path_*" / "*Path*" or an fgd entity with 1<<18 (CMapEntity::changeClass) */
 // 1 << 8
 #define EFL_IGNORE					( 1 << 9  ) /* "Ignore" flag (Brushes and Paths only) */
 // 1 << 20
