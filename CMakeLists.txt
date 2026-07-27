@@ -18,6 +18,14 @@ set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 
 set( SRCDIR "${CMAKE_CURRENT_LIST_DIR}" )
 
+# 10 - Freeware
+# 100 - Steam Public
+# 121 - Steam Beta
+option( OVERRIDE_API_VERSION "Change defininon of JACK_API_VERSION" -1 )
+if( NOT ${OVERRIDE_API_VERSION} EQUAL -1 )
+	add_compile_definitions( JACK_API_VERSION=${OVERRIDE_API_VERSION} )
+endif()
+
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 	set( IS_32BIT 0 )
 	set( IS_64BIT 1 )
