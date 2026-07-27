@@ -113,18 +113,28 @@ FORCEINLINE void FreeEpairList( epair_t *list )
 
 typedef struct qSplineNode_s
 {
-	struct qSplineNode_s *nextNode;
-#if defined( JACK_64BIT )
-	char gap[8];
-#else
-	char gap[4];
-#endif // JACK_64BIT
-	struct qEntity_s *owner;
-	char gap2[24];
+	/* Next/Previous spline node list. First element never has ->prev set and last element never has ->next set */
+	struct qSplineNode_s *next;
+	struct qSplineNode_s *prev;
+
+	/* Owner entity of this spline node */
+	struct qEntity_s *m_ownerEntity;
+
+	char gap2_1[4];
+	int m_unknownInt;
+
+	int m_editorFlags;
+
+	vec3_t m_transformVec;
+
 	vec3_t m_vecForward;
 	vec3_t m_vecRight;
 	vec3_t m_vecUp;
-	char gap3[48];
+
+	vec3_t m_origin;
+
+	char gap4[36];
+
 	float speed;
 	float yaw_speed;
 	float fov;
