@@ -9,15 +9,24 @@
 #if !defined( SERIALIZER_MAP_H )
 #define SERIALIZER_MAP_H
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 extern bool ExportMAP( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef );
 extern bool ImportMAP( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef );
+#else
+extern bool ExportMAP( const char *filePath, struct qWorld_s *worldDef );
+extern bool ImportMAP( const char *filePath, struct qWorld_s *worldDef );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 class Serializer;
 
 class MAPSerializer : public Serializer
 {
 public:
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	MAPSerializer( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef, int fileMode );
+#else
+	MAPSerializer( const char *filePath, struct qWorld_s *worldDef, int fileMode );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	virtual ~MAPSerializer();
 
 public: // Serializer

@@ -455,7 +455,11 @@ typedef struct
 /* Parser API */
 #define PFL_NOERRORS				( 1 << 0 )
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int offset, int size, int parseFlags );
+#else
+typedef bool		(*pfnEditor_SC_ParseFromFile)			( const char *file, int parseFlags );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef bool		(*pfnEditor_SC_ParseFromMemory)			( const char *buf, int bufSize, int parseFlags );
 
 /*

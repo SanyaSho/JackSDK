@@ -32,6 +32,7 @@
 static int s_entCnt = 0;
 #endif // FINE_OUTPUT
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /*
 ===============
 ExportMAP
@@ -53,14 +54,42 @@ bool ImportMAP( const char *filePath, size_t seekOffset, size_t readLimit, struc
 	MAPSerializer mapSerializer( filePath, seekOffset, readLimit, worldDef, FMODE_PARSERAPI );
 	return mapSerializer.Import();
 }
+#else
+/*
+===============
+ExportMAP
+===============
+*/
+bool ExportMAP( const char *filePath, struct qWorld_s *worldDef )
+{
+	MAPSerializer mapSerializer( filePath, worldDef, FMODE_PARSERAPI );
+	return mapSerializer.Export();
+}
+
+/*
+===============
+ImportMAP
+===============
+*/
+bool ImportMAP( const char *filePath, struct qWorld_s *worldDef )
+{
+	MAPSerializer mapSerializer( filePath, worldDef, FMODE_PARSERAPI );
+	return mapSerializer.Import();
+}
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 /*
 ===============
 MAPSerializer
 ===============
 */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 MAPSerializer::MAPSerializer( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef, int fileMode )
 	: Serializer( filePath, seekOffset, readLimit, worldDef, fileMode )
+#else
+MAPSerializer::MAPSerializer( const char *filePath, struct qWorld_s *worldDef, int fileMode )
+	: Serializer( filePath, worldDef, fileMode )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 {
 	m_mapVersion = 0;
 	m_numInvalidSolid = 0;
@@ -113,7 +142,7 @@ bool MAPSerializer::Export()
 		return false;
 	}
 
-	m_mapVersion = MAPVERSION_VALVE220;
+	m_mapVersion = MAPVERSION;
 
 	m_cordon = FBitSet( m_worldDef->m_editorFlags, 0x200000 );
 
@@ -121,7 +150,7 @@ bool MAPSerializer::Export()
 		( fabs( m_worldDef->m_vecCordonMin.x ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.y ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.z ) < 0.001 ||
 			fabs( m_worldDef->m_vecCordonMax.x ) < 0.001 && fabs( m_worldDef->m_vecCordonMax.y ) < 0.001 && fabs( m_worldDef->m_vecCordonMax.z ) < 0.001 ) )
 	{
-		this->m_cordon = false;
+		m_cordon = false;
 	}
 
 	bool success = true;
@@ -129,17 +158,13 @@ bool MAPSerializer::Export()
 	//
 	// Serialize entities
 	//
-	qEntity_t *entityList = m_worldDef->m_entityList;
-
-	while ( entityList )
+	for ( qEntity_t *entityDef = m_worldDef->m_entityList; entityDef != NULL; entityDef = entityDef->next )
 	{
-		if ( !SerializeEntities( entityList ) )
+		if ( !SerializeEntities( entityDef ) )
 		{
 			success = false;
 			break;
 		}
-
-		entityList = entityList->next;
 	}
 
 	//
@@ -147,17 +172,13 @@ bool MAPSerializer::Export()
 	//
 	if ( success )
 	{
-		qPath_t *pathList = m_worldDef->m_pathList;
-
-		while ( pathList )
+		for ( qPath_t *pathDef = m_worldDef->m_pathList; pathDef != NULL; pathDef = pathDef->next )
 		{
-			if ( !SerializePathNodes( pathList ) )
+			if ( !SerializePathNodes( pathDef ) )
 			{
 				success = false;
 				break;
 			}
-
-			pathList = pathList->next;
 		}
 	}
 
@@ -815,7 +836,7 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			newEntityDef->m_vecAngles = angles;
 		}
 
-		Entity_Build( newEntityDef, m_mapVersion >= MAPVERSION_VALVE220 ? ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS : ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS | ENT_BLDFLG_BIT3 );
+		Entity_Build( newEntityDef, /*m_mapVersion >= MAPVERSION_VALVE220 ?*/ ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS /*: ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS | ENT_BLDFLG_BIT3*/ );
 
 		return true;
 	}

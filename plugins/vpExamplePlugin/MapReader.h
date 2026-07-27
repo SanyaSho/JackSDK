@@ -30,8 +30,10 @@ protected:
 
 private:
 	char m_filePath[MAX_PATH];
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	long m_seekOffset;
 	long m_readLimit;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	int m_invalidSolids;
 

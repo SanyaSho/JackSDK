@@ -21,7 +21,11 @@
 Serializer
 ===============
 */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 Serializer::Serializer( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef, int fileMode )
+#else
+Serializer::Serializer( const char *filePath, struct qWorld_s *worldDef, int fileMode )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 {
 	m_parser = &gEditorfuncs.parserfuncs;
 
@@ -29,9 +33,11 @@ Serializer::Serializer( const char *filePath, size_t seekOffset, size_t readLimi
 
 	m_fileHandle = NULL;
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	m_seekOffset = seekOffset;
 	m_currentOffset = 0;
 	m_readLimit = readLimit;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	m_fileMode = fileMode;
 
@@ -109,17 +115,23 @@ bool Serializer::OpenForRead()
 			return false;
 		}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		if ( m_seekOffset != 0 && fseek( m_fileHandle, m_seekOffset, SEEK_SET ) != 0 )
 		{
 			strncpy( errorStr, strerror( errno ), sizeof( errorStr ) );
 			Sys_Error( "can't read \"%s\" (%s)", m_filePath, errorStr );
 			return false;
 		}
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		break;
 	}
 	case FMODE_PARSERAPI:
 	{
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		if ( !m_parser->pfnSC_ParseFromFile( m_filePath, m_seekOffset, m_readLimit, 0 ) )
+#else
+		if ( !m_parser->pfnSC_ParseFromFile( m_filePath, 0 ) )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		{
 			strncpy( errorStr, strerror( errno ), sizeof( errorStr ) );
 			Sys_Error( "can't read \"%s\" (%s)", m_filePath, errorStr );
@@ -147,8 +159,10 @@ bool Serializer::WriteData( const void *data, size_t n )
 	if ( !m_fileHandle )
 		return false;
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( m_readLimit != 0 && ( n + m_currentOffset ) > m_readLimit )
 		return false;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	if ( fwrite( data, 1, n, m_fileHandle ) != n )
 	{
@@ -157,7 +171,9 @@ bool Serializer::WriteData( const void *data, size_t n )
 		return false;
 	}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	m_currentOffset += n;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	return true;
 }
@@ -177,8 +193,10 @@ bool Serializer::ReadData( void *data, size_t n, bool showerror /*= true*/ )
 	if ( !m_fileHandle )
 		return false;
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( m_readLimit != 0 && ( n + m_currentOffset ) > m_readLimit )
 		return false;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	if ( fread( data, 1, n, m_fileHandle ) != n )
 	{
@@ -191,7 +209,9 @@ bool Serializer::ReadData( void *data, size_t n, bool showerror /*= true*/ )
 		return false;
 	}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	m_currentOffset += n;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	return true;
 }

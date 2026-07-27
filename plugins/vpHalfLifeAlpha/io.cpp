@@ -42,7 +42,11 @@ struct formatList_t
 	int m_formatIndex;
 	const char *m_formatDesctiption;
 	const char *m_formatExtension;
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	bool (*m_pfnFunction)( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef );
+#else
+	bool (*m_pfnFunction)( const char *filePath, struct qWorld_s *worldDef );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 };
 // clang-format on
 
@@ -75,13 +79,21 @@ DLL_EXPORT int vpEnumExportFormats( pfnRegisterIOFormat registerIOFormat, void *
 vpExport
 ===============
 */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 DLL_EXPORT int vpExport( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef )
+#else
+DLL_EXPORT int vpExport( int formatIndex, const char *filePath, qWorld_s *worldDef )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 {
 	for ( int i = 0; i < ARRAYSIZE( s_exportList ); i++ )
 	{
 		if ( s_exportList[i].m_formatIndex == formatIndex )
 		{
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 			return s_exportList[i].m_pfnFunction( filePath, seekOffset, readLimit, worldDef );
+#else
+			return s_exportList[i].m_pfnFunction( filePath, worldDef );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		}
 	}
 
@@ -117,13 +129,21 @@ DLL_EXPORT int vpEnumImportFormats( pfnRegisterIOFormat registerIOFormat, void *
 vpImport
 ===============
 */
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 DLL_EXPORT int vpImport( int formatIndex, const char *filePath, size_t seekOffset, size_t readLimit, qWorld_s *worldDef )
+#else
+DLL_EXPORT int vpImport( int formatIndex, const char *filePath, qWorld_s *worldDef )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 {
 	for ( int i = 0; i < ARRAYSIZE( s_importList ); i++ )
 	{
 		if ( s_importList[i].m_formatIndex == formatIndex )
 		{
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 			return s_importList[i].m_pfnFunction( filePath, seekOffset, readLimit, worldDef );
+#else
+			return s_importList[i].m_pfnFunction( filePath, worldDef );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		}
 	}
 

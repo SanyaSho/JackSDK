@@ -62,7 +62,11 @@ inline vec3_t ReadVector3D( bool nextLine = false )
 }
 
 MapReader::MapReader( const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef )
-	: m_seekOffset( seekOffset ), m_readLimit( readLimit ), m_invalidSolids( 0 ), m_world( worldDef ), m_mapVersion( 0 )
+	: 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	m_seekOffset( seekOffset ), m_readLimit( readLimit ), 
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
+	m_invalidSolids( 0 ), m_world( worldDef ), m_mapVersion( 0 )
 {
 	strncpy( m_filePath, filePath, sizeof( m_filePath ) );
 	m_filePath[sizeof( m_filePath ) - 1] = '\0';
@@ -76,7 +80,11 @@ bool MapReader::LoadMap()
 {
 	Sys_Printf( "Loading: \"%s\"", m_filePath );
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( SC_ParseFromFile( m_filePath, m_seekOffset, m_readLimit, 0 ) )
+#else
+	if ( SC_ParseFromFile( m_filePath, 0 ) )
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	{
 		while ( SC_GetToken( true ) )
 		{

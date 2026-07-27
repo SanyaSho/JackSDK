@@ -17,7 +17,11 @@
 class Serializer
 {
 public:
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	Serializer( const char *filePath, size_t seekOffset, size_t readLimit, struct qWorld_s *worldDef, int fileMode );
+#else
+	Serializer( const char *filePath, struct qWorld_s *worldDef, int fileMode );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	virtual ~Serializer();
 
 	bool OpenForWrite();
@@ -36,9 +40,11 @@ protected:
 
 	FILE *m_fileHandle;
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	size_t m_seekOffset;
 	size_t m_currentOffset;
 	size_t m_readLimit;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	int m_fileMode;
 
