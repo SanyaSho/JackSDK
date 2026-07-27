@@ -7,6 +7,7 @@
 //=====================================================================================//
 
 #include <stdio.h>
+#include <cfloat>
 
 // Plugin API
 #include "PluginMeta.h"

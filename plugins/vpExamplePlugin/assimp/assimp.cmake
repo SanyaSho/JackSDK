@@ -137,14 +137,14 @@ function( target_use_assimp target assimpdir )
 		"${ASSIMP_DIR}/include"
 	)
 
-	target_link_directories(
-		${target} PRIVATE
-
-		"$<${IS_32BIT}:${ASSIMP_DIR}/lib/x86>"
-		"$<${IS_64BIT}:${ASSIMP_DIR}/lib/x64>"
-	)
-
 	if( WIN32 )
+		target_link_directories(
+			${target} PRIVATE
+
+			"$<${IS_32BIT}:${ASSIMP_DIR}/lib/x86>"
+			"$<${IS_64BIT}:${ASSIMP_DIR}/lib/x64>"
+		)
+
 		target_link_libraries(
 			${target} PRIVATE
 
@@ -165,11 +165,32 @@ function( target_use_assimp target assimpdir )
 			)
 		endif()
 	else()
+		target_link_directories(
+			${target} PRIVATE
+
+			"$<${IS_32BIT}:${ASSIMP_DIR}/bin/x86>"
+			"$<${IS_64BIT}:${ASSIMP_DIR}/bin/x64>"
+		)
+
 		target_link_libraries(
 			${target} PRIVATE
 
 			assimp
 		)
+
+		if ( ${IS_32BIT} )
+			install(
+				FILES "${ASSIMP_DIR}/bin/x86/libassimp.so" "${ASSIMP_DIR}/bin/x86/libassimp.so.6" "${ASSIMP_DIR}/bin/x86/libassimp.so.6.0.5"
+				DESTINATION ${CMAKE_INSTALL_PREFIX}
+				OPTIONAL
+			)
+		else()
+			install(
+				FILES "${ASSIMP_DIR}/bin/x64/libassimp.so" "${ASSIMP_DIR}/bin/x64/libassimp.so.6" "${ASSIMP_DIR}/bin/x64/libassimp.so.6.0.5"
+				DESTINATION ${CMAKE_INSTALL_PREFIX}
+				OPTIONAL
+			)
+		endif()
 	endif()
 
 endfunction()

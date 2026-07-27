@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cfloat>
 #include <math.h>
 #undef NDEBUG
 #include <assert.h>

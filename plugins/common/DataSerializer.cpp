@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <cerrno>
 
 // Plugin API
 #include "PluginAPI.h"
