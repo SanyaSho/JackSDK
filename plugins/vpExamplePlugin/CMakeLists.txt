@@ -81,6 +81,6 @@ target_compile_definitions(
 #	/fsanitize=address
 #)
 
-target_use_jackpluginsdk( exampleplugin )
+target_use_jackpluginsdk( exampleplugin "${SRCDIR}/sdk" )
 
 target_use_assimp( exampleplugin "${CMAKE_CURRENT_LIST_DIR}/assimp" )

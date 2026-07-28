@@ -95,4 +95,4 @@ target_include_directories(
 	"../common"
 )
 
-target_use_jackpluginsdk( halflifealpha )
+target_use_jackpluginsdk( halflifealpha "${SRCDIR}/sdk" )

@@ -38,4 +38,4 @@ install_library(
 	INSTALL_DEST "${CMAKE_INSTALL_PREFIX}"
 )
 
-target_use_jackpluginsdk( PluginRunner )
+target_use_jackpluginsdk( PluginRunner "${SRCDIR}/sdk" )

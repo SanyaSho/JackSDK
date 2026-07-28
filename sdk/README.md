@@ -3,7 +3,7 @@
 This folder is a part of [opensource Plugin SDK](https://github.com/SanyaSho/JackSDK) for [J.A.C.K. (prev. Jackhammer)](https://store.steampowered.com/app/496450/JACK/).
 
 ## Usage
-To use this SDK with your project you must include [JackPluginSDK.cmake](JackPluginSDK.cmake) into your project's `CMakeLists.txt` and call `target_use_jackpluginsdk( target )` after declaring the library.
+To use this SDK with your project you must include [JackPluginSDK.cmake](JackPluginSDK.cmake) into your project's `CMakeLists.txt` and call `target_use_jackpluginsdk( target "path/to/sdk/dir" )` after declaring the library.
 
 If you're not using CMake then you must add `public` and `GLEW/include` folders to your include list and also `#define PLUGINSDK`.
 

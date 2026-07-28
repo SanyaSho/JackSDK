@@ -11,9 +11,7 @@
 
 include_guard( GLOBAL )
 
-function( target_use_jackpluginsdk target )
-	set( JACK_SDK_DIR "${SRCDIR}/sdk" )
-
+function( target_use_jackpluginsdk target JACK_SDK_DIR )
 	set( JACK_SDK_HEADER_FILES )
 	BEGIN_SRC( JACK_SDK_HEADER_FILES "SDK Header Files" )
 		SRC_GRP(
