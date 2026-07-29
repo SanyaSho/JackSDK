@@ -42,14 +42,6 @@ struct qNode_s;
 
 class CMapOverlay;
 
-typedef struct qOverlayData_s
-{
-	vec3_t position;
-	vec2_t uv;
-	char gap[4];
-} qOverlayData_t;
-COMPILE_TIME_ASSERT( sizeof( qOverlayData_t ) == SIZEOF_QOVERLAYDATA_S /* Always 24 */ );
-
 typedef struct qOverlay_s
 {
 #if JACK_API_VERSION > API_VERSION_HLFX_FREEWARE
@@ -76,7 +68,7 @@ typedef struct qOverlay_s
 	vec3_t m_bboxMax;
 
 	/* This field is written as a 96 byte blob into the JMF */
-	struct qOverlayData_s m_data[4];
+	struct qVertex_s m_data[4];
 } qOverlay_t;
 COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == SIZEOF_QOVERLAY_S );
 

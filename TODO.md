@@ -48,7 +48,6 @@
 - Figure out what data is stored in qSpriteDrawData_s, qStudioDrawData_s, qParticlesDrawData_s.
 
 ### PluginWorld.h
-- qOverlayData_s is probably a qVertex_s
 - Fix/remove qDecalFragment_s completly.
 - Guess the missing fields inside qPatch_s.
 - Fillup qTrans_s, qSky_s.
