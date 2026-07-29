@@ -6,7 +6,7 @@
 
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
-if( NOT EXISTS "pybind11" )
+if( NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/pybind11" )
 	message( FATAL_ERROR "pybind11 was not found. Get it from https://github.com/pybind/pybind11/releases/tag/v3.0.4" )
 endif()
 
@@ -35,6 +35,8 @@ BEGIN_SRC( PYTHONHOST_SOURCE_FILES "Source Files" )
 			"bindings/PluginActions.pyi"
 			"bindings/PluginCamera.cpp"
 			"bindings/PluginCamera.pyi"
+			"bindings/PluginData.cpp"
+			"bindings/PluginData.pyi"
 			"bindings/PluginAPI.cpp"
 			"bindings/PluginAPI.pyi"
 			"bindings/PluginEntity.cpp"
@@ -49,6 +51,8 @@ BEGIN_SRC( PYTHONHOST_SOURCE_FILES "Source Files" )
 			"bindings/PluginNodes.pyi"
 			"bindings/PluginPaths.cpp"
 			"bindings/PluginPaths.pyi"
+			"bindings/PluginRender.cpp"
+			"bindings/PluginRender.pyi"
 			"bindings/PluginWorld.cpp"
 			"bindings/PluginWorld.pyi"
 		#}

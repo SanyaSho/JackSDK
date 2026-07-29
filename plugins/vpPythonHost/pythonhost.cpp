@@ -21,6 +21,7 @@ namespace py = pybind11;
 #include "pythonhost.h"
 
 extern void FreePythonActions();
+extern void FreePythonIOFormats();
 
 
 /*
@@ -108,6 +109,7 @@ PythonHost::~PythonHost()
 	}
 
 	FreePythonActions();
+	FreePythonIOFormats();
 
 	if ( m_stderr )
 	{
@@ -183,7 +185,7 @@ PYBIND11_EMBEDDED_MODULE( JackSDK, m )
 	AUTO_REGISTER( BaseTypes );
 	AUTO_REGISTER( PluginActions );
 	AUTO_REGISTER( PluginCamera );
-	// PluginData
+	AUTO_REGISTER( PluginData );
 	AUTO_REGISTER( PluginEntity );
 	AUTO_REGISTER( PluginFaces );
 	AUTO_REGISTER( PluginGroups );
@@ -192,7 +194,7 @@ PYBIND11_EMBEDDED_MODULE( JackSDK, m )
 	AUTO_REGISTER( PluginPaths );
 	// PluginPrimitives
 	// PluginProfile
-	// PluginRender
+	AUTO_REGISTER( PluginRender );
 	AUTO_REGISTER( PluginWorld );
 
 	// Must be last registered item
