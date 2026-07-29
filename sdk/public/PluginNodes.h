@@ -63,8 +63,11 @@ typedef struct qNode_s
 	/* Editor flags. See head of PluginAPI.h for more info */
 	int m_editorFlags;
 
+	// https://hlfx.ru/forum/showthread.php?s=d5a017b968f95da13e9d8298dfb583fd&threadid=4448&postid=224738#post224738
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	/* Index of the node on a path */
 	int m_nodeIndex;
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 	/* Internal node ID */
 	int m_editorId;
