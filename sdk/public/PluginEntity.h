@@ -58,6 +58,7 @@ typedef struct epair_s
 } epair_t;
 COMPILE_TIME_ASSERT( sizeof( epair_t ) == SIZEOF_EPAIR_S );
 
+#if !defined( ENTITYAPI_NO_INLINEFUNCS )
 FORCEINLINE epair_t *AllocEpair( const char *key, const char *value )
 {
 	epair_t *pair = (epair_t *)Sys_Malloc( sizeof( epair_t ) );
@@ -109,6 +110,7 @@ FORCEINLINE void FreeEpairList( epair_t *list )
 		Sys_Free( pair );
 	}
 }
+#endif // !ENTITYAPI_NO_INLINEFUNCS
 
 
 typedef struct qSplineNode_s
