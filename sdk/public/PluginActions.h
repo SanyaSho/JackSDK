@@ -78,10 +78,10 @@ typedef struct pluginActionDesc_s
 	unsigned int m_actionFlags;
 
 	/* First argument of m_dispatchFunc */
-	unsigned int m_state;
+	unsigned int m_actionUserData;
 
 	/* Function called after action interaction */
-	void (*m_dispatchFunc)( int state );
+	void (*m_dispatchFunc)( int actionUserData );
 } pluginActionDesc_t;
 COMPILE_TIME_ASSERT( sizeof( pluginActionDesc_t ) == SIZEOF_PLUGINACTIONDESC_T );
 
