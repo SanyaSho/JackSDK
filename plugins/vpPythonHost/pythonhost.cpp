@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <locale.h>
-#include <filesystem>
 
 // Plugin API
 #include "PluginMeta.h"
@@ -17,6 +16,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
 namespace py = pybind11;
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 #include "pythonhost.h"
 
@@ -151,16 +153,20 @@ void PythonHost::Initialize()
 LoadScripts
 ===============
 */
-void PythonHost::LoadScripts( const char *path )
+void PythonHost::LoadScripts()
 {
 	py::gil_scoped_acquire gil;
+
+	auto &searchPath = fs::current_path() / "plugins" / "pythonscripts";
+
+	Sys_Printf( "Python: Loading Python modules from \"%s\"", searchPath.c_str() );
 
 	py::module::import( "PythonHost" );
 
 	try
 	{
 		py::module sys = py::module::import( "sys" );
-		sys.attr( "path" ).attr( "append" )( path );
+		sys.attr( "path" ).attr( "append" )( searchPath.generic_string() );
 
 		sys.attr( "stdout" ) = m_stdout;
 		sys.attr( "stderr" ) = m_stderr;
@@ -170,13 +176,29 @@ void PythonHost::LoadScripts( const char *path )
 		Sys_Error( "%s", e.what() );
 	}
 
-	try
+	for ( auto &entry : fs::recursive_directory_iterator( searchPath ) )
 	{
-		py::module::import( "actions" );
-	}
-	catch ( std::exception &e )
-	{
-		Sys_Error( "%s", e.what() );
+		if ( !entry.is_regular_file() )
+			continue;
+
+		if ( entry.path().extension() != ".py" )
+			continue;
+
+		fs::path relativePath = fs::relative( entry.path(), searchPath ).replace_extension( "" );
+
+		std::string moduleName = relativePath.generic_string();
+		std::replace( moduleName.begin(), moduleName.end(), '/', '.' );
+
+		Sys_Printf( "Python: Loading module \"%s\"", moduleName.c_str() );
+
+		try
+		{
+			py::module::import( moduleName.c_str() );
+		}
+		catch ( std::exception &e )
+		{
+			Sys_Error( "%s", e.what() );
+		}
 	}
 }
 

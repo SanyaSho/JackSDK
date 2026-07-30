@@ -27,7 +27,7 @@ public:
 	virtual ~PythonHost();
 
 	virtual void Initialize();
-	virtual void LoadScripts( const char *path );
+	virtual void LoadScripts();
 
 private:
 	IPythonOutput *m_stdout;

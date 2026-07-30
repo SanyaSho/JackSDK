@@ -38,7 +38,7 @@ DLL_EXPORT int vpMain( plugin_funcs_t *editorFuncs, int editorPluginVersion )
 	setlocale( LC_ALL, "C" );
 
 	gPythonHost.Initialize();
-	gPythonHost.LoadScripts( "E:\\SteamLibrary\\steamapps\\common\\JACK\\plugins\\pythonscripts" );
+	gPythonHost.LoadScripts();
 
 	return 0;
 }
