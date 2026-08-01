@@ -789,9 +789,9 @@ typedef struct
 
 /* Math API */
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-typedef char *		(*pfnEditor_Sys_PrintValue)				( float value );
-typedef char *		(*pfnEditor_Sys_PrintMapCoord)			( float coord );
-typedef char *		(*pfnEditor_Sys_PrintAxis)				( float axis );
+typedef const char *(*pfnEditor_Sys_PrintValue)				( float value );
+typedef const char *(*pfnEditor_Sys_PrintMapCoord)			( float coord );
+typedef const char *(*pfnEditor_Sys_PrintAxis)				( float axis );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef void		(*pfnEditor_Sys_SnapVertex)				( float *rgflVertex );
 typedef void		(*pfnEditor_Sys_SnapAxis)				( int num, float *rgflAxis );
