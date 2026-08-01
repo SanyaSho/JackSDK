@@ -407,7 +407,7 @@ typedef int (*vpEnumGenericFunction_t)( pfnRegisterIOFormat registerIOFormat, vo
 
 
 // Prototype for the function that is used to register surface/content flags internally
-typedef void (*pfnRegisterFlags)( const char *pluginName, const char *surfaceFlagName, unsigned int bitIndex, void *libraryHandle );
+typedef void (*pfnRegisterFlags)( const char *pluginName, const char *flagName, unsigned int bitIndex, void *libraryHandle );
 
 typedef int (*vpEnumGenericFlags_t)( pfnRegisterFlags registerFlags, void *libraryHandle );
 

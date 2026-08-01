@@ -714,7 +714,7 @@ typedef struct
  n - Size of the buffer in bytes.
  Returns true on success, false on failure.
 */
-typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *outBuf, size_t outBufSize );
 
 /*
  Sys_GetModDirectory
@@ -726,7 +726,7 @@ typedef bool		(*pfnEditor_Sys_GetBaseDirectory)		( char *dest, size_t n );
  n - Size of the buffer in bytes.
  Returns true on success, false on failure.
 */
-typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *outBuf, size_t outBufSize );
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 /*
@@ -738,11 +738,11 @@ typedef bool		(*pfnEditor_Sys_GetModDirectory)		( char *dest, size_t n );
  n - Size of the buffer in bytes.
  Returns true on success, false on failure.
 */
-typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *dest, size_t n );
+typedef bool		(*pfnEditor_Sys_GetFallbackDirectory)	( char *outBuf, size_t outBufSize );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
-typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *dest, size_t n );
-typedef char *		(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
+typedef void		(*pfnEditor_Sys_ExpandFileName)			( const char *src, char *outBuf, size_t outBufSize );
+typedef const char *(*pfnEditor_Sys_MakeLocalFileName)		( const char *filePath );
 
 /*
  Sys_FileExists
