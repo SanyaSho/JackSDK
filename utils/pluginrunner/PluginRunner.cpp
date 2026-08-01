@@ -269,10 +269,10 @@ static float Sys_GetTextureGamma()
 	return 1.f;
 }
 
-static char *Sys_MakeLocalFileName( const char *file )
+static const char *Sys_MakeLocalFileName( const char *file )
 {
 	Sys_Printf( "%s( %s )", __FUNCTION__, file );
-	return (char *)file;
+	return file;
 }
 
 static byte *Sys_LoadFile( const char *filePath, int *numBytesRead )
