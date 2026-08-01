@@ -37,7 +37,7 @@ struct textureList_t
 	textureList_t *next;
 };
 
-textureList_t *g_textureList;
+textureList_t *g_textureList = NULL;
 
 
 /*
@@ -320,6 +320,8 @@ static void PluginAction_ExtractTextures_Command()
 	char wadOut[MAX_PATH] = { 0 };
 	Dialog_QueryArgument( "wad", wadOut, sizeof( wadOut ) );
 
+	s_numbOfFiles = 0;
+
 	//
 	// Count the files
 	//
@@ -389,19 +391,22 @@ static void PluginAction_ExtractTextures_Command()
 	// Cleanup
 	//
 
-	s_numbOfTextures = 0;
-
 	if ( g_textureList != NULL )
 	{
-		for ( textureList_t *tex = g_textureList; tex != NULL; tex = tex->next )
+		for ( textureList_t *tex = g_textureList; tex != NULL; )
 		{
+			textureList_t *next = tex->next;
+
 			Sys_Free( tex->paldata );
 			Sys_Free( tex->imgdata );
 			Sys_Free( tex );
+
+			tex = next;
 		}
 	}
-
 	g_textureList = NULL;
+
+	s_numbOfTextures = 0;
 
 	float endTime = Sys_FloatTime();
 	Dialog_Printf( "%.2f seconds elapsed", (endTime - startTime) );
