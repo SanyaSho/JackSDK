@@ -351,10 +351,12 @@ typedef bool (*vpListArchiveFiles_t)( int formatIndex, qArchiveData_s *archiveDa
 
 // clang-format on
 
+struct CGameConfig;
+
 struct GCList_t
 {
 	GCList_t *next;
-	struct CGameConfig *m_gameConfig;
+	CGameConfig *m_gameConfig;
 };
 COMPILE_TIME_ASSERT( sizeof( GCList_t ) == SIZEOF_GCLIST_T );
 
