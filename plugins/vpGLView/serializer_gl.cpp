@@ -124,6 +124,18 @@ Import
 */
 bool GLSerializer::Import()
 {
+	int optionsMask = 0;
+
+	if ( !FBitSet( m_worldDef->m_editorFlags, ( 1 << 23 ) ) )
+	{
+		optionsMask = Dialog_CheckOptions( "GL Import", "These options can be useful.", "Reverse vertex order|" );
+
+		if ( optionsMask == -1 )
+		{
+			return false;
+		}
+	}
+
 	if ( !FBitSet( m_worldDef->m_editorFlags, ( 1 << 23 ) ) )
 	{
 		Sys_Printf( "Loading: \"%s\"", m_filePath );
@@ -144,7 +156,7 @@ bool GLSerializer::Import()
 	{
 		m_parser->pfnSC_UnGetToken();
 
-		SerializeGLViewFile( worldSpawn );
+		SerializeGLViewFile( worldSpawn, FBitSet( optionsMask, 1<<0 ) );
 	}
 
 	m_parser->pfnSC_EndOfParsing();
@@ -159,7 +171,7 @@ bool GLSerializer::Import()
 SerializeGLViewFile
 ===============
 */
-void GLSerializer::SerializeGLViewFile( qEntity_s *worldSpawn )
+void GLSerializer::SerializeGLViewFile( qEntity_s *worldSpawn, bool invert )
 {
 	m_parser->pfnSC_GetToken( true );
 	int numVerts = V_Atoi( m_parser->pfnSC_Token() );
@@ -299,7 +311,7 @@ void GLSerializer::SerializeGLViewFile( qEntity_s *worldSpawn )
 	{
 		for ( int i = 0; i < numVerts; ++i )
 		{
-			overlayDef->m_data[i].coords = pointList[i];
+			overlayDef->m_data[i].coords = pointList[invert ? (numVerts - 1 - i) : i];
 		}
 
 		// Try to fixup the wrong geometry

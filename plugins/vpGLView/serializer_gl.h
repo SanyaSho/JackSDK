@@ -36,7 +36,7 @@ public: // Serializer
 	virtual bool Import();
 
 protected:
-	void SerializeGLViewFile( qEntity_s *worldSpawn );
+	void SerializeGLViewFile( qEntity_s *worldSpawn, bool invert );
 
 protected:
 };
