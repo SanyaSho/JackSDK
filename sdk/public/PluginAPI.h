@@ -1185,7 +1185,7 @@ typedef enum
 } PatchCapLocation_e;
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
-typedef qPatch_s *	(*pfnEditor_Patch_Create)				( qWorld_s *worldDef, const qTexDef_s *texDef, int numColumns, int numRows );
+typedef qPatch_s *	(*pfnEditor_Patch_Create)				( qBrush_s *brushDef, const qTexDef_s *texDef, int numColumns, int numRows );
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 typedef qPatch_s *	(*pfnEditor_Patch_CreateCap)			( qBrush_s *brushDef, const qPatch_s *patchDef, PatchCapType_e capType, PatchCapLocation_e capLocation, int );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
@@ -1234,10 +1234,10 @@ typedef struct
  Overlay_Create
  Creates an empty overlay definition.
 
- worldDef - World definition (can be obtained from Global_GetCurrentWorld).
+ brushDef - Brush definition.
  texDef - Texture information used by this overlay. Applied to each face of the overlay.
 */
-typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qWorld_s *worldDef, const qTexDef_s &texDef );
+typedef qOverlay_s *(*pfnEditor_Overlay_Create)				( qBrush_s *brushDef, const qTexDef_s *texDef );
 
 /*
  Overlay_Destroy
