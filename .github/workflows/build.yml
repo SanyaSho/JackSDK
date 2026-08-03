@@ -38,8 +38,8 @@ jobs:
 
       - name: Build and Install
         run: |
-          cmake --build build_${{ matrix.api_level.builddir }} --config Release --parallel
-          cmake --install build_${{ matrix.api_level.builddir }} --config Release
+          cmake --build build_${{ matrix.api_level.builddir }} --config RelWithDebInfo --parallel
+          cmake --install build_${{ matrix.api_level.builddir }} --config RelWithDebInfo
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
@@ -86,8 +86,8 @@ jobs:
 
       - name: Build and Install
         run: |
-          cmake --build build_${{ matrix.api_level.builddir }} --config Release --parallel
-          cmake --install build_${{ matrix.api_level.builddir }} --config Release
+          cmake --build build_${{ matrix.api_level.builddir }} --config RelWithDebInfo --parallel
+          cmake --install build_${{ matrix.api_level.builddir }} --config RelWithDebInfo
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
