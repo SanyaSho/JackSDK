@@ -43,5 +43,6 @@ include( "cmake/srcgrp.cmake" )
 include( "cmake/simpleinstall.cmake" )
 
 add_subdirectory( "plugins/vpExamplePlugin" )
+add_subdirectory( "plugins/vpGLView" )
 add_subdirectory( "plugins/vpHalfLifeAlpha" )
 add_subdirectory( "utils/pluginrunner" )
