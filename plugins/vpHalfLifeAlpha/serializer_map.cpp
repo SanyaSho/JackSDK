@@ -807,7 +807,7 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			}
 			else
 			{
-				epairList = AddEpairToList( epairList, key, value );
+				AddEpairToList( epairList, key, value );
 			}
 		}
 
