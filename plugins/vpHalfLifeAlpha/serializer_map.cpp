@@ -255,8 +255,8 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 
 	if ( m_writeMode )
 	{
-		p0 = faceDef->m_vertices[0].coords;
-		p1 = faceDef->m_vertices[1].coords;
+		p0 = faceDef->m_vertices[1].coords;
+		p1 = faceDef->m_vertices[0].coords;
 		p2 = faceDef->m_vertices[2].coords;
 
 		Sys_SnapVertex( p0.Base() );
@@ -382,7 +382,7 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 				texDef.m_yShift = V_Atof( m_parser->pfnSC_Token() );
 
 				m_parser->pfnSC_GetToken( false );
-				texDef.m_rotate = V_Atof( m_parser->pfnSC_Token() );
+				texDef.m_rotate = -V_Atof( m_parser->pfnSC_Token() );
 
 				m_parser->pfnSC_GetToken( false );
 				texDef.m_scale.x = V_Atof( m_parser->pfnSC_Token() );
@@ -483,9 +483,8 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 		if ( faceDef )
 		{
 			faceDef->m_plane = plane;
+			return true;
 		}
-
-		return true;
 	}
 
 	return false;
@@ -836,7 +835,7 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			newEntityDef->m_vecAngles = angles;
 		}
 
-		Entity_Build( newEntityDef, /*m_mapVersion >= MAPVERSION_VALVE220 ?*/ ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS /*: ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS | ENT_BLDFLG_BIT3*/ );
+		Entity_Build( newEntityDef, m_mapVersion >= MAPVERSION_VALVE220 ? ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS : ENT_BLDFLG_FULLBUILD | ENT_BLDFLG_BRUSH_FACESNADOVERLAYS | ENT_BLDFLG_BIT3 );
 
 		return true;
 	}
