@@ -36,7 +36,7 @@ struct qWorld_s;
 #define ENT_BLDFLG_FULLBUILD				( 1 << 0  ) // Will append bits [4, 5, 6, 7, 9, 11, 12] to the flags
 #define ENT_BLDFLG_BIT1						( 1 << 1  )
 #define ENT_BLDFLG_BRUSH_FACESNADOVERLAYS	( 1 << 2  ) // Will build Faces and Overlays for brush inside an entity
-#define ENT_BLDFLG_BIT3						( 1 << 3  )
+#define ENT_BLDFLG_BIT3						( 1 << 3  ) // Textures with TEXALIGN_QUAKE will be rendered correctly
 #define ENT_BLDFLG_BIT4						( 1 << 4  ) // 0x10
 #define ENT_BLDFLG_PARSE_RENDERMODE			( 1 << 5  )
 #define ENT_BLDFLG_PARSE_ENTITYSTATE		( 1 << 6  )
