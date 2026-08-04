@@ -45,4 +45,6 @@ include( "cmake/simpleinstall.cmake" )
 add_subdirectory( "plugins/vpExamplePlugin" )
 add_subdirectory( "plugins/vpGLView" )
 add_subdirectory( "plugins/vpHalfLifeAlpha" )
+add_subdirectory( "plugins/vpPythonHost" )
+
 add_subdirectory( "utils/pluginrunner" )
