@@ -620,7 +620,7 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 			{
 				fprintf( m_fileHandle, EXTRA_TAB "\"mapversion\" \"%i\"\n", m_mapVersion );
 				fprintf( m_fileHandle, EXTRA_TAB "\"wad\" \"%s\"\n", m_packageList );
-				fprintf( m_fileHandle, EXTRA_TAB "\"generator\" \"%s (%s)\"\n", V_VersionString(), "vpHalfLifeAlpha" );
+				fprintf( m_fileHandle, EXTRA_TAB "\"_generator\" \"%s (%s)\"\n", V_VersionString(), "vpHalfLifeAlpha" );
 				SerializeCordon();
 			}
 
