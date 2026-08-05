@@ -87,6 +87,9 @@ struct rgba_t
 {
 	byte r, g, b, a;
 
+	rgba_t() { r = g = b = a = 0; }
+	rgba_t( byte r, byte g, byte b, byte a ) { this->r = r; this->g = g; this->b = b; this->a = a; }
+
 	// clang-format off
 	FORCEINLINE byte *data() { return (byte *)this; }
 	FORCEINLINE const byte *data() const { return (const byte *)this; }
