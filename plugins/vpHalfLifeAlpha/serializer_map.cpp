@@ -251,7 +251,7 @@ SerializeBrushFaces
 bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_s *brushDef )
 {
 	vec3_t p0, p1, p2;
-	vec3_t uAxis, vAxis;
+	vec4_t uAxis, vAxis;
 
 	if ( m_writeMode )
 	{
@@ -281,13 +281,11 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 			faceDef->m_texDef.m_textureName,
 
 			// [
-			Sys_PrintAxisVector3D( uAxis ),
-			Sys_PrintAxis( faceDef->m_texDef.m_xShift ),
+			Sys_PrintAxisVector4D( uAxis ),
 			// ]
 
 			// [
-			Sys_PrintAxisVector3D( vAxis ),
-			Sys_PrintAxis( faceDef->m_texDef.m_yShift ),
+			Sys_PrintAxisVector4D( vAxis ),
 			// ]
 
 			Sys_PrintValue( faceDef->m_texDef.m_rotate ),
@@ -316,8 +314,8 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 		fprintf( m_fileHandle, " %s %s %s %s %s %s\n",
 			faceDef->m_texDef.m_textureName,
 
-			Sys_PrintAxis( faceDef->m_texDef.m_xShift ),
-			Sys_PrintAxis( faceDef->m_texDef.m_yShift ),
+			Sys_PrintAxis( faceDef->m_texDef.m_UAxis.w ),
+			Sys_PrintAxis( faceDef->m_texDef.m_VAxis.w ),
 
 			Sys_PrintAxis( faceDef->m_texDef.m_rotate ),
 			Sys_PrintValueVector2D( faceDef->m_texDef.m_scale )
@@ -326,8 +324,8 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 		fprintf( m_fileHandle, " %s %g %g %g %g %g\n",
 			faceDef->m_texDef.m_textureName,
 
-			faceDef->m_texDef.m_xShift,
-			faceDef->m_texDef.m_yShift,
+			faceDef->m_texDef.m_UAxis.w,
+			faceDef->m_texDef.m_VAxis.w,
 
 			faceDef->m_texDef.m_rotate,
 			Sys_PrintVector2D( faceDef->m_texDef.m_scale )
@@ -355,6 +353,7 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 
 		m_parser->pfnSC_GetToken( false );
 		strncpy( texDef.m_textureName, m_parser->pfnSC_Token(), sizeof( texDef.m_textureName ) );
+		texDef.m_textureName[sizeof( texDef.m_textureName ) - 1] = '\0';
 
 		m_parser->pfnSC_SetParseFlags( m_parser->pfnSC_GetParseFlags() & ~PFL_NOERRORS );
 
@@ -376,10 +375,10 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 			}
 			else
 			{
-				texDef.m_xShift = V_Atof( m_parser->pfnSC_Token() );
+				texDef.m_UAxis.w = V_Atof( m_parser->pfnSC_Token() );
 
 				m_parser->pfnSC_GetToken( false );
-				texDef.m_yShift = V_Atof( m_parser->pfnSC_Token() );
+				texDef.m_VAxis.w = V_Atof( m_parser->pfnSC_Token() );
 
 				m_parser->pfnSC_GetToken( false );
 				texDef.m_rotate = -V_Atof( m_parser->pfnSC_Token() );
@@ -409,7 +408,7 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 			m_parser->pfnSC_GetToken( false );
 			texDef.m_UAxis.z = V_Atof( m_parser->pfnSC_Token() );
 			m_parser->pfnSC_GetToken( false );
-			texDef.m_xShift = V_Atof( m_parser->pfnSC_Token() );
+			texDef.m_UAxis.w = V_Atof( m_parser->pfnSC_Token() );
 			// ]
 
 			m_parser->pfnSC_MatchToken( "]" );
@@ -432,7 +431,7 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 			m_parser->pfnSC_GetToken( false );
 			texDef.m_VAxis.z = V_Atof( m_parser->pfnSC_Token() );
 			m_parser->pfnSC_GetToken( false );
-			texDef.m_yShift = V_Atof( m_parser->pfnSC_Token() );
+			texDef.m_VAxis.w = V_Atof( m_parser->pfnSC_Token() );
 			// ]
 
 			m_parser->pfnSC_MatchToken( "]" );

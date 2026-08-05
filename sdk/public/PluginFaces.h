@@ -76,11 +76,11 @@ FORCEINLINE void PlaneFromPoints( const vec3_t &p0, const vec3_t &p1, const vec3
 /* This struct is written as a 128 byte blob to the JMF */
 typedef struct qTexDef_s
 {
-	vec3_t m_UAxis;
-	float m_xShift;
+	// w is xShift
+	vec4_t m_UAxis;
 
-	vec3_t m_VAxis;
-	float m_yShift;
+	// w is yShift
+	vec4_t m_VAxis;
 
 	vec2_t m_scale;
 

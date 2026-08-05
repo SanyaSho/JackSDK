@@ -61,6 +61,22 @@ inline vec3_t ReadVector3D( bool nextLine = false )
 	return vec;
 }
 
+inline vec4_t ReadVector4D( bool nextLine = false )
+{
+	vec4_t vec;
+
+	SC_GetToken( nextLine );
+	vec.x = atof( SC_Token() );
+	SC_GetToken( nextLine );
+	vec.y = atof( SC_Token() );
+	SC_GetToken( nextLine );
+	vec.z = atof( SC_Token() );
+	SC_GetToken( nextLine );
+	vec.w = atof( SC_Token() );
+
+	return vec;
+}
+
 MapReader::MapReader( const char *filePath, long seekOffset, long readLimit, qWorld_s *worldDef )
 	: 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
@@ -414,8 +430,8 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 		{
 			SC_UnGetToken();
 
-			texDef.m_xShift = ReadFloat();
-			texDef.m_yShift = ReadFloat();
+			texDef.m_UAxis.w = ReadFloat();
+			texDef.m_VAxis.w = ReadFloat();
 
 			texDef.m_rotate = -ReadFloat();
 
@@ -440,8 +456,7 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 			SC_UnGetToken();
 		}
 
-		texDef.m_UAxis = ReadVector3D();
-		texDef.m_xShift = ReadFloat();
+		texDef.m_UAxis = ReadVector4D();
 
 		SC_MatchToken( "]" );
 		if ( SC_CheckError() )
@@ -451,8 +466,7 @@ bool MapReader::ParseFaces( qBrush_s *brushOwner )
 		if ( SC_CheckError() )
 			return false;
 
-		texDef.m_VAxis = ReadVector3D();
-		texDef.m_yShift = ReadFloat();
+		texDef.m_VAxis = ReadVector4D();
 
 		SC_MatchToken( "]" );
 		if ( SC_CheckError() )
