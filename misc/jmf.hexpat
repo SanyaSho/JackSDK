@@ -118,15 +118,15 @@ struct JMFKeyValue
 struct JMFBackgroundImage
 {
     JMFString filePath;
-    double imageScale;
-    s32 imageBrightness;
-    s32 imageFiltering;
-    s32 invertImageColors;
+    double scale;
+    s32 alpha;
+    s32 filter;
+    s32 flags;
 
-    s32 imageXOffset;
-    s32 imageYOffset;
+    s32 xOffset;
+    s32 yOffset;
 
-    char gap[4];
+    s32 __pad;
 };
 
 //
@@ -410,7 +410,11 @@ struct JMFHeader
     if ( gVersion >= 114 )
     {
         s32 hasExportPath;
-        JMFString exportPath;
+
+        if ( hasExportPath != 0 )
+        {
+            JMFString exportPath;
+        }
     }
 
     // Background images
