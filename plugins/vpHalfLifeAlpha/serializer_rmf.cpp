@@ -83,16 +83,6 @@ RMFSerializer::RMFSerializer( const char *filePath, struct qWorld_s *worldDef )
 */
 RMFSerializer::~RMFSerializer()
 {
-	if ( m_fileHandle )
-	{
-		if ( m_writeMode )
-		{
-			fflush( m_fileHandle );
-		}
-
-		fclose( m_fileHandle );
-		m_fileHandle = NULL;
-	}
 }
 
 /*

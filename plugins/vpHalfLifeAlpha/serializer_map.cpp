@@ -107,17 +107,6 @@ MAPSerializer ::~MAPSerializer()
 #if defined( FINE_OUTPUT )
 	s_entCnt = 0;
 #endif // FINE_OUTPUT
-
-	if ( m_fileHandle )
-	{
-		if ( m_writeMode )
-		{
-			fflush( m_fileHandle );
-		}
-
-		fclose( m_fileHandle );
-		m_fileHandle = NULL;
-	}
 }
 
 /*
@@ -144,7 +133,7 @@ bool MAPSerializer::Export()
 
 	m_mapVersion = MAPVERSION;
 
-	m_cordon = FBitSet( m_worldDef->m_editorFlags, 0x200000 );
+	m_cordon = FBitSet( m_worldDef->m_editorFlags, EFL_CORDON );
 
 	if ( m_cordon &&
 		( fabs( m_worldDef->m_vecCordonMin.x ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.y ) < 0.001 && fabs( m_worldDef->m_vecCordonMin.z ) < 0.001 ||
