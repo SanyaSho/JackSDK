@@ -78,7 +78,7 @@ bool Serializer::OpenForWrite()
 
 	m_writeMode = true;
 
-	assert( m_fileMode == FMODE_PARSERAPI );
+	assert( m_fileMode != FMODE_PARSERAPI );
 
 	m_fileHandle = fopen( Sys_MakeLocalFileName( m_filePath ), m_fileMode == FMODE_STDIO_BINARY ? "wb" : "w" );
 	if ( !m_fileHandle )
