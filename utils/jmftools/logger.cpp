@@ -37,9 +37,9 @@ void Sys_Printf( const char *format, ... )
 #if defined( WIN32 )
 	OutputDebugString( buf );
 	OutputDebugString( "\n" );
-#else
-	printf( "%s\n", buf );
 #endif // WIN32
+
+	printf( "%s\n", buf );
 }
 
 /*
@@ -64,9 +64,9 @@ void Sys_DPrintf( const char *format, ... )
 #if defined( WIN32 )
 	OutputDebugString( buf );
 	OutputDebugString( "\n" );
-#else
-	printf( "%s\n", buf );
 #endif // WIN32
+
+	printf( "%s\n", buf );
 }
 
 /*
@@ -92,9 +92,9 @@ void Sys_Warning( const char *format, ... )
 	OutputDebugString( "WARNING: " );
 	OutputDebugString( buf );
 	OutputDebugString( "\n" );
-#else
-	printf( "WARNING: %s\n", buf );
 #endif // WIN32
+
+	printf( "WARNING: %s\n", buf );
 }
 
 /*
@@ -120,7 +120,7 @@ void Sys_Error( const char *format, ... )
 	OutputDebugString( "ERROR: " );
 	OutputDebugString( buf );
 	OutputDebugString( "\n" );
-#else
-	printf( "ERROR: %s\n", buf );
 #endif // WIN32
+
+	printf( "ERROR: %s\n", buf );
 }
