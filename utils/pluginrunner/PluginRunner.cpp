@@ -259,7 +259,7 @@ static float Sys_FloatTime()
 	return 1.f;
 }
 
-static char *V_VersionString()
+static const char *V_VersionString()
 {
 	return "PluginRunner";//"J.A.C.K. 1.2.4603";
 }

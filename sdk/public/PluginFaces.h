@@ -39,7 +39,7 @@ typedef struct qPlane_s
 	float dist; // DotProduct of normal
 	int alignedAxis;
 } qPlane_t;
-COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == SIZEOF_QPLANE_S /* Always 20 */ );
+COMPILE_TIME_ASSERT( sizeof( qPlane_t ) == SIZEOF_QPLANE_S /* Always 20, serialized */ );
 
 FORCEINLINE void PlaneFromPoints( const vec3_t &p0, const vec3_t &p1, const vec3_t &p2, struct qPlane_s &planeOut )
 {

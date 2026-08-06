@@ -75,10 +75,11 @@ COMPILE_TIME_ASSERT( sizeof( qOverlay_t ) == SIZEOF_QOVERLAY_S );
 
 typedef struct qDecalFragment_s
 {
+	char gap[8];
 	struct qDecalFragment_s *next;
-	struct qDecalFragment_s *prev; // is this ->next?
-	struct qDecal_s *m_decalList;
-	struct qBrush_s *m_brushOwner;
+	struct qEntity_s *m_decal;
+	struct qBrush_s *m_brush;
+	char gap2[2664];
 } qDecalFragment_t;
 COMPILE_TIME_ASSERT( sizeof( qDecalFragment_t ) == SIZEOF_QDECALFRAGMENT_S );
 

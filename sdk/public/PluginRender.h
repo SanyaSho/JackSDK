@@ -330,9 +330,9 @@ COMPILE_TIME_ASSERT( sizeof( qSpriteDrawData_t ) == SIZEOF_QSPRITEDRAWDATA_S );
 /*
  qEntity_s::m_drawData for mod_decal
 */
-typedef struct qDecalDrawData_s
+typedef struct qDecal_s
 {
-	struct qDecal_s *m_decalData;
+	struct qDecalFragment_s *m_decalData;
 
 	/* Shader used by this decal */
 	struct qShader_s *m_decalShader;
@@ -340,8 +340,8 @@ typedef struct qDecalDrawData_s
 	/* Selection box size */
 	vec3_t m_sizeMin;
 	vec3_t m_sizeMax;
-} qDecalDrawData_t;
-COMPILE_TIME_ASSERT( sizeof( qDecalDrawData_t ) == SIZEOF_QDECALDRAWDATA_S );
+} qDecal_t;
+COMPILE_TIME_ASSERT( sizeof( qDecal_t ) == SIZEOF_QDECAL_S );
 
 
 /*

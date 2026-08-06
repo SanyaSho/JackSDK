@@ -105,9 +105,11 @@ GGClass Flags (FGD):
 #define EFL_INVENTORYITEM			( 1 << 6  ) /* Entity "item_*" / "Item*" or "weapon_*" / "Weapon*" or fgd entity with 1<<17 (CMapEntity::changeClass) */
 #define EFL_PATHWAY					( 1 << 7  ) /* Entity "path_*" / "*Path*" or an fgd entity with 1<<18 (CMapEntity::changeClass) */
 // 1 << 8
-#define EFL_IGNORE					( 1 << 9  ) /* "Ignore" flag (Brushes and Paths only) */
+#define EFL_IGNORE					( 1 << 9  ) /* "Ignore" flag */
+// 1 << 11 /* Decal_UpdateVicinity */
 // 1 << 20
 #define EFL_CORDON					( 1 << 21 )
+#define EFL_FRESHWORLD				( 1 << 22 ) /* This flag is set by CMapWorld::clear */
 // 1 << 23
 
 // clang-format on
@@ -834,7 +836,7 @@ typedef struct
 
  Possible outputs: "J.A.C.K. 1.2.4603" / "J.A.C.K. 1.1.3773 Freeware"
 */
-typedef char *		(*pfnEditor_V_VersionString)			();
+typedef const char *(*pfnEditor_V_VersionString)			();
 
 /*
  Sys_GetTextureGamma
@@ -859,7 +861,7 @@ typedef qWorld_s *	(*pfnEditor_Global_GetCurrentWorld)		();
  listSeparator - Separator character.
  removeVolumePrefix - (WINDOWS-ONLY) Removes the drive letter from the paths.
 */
-typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, char listSeparator, int removeVolumePrefix );
+typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, bool listSeparator, int removeVolumePrefix );
 
 
 /* Entity API */
@@ -1441,7 +1443,7 @@ typedef struct
 
 /* Shader API */
 typedef qShader_s *	(*pfnEditor_Shader_Lookup)				( const char *hashName );
-typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *hashName, const char *shaderName, int shaderFlags );
+typedef qShader_s *	(*pfnEditor_Shader_Create)				( const char *hashName, const char *shaderName, int shaderCreateFlags );
 typedef void		(*pfnEditor_Shader_Destroy)				( qShader_s *shaderDef );
 typedef void		(*pfnEditor_Shader_AddStage)			( qShader_s *shaderDef, qShaderStage_s *shaderStage );
 typedef void		(*pfnEditor_Shader_RemoveStage)			( qShaderStage_s *shaderStage );
