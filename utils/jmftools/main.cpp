@@ -55,7 +55,7 @@ static qWorld_s *Global_GetCurrentWorld()
 BuildPackageList
 ===============
 */
-static bool BuildPackageList( qWorld_s *worldDef, char **outBuf, bool listSeparator, int removeVolumePrefix )
+static bool BuildPackageList( qWorld_s *worldDef, char **outBuf, char listSeparator, int removeVolumePrefix )
 {
 	if ( !worldDef )
 	{
@@ -189,9 +189,9 @@ int main( int argc, char **argv )
 	}
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	JMFSerializer mapSerializer( s_outputFile, 0, 0, s_currentWorld );
+	MAPSerializer mapSerializer( s_outputFile, 0, 0, s_currentWorld, FMODE_STDIO );
 #else
-	JMFSerializer mapSerializer( s_outputFile, s_currentWorld );
+	MAPSerializer mapSerializer( s_outputFile, s_currentWorld, FMODE_STDIO );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( !mapSerializer.Export() )
 	{

@@ -140,7 +140,7 @@ void CMapWorld::pushGroup( qGroup_s *groupDef )
 buildPackageList
 ===============
 */
-bool CMapWorld::buildPackageList( char **outBuf, bool listSeparator, int removeVolumePrefix )
+bool CMapWorld::buildPackageList( char **outBuf, char listSeparator, int removeVolumePrefix )
 {
 	if ( !outBuf )
 	{

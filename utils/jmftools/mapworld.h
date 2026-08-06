@@ -29,7 +29,7 @@ public:
 
 	void pushGroup( qGroup_s *groupDef );
 
-	bool buildPackageList( char **outBuf, bool listSeparator, int removeVolumePrefix );
+	bool buildPackageList( char **outBuf, char listSeparator, int removeVolumePrefix );
 
 public:
 	void clear();

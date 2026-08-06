@@ -34,10 +34,10 @@ public:
 
 protected:
 	bool WriteString( const char *data );
-	bool ReadString( char **outBuf );
+	bool ReadString( char **outBuf, bool showerror = true );
 
 	bool WriteStringVersion( const char *data, int jmfVersion );
-	bool ReadStringVersion( char **outBuf, int jmfVersion );
+	bool ReadStringVersion( char **outBuf, int jmfVersion, bool showerror = true );
 
 protected:
 	bool ProcessHeader();

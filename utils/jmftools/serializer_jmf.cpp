@@ -436,11 +436,11 @@ bool JMFSerializer::WriteString( const char *data )
 ReadString
 ===============
 */
-bool JMFSerializer::ReadString( char **outBuf )
+bool JMFSerializer::ReadString( char **outBuf, bool showerror /*= true*/ )
 {
 	int length = -1;
 
-	if ( !ReadData( &length, sizeof( int ) ) || ( length == -1 ) )
+	if ( !ReadData( &length, sizeof( int ), showerror ) || ( length == -1 ) )
 	{
 		*outBuf = NULL;
 		return false;
@@ -484,11 +484,11 @@ bool JMFSerializer::WriteStringVersion( const char *data, int jmfVersion )
 ReadStringVersion
 ===============
 */
-bool JMFSerializer::ReadStringVersion( char **outBuf, int jmfVersion )
+bool JMFSerializer::ReadStringVersion( char **outBuf, int jmfVersion, bool showerror /*= true*/ )
 {
 	if ( m_jmfVersion >= jmfVersion )
 	{
-		return ReadString( outBuf );
+		return ReadString( outBuf, showerror );
 	}
 
 	return false;
@@ -1179,7 +1179,7 @@ bool JMFSerializer::SerializeEntity( qEntity_s *entityDef )
 	else
 	{
 		char *classname = NULL;
-		ReadString( &classname );
+		ReadString( &classname, false ); // We don't want to show an error about file read fail when we reach EOF
 
 		if ( !classname || !classname[0] )
 		{
