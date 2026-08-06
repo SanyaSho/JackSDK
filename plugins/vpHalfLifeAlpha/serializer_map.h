@@ -38,7 +38,7 @@ protected:
 	bool SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_s *brushDef );
 	bool SerializeBrushes( struct qBrush_s *brushDef, struct qEntity_s *entityDef );
 	bool SerializeEntities( struct qEntity_s *entityDef );
-	bool SerializePathNodes( struct qPath_s *pathList );
+	bool SerializePathNodes( struct qPath_s *pathDef );
 
 protected:
 	int m_mapVersion;

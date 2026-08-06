@@ -861,7 +861,7 @@ typedef qWorld_s *	(*pfnEditor_Global_GetCurrentWorld)		();
  listSeparator - Separator character.
  removeVolumePrefix - (WINDOWS-ONLY) Removes the drive letter from the paths.
 */
-typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, bool listSeparator, int removeVolumePrefix );
+typedef bool		(*pfnEditor_BuildPackageList)			( qWorld_s *worldDef, char **outBuf, char listSeparator, int removeVolumePrefix );
 
 
 /* Entity API */
