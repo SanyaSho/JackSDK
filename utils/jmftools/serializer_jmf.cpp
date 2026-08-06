@@ -202,10 +202,7 @@ bool JMFSerializer::Export()
 
 	// VisGroups
 	{
-		int visGroupCount = 0;
-
-		visGroupCount = (int)m_mapWorld->m_visGroupList.size();
-
+		int visGroupCount = (int)m_mapWorld->m_visGroupList.size();
 		if ( !WriteData( &visGroupCount, sizeof( int ) ) )
 		{
 			return false;
@@ -1129,11 +1126,18 @@ bool JMFSerializer::SerializeEntity( qEntity_s *entityDef )
 			}
 		}
 
-		// TODO
-		int visGroupCount = 0;
+		int visGroupCount = (int)entityDef->m_mapEntity->m_visGroupList.size();
 		if ( !WriteData( &visGroupCount, sizeof( int ) ) )
 		{
 			return false;
+		}
+
+		for ( auto visGroup : entityDef->m_mapEntity->m_visGroupList )
+		{
+			if ( !WriteData( &visGroup->m_editorId, sizeof( int ) ) )
+			{
+				return false;
+			}
 		}
 
 		int brushCount = 0;
@@ -1262,7 +1266,15 @@ bool JMFSerializer::SerializeEntity( qEntity_s *entityDef )
 				return false;
 			}
 
-			// CMapEntity::addToVisGroup
+			for ( auto visGroup : m_mapWorld->m_visGroupList )
+			{
+				if ( visGroup->m_editorId != visGroupId )
+				{
+					continue;
+				}
+
+				entityDef->m_mapEntity->addToVisGroup( visGroup );
+			}
 		}
 
 		int brushCount = 0;
@@ -1353,11 +1365,18 @@ bool JMFSerializer::SerializeBrush( qBrush_s *brushDef, qEntity_s *entityDef )
 			return false;
 		}
 
-		// TODO
-		int visGroupCount = 0;
+		int visGroupCount = (int)brushDef->m_mapBrush->m_visGroupList.size();
 		if ( !WriteData( &visGroupCount, sizeof( int ) ) )
 		{
 			return false;
+		}
+
+		for ( auto visGroup : brushDef->m_mapBrush->m_visGroupList )
+		{
+			if ( !WriteData( &visGroup->m_editorId, sizeof( int ) ) )
+			{
+				return false;
+			}
 		}
 
 		int faceCount = 0;
@@ -1461,7 +1480,15 @@ bool JMFSerializer::SerializeBrush( qBrush_s *brushDef, qEntity_s *entityDef )
 				return false;
 			}
 
-			//brushDef->m_mapbrush->addToVisGroup( visGroup );
+			for ( auto visGroup : m_mapWorld->m_visGroupList )
+			{
+				if ( visGroup->m_editorId != visGroupId )
+				{
+					continue;
+				}
+
+				brushDef->m_mapBrush->addToVisGroup( visGroup );
+			}
 		}
 
 		int faceCount = 0;

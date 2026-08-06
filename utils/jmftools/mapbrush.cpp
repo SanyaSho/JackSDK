@@ -91,6 +91,19 @@ CMapBrush::~CMapBrush()
 
 /*
 ===============
+addToVisGroup
+===============
+*/
+void CMapBrush::addToVisGroup( CVisGroup *visGroup )
+{
+	if ( std::find( m_visGroupList.begin(), m_visGroupList.end(), visGroup ) == m_visGroupList.end() )
+	{
+		m_visGroupList.push_back( visGroup );
+	}
+}
+
+/*
+===============
 removeFromAllVisGroups
 ===============
 */

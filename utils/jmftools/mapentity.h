@@ -52,6 +52,7 @@ public:
 	}
 
 public:
+	void addToVisGroup( CVisGroup *visGroup );
 	void removeFromAllVisGroups();
 
 protected:
