@@ -935,7 +935,11 @@ bool MAPSerializer::SerializePathNodes( struct qPath_s *pathDef )
 			}
 		}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 		fprintf( m_fileHandle, "\"origin\" \"%s %s %s\"\n", Sys_PrintMapCoordVector3D( nodeDef->m_vecOrigin ) );
+#else
+		fprintf( m_fileHandle, "\"origin\" \"%g %g %g\"\n", Sys_PrintVector3D( nodeDef->m_vecOrigin ) );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 		const vec3_t &ang = nodeDef->m_vecAngles;
 		if ( ang.x != 0.f || ang.y != 0.f || ang.z != 0.f )
@@ -985,7 +989,11 @@ bool MAPSerializer::SerializePathNodes( struct qPath_s *pathDef )
 				}
 			}
 
+#if JACK_API_VERSION >= API_VERSION_STEAM_BETA
 			fprintf( m_fileHandle, "\"origin\" \"%s %s %s\"\n", Sys_PrintMapCoordVector3D( nodeDef->m_vecOrigin ) );
+#else
+			fprintf( m_fileHandle, "\"origin\" \"%g %g %g\"\n", Sys_PrintVector3D( nodeDef->m_vecOrigin ) );
+#endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
 			const vec3_t &ang = nodeDef->m_vecAngles;
 			if ( ang.x != 0.f || ang.y != 0.f || ang.z != 0.f )
