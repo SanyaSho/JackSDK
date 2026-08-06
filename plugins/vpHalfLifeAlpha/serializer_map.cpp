@@ -176,7 +176,7 @@ bool MAPSerializer::Export()
 	//
 	if ( m_packageList )
 	{
-		gEditorfuncs.pfnSys_Free( m_packageList );
+		Sys_Free( m_packageList );
 		m_packageList = nullptr;
 	}
 
@@ -285,13 +285,11 @@ bool MAPSerializer::SerializeBrushFaces( struct qFace_s *faceDef, struct qBrush_
 			faceDef->m_texDef.m_textureName,
 
 			// [
-			Sys_PrintVector3D( uAxis ),
-			faceDef->m_texDef.m_xShift,
+			Sys_PrintVector4D( uAxis ),
 			// ]
 
 			// [
-			Sys_PrintVector3D( vAxis ),
-			faceDef->m_texDef.m_yShift,
+			Sys_PrintVector4D( vAxis ),
 			// ]
 
 			faceDef->m_texDef.m_rotate,
@@ -836,40 +834,173 @@ bool MAPSerializer::SerializeEntities( struct qEntity_s *entityDef )
 SerializePathNodes
 ===============
 */
-bool MAPSerializer::SerializePathNodes( struct qPath_s *pathList )
+bool MAPSerializer::SerializePathNodes( struct qPath_s *pathDef )
 {
 	if ( !m_writeMode )
 	{
 		return true;
 	}
 
-	qNode_t *nodeList = pathList->m_nodeList;
-	if ( !nodeList )
+	if ( !pathDef->m_nodeList )
 		return true;
 
-	const char *pathClassname = pathList->m_pathClassname;
-	if ( !pathClassname || !pathClassname[0] )
+	if ( !pathDef->m_pathClassname || !pathDef->m_pathClassname[0] )
 		return true;
 
-	if ( m_cordon && (
-		( pathList->m_bboxMin.x > m_worldDef->m_vecCordonMax.x - 0.001 ) || ( pathList->m_bboxMin.y > m_worldDef->m_vecCordonMax.y - 0.001 ) || ( pathList->m_bboxMin.z > m_worldDef->m_vecCordonMax.z - 0.001 ) ||
-		( pathList->m_bboxMax.x > m_worldDef->m_vecCordonMin.x + 0.001 ) || ( pathList->m_bboxMax.y > m_worldDef->m_vecCordonMin.y + 0.001 ) || ( pathList->m_bboxMax.z > m_worldDef->m_vecCordonMin.z + 0.001 ) ) )
+	if ( m_cordon )
 	{
-		return true;
+		const vec3_t &bbmin = pathDef->m_bboxMin;
+		const vec3_t &bbmax = pathDef->m_bboxMax;
+
+		if (( bbmin.x > m_worldDef->m_vecCordonMax.x - 0.001 ) || ( bbmin.y > m_worldDef->m_vecCordonMax.y - 0.001 ) || ( bbmin.z > m_worldDef->m_vecCordonMax.z - 0.001 ) ||
+			( bbmax.x < m_worldDef->m_vecCordonMin.x + 0.001 ) || ( bbmax.y < m_worldDef->m_vecCordonMin.y + 0.001 ) || ( bbmax.z < m_worldDef->m_vecCordonMin.z + 0.001 ))
+		{
+			return true;
+		}
+
+		for ( qNode_s *nodeDef = pathDef->m_nodeList; nodeDef != NULL; nodeDef = nodeDef->next )
+		{
+			const vec3_t &org = nodeDef->m_vecOrigin;
+
+			if (( org.x >= m_worldDef->m_vecCordonMin.x + 0.001f && org.y >= m_worldDef->m_vecCordonMin.y + 0.001f && org.z >= m_worldDef->m_vecCordonMin.z + 0.001f ) &&
+				( org.x <= m_worldDef->m_vecCordonMax.x - 0.001f && org.y <= m_worldDef->m_vecCordonMax.y - 0.001f && org.z <= m_worldDef->m_vecCordonMax.z - 0.001f ))
+			{
+				return true;
+			}
+		}
 	}
 
-	// TODO: Per-node cordon check
-
-	for ( qNode_t *nodeDef = nodeList; nodeDef != NULL; nodeDef = nodeDef->next )
+	int nodeIdx = 0;
+	for ( qNode_t *nodeDef = pathDef->m_nodeList; nodeDef != NULL; nodeDef = nodeDef->next )
 	{
 		fprintf( m_fileHandle, "%s\n", "{" );
 
-		// TODO
+		fprintf( m_fileHandle, "\"classname\" \"%s\"\n", pathDef->m_pathClassname );
+
+		if ( nodeDef->m_nameOverride && nodeDef->m_nameOverride[0] )
+		{
+			fprintf( m_fileHandle, "\"targetname\" \"%s\"\n", nodeDef->m_nameOverride );
+
+			if ( nodeDef == pathDef->m_nodeList )
+			{
+				++nodeIdx;
+			}
+		}
+		else
+		{
+			if ( nodeIdx != 0 )
+			{
+				fprintf( m_fileHandle, "\"targetname\" \"%s_%i\"\n", pathDef->m_pathName, nodeIdx );
+			}
+			else
+			{
+				fprintf( m_fileHandle, "\"targetname\" \"%s\"\n", pathDef->m_pathName );
+			}
+
+			++nodeIdx;
+		}
+
+		if ( nodeDef->next )
+		{
+			if ( nodeDef->next->m_nameOverride && nodeDef->next->m_nameOverride[0] )
+			{
+				fprintf( m_fileHandle, "\"target\" \"%s\"\n", nodeDef->next->m_nameOverride );
+			}
+			else
+			{
+				fprintf( m_fileHandle, "\"target\" \"%s_%i\"\n", pathDef->m_pathName, nodeIdx );
+			}
+		}
+		else if ( pathDef->m_pathDirection == 1 )
+		{
+			const char *target = pathDef->m_nodeList->m_nameOverride;
+
+			if ( !target || !target[0] )
+			{
+				target = pathDef->m_pathName;
+			}
+
+			fprintf( m_fileHandle, "\"target\" \"%s\"\n", target );
+		}
+		else if ( pathDef->m_pathDirection == 2 && nodeDef->prev )
+		{
+			fprintf( m_fileHandle, "\"target\" \"%s_%i\"\n", pathDef->m_pathName, nodeIdx );
+		}
+
+		for ( epair_s *epairs = nodeDef->epairs; epairs != NULL; epairs = epairs->next )
+		{
+			if ( epairs->key && epairs->value )
+			{
+				fprintf( m_fileHandle, "\"%s\" \"%s\"\n", epairs->key, epairs->value );
+			}
+		}
+
+		fprintf( m_fileHandle, "\"origin\" \"%s %s %s\"\n", Sys_PrintMapCoordVector3D( nodeDef->m_vecOrigin ) );
+
+		const vec3_t &ang = nodeDef->m_vecAngles;
+		if ( ang.x != 0.f || ang.y != 0.f || ang.z != 0.f )
+		{
+			fprintf( m_fileHandle, "\"angles\" \"%.0f %.0f %.0f\"\n", Sys_PrintVector3D( ang ) );
+		}
+
+		if ( nodeDef->m_fireEntityOnPass && nodeDef->m_fireEntityOnPass[0] )
+		{
+			fprintf( m_fileHandle, "\"message\" \"%s\"\n", nodeDef->m_fireEntityOnPass );
+		}
 
 		fprintf( m_fileHandle, "%s\n", "}" );
 	}
 
-	// TODO
+	if ( pathDef->m_pathDirection == 2 )
+	{
+		for ( qNode_s *nodeDef = pathDef->m_lastNode->prev; nodeDef != NULL; nodeDef = nodeDef->prev )
+		{
+			fprintf( m_fileHandle, "%s\n", "{" );
+
+			fprintf( m_fileHandle, "\"classname\" \"%s\"\n", pathDef->m_pathClassname );
+
+			fprintf( m_fileHandle, "\"targetname\" \"%s_%i\"\n", pathDef->m_pathName, nodeIdx++ );
+
+			if ( nodeDef->prev->prev != NULL )
+			{
+				fprintf( m_fileHandle, "\"target\" \"%s_%i\"\n", pathDef->m_pathName, nodeIdx );
+			}
+			else
+			{
+				const char *target = pathDef->m_nodeList->m_nameOverride;
+
+				if ( !target || !target[0] )
+				{
+					target = pathDef->m_pathName;
+				}
+
+				fprintf( m_fileHandle, "\"target\" \"%s\"\n", target );
+			}
+
+			for ( epair_s *epairs = nodeDef->epairs; epairs != NULL; epairs = epairs->next )
+			{
+				if ( epairs->key && epairs->value )
+				{
+					fprintf( m_fileHandle, "\"%s\" \"%s\"\n", epairs->key, epairs->value );
+				}
+			}
+
+			fprintf( m_fileHandle, "\"origin\" \"%s %s %s\"\n", Sys_PrintMapCoordVector3D( nodeDef->m_vecOrigin ) );
+
+			const vec3_t &ang = nodeDef->m_vecAngles;
+			if ( ang.x != 0.f || ang.y != 0.f || ang.z != 0.f )
+			{
+				fprintf( m_fileHandle, "\"angles\" \"%.0f %.0f %.0f\"\n", Sys_PrintVector3D( ang ) );
+			}
+
+			if ( nodeDef->m_fireEntityOnPass && nodeDef->m_fireEntityOnPass[0] )
+			{
+				fprintf( m_fileHandle, "\"message\" \"%s\"\n", nodeDef->m_fireEntityOnPass );
+			}
+
+			fprintf( m_fileHandle, "%s\n", "}" );
+		}
+	}
 
 	return true;
 }
