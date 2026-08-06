@@ -29,6 +29,9 @@ public:
 	virtual bool Export();
 	virtual bool Import();
 
+	void setExportPath( const char *exportPath ) { strncpy( m_exportPath, exportPath, sizeof( m_exportPath ) ); m_exportPath[sizeof( m_exportPath ) - 1] = '\0'; }
+	const char *getExportPath() { return m_exportPath; }
+
 protected:
 	bool WriteString( const char *data );
 	bool ReadString( char **outBuf );
@@ -52,6 +55,8 @@ protected:
 private:
 	CMapWorld *m_mapWorld;
 	int m_jmfVersion;
+
+	char m_exportPath[MAX_PATH];
 };
 
 #endif // !SERIALIZER_RMF_H

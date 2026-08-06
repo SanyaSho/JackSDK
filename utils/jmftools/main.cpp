@@ -18,7 +18,6 @@
 #define ENTITYAPI_NO_INLINEFUNCS
 #define PLUGINEDITORFUNCTIONS_H
 #include "PluginMeta.h"
-plugin_funcs_t gEditorfuncs {};
 
 #include "logger.h"
 #include "math.h"
@@ -38,6 +37,17 @@ V_VersionString
 static const char *V_VersionString()
 {
 	return "jmftools";
+}
+
+/*
+===============
+Global_GetCurrentWorld
+===============
+*/
+static CMapWorld *s_currentWorld = NULL;
+static qWorld_s *Global_GetCurrentWorld()
+{
+	return (qWorld_s *)s_currentWorld;
 }
 
 /*
@@ -65,16 +75,13 @@ static const char *Sys_MakeLocalFileName( const char *filePath )
 	return filePath;
 }
 
-static char s_inputFile[MAX_PATH] = { 0 };
-static char s_outputFile[MAX_PATH] = { 0 };
+plugin_funcs_t gEditorfuncs;
 
-/*
-===============
-main
-===============
-*/
-int main( int argc, char **argv )
+static void BuildEditorFunctionsTable()
 {
+	memset( &gEditorfuncs, 0, sizeof( gEditorfuncs ) );
+	gEditorfuncs.m_intefaceVersion = sizeof( plugin_funcs_t );
+
 	gEditorfuncs.pfnSys_Printf = Sys_Printf;
 	gEditorfuncs.pfnSys_DPrintf = Sys_DPrintf;
 	gEditorfuncs.pfnSys_Warning = Sys_Warning;
@@ -99,11 +106,31 @@ int main( int argc, char **argv )
 
 	gEditorfuncs.pfnV_VersionString = V_VersionString;
 
-	gEditorfuncs.pfnBuildPackageList = BuildPackageList;
+	gEditorfuncs.pfnGlobal_GetCurrentWorld = Global_GetCurrentWorld;
 
-	if ( argc < 2 )
+	gEditorfuncs.pfnBuildPackageList = BuildPackageList;
+}
+
+static void PrintUsage( const char *exeName )
+{
+	Sys_Printf( "Usage: %s -i <inputfile> -o <outputfile>", exeName );
+}
+
+static char s_inputFile[MAX_PATH] = { 0 };
+static char s_outputFile[MAX_PATH] = { 0 };
+
+/*
+===============
+main
+===============
+*/
+int main( int argc, char **argv )
+{
+	BuildEditorFunctionsTable();
+
+	if ( argc == 1 )
 	{
-		Sys_Printf( "Usage: jmftools -i <in.jmf>\n" );
+		PrintUsage( argv[0] );
 		return 0;
 	}
 
@@ -111,12 +138,24 @@ int main( int argc, char **argv )
 	{
 		if ( !stricmp( argv[i], "-i" ) || !stricmp( argv[i], "--input" ) )
 		{
+			if ( i + 1 >= argc || argv[i + 1][0] == '-' )
+			{
+				PrintUsage( argv[0] );
+				return 1;
+			}
+
 			strncpy( s_inputFile, argv[i + 1], sizeof( s_inputFile ) );
 			s_inputFile[sizeof( s_inputFile ) - 1] = '\0';
 			i++;
 		}
 		else if ( !stricmp( argv[i], "-o" ) || !stricmp( argv[i], "--output" ) )
 		{
+			if ( i + 1 >= argc || argv[i + 1][0] == '-' )
+			{
+				PrintUsage( argv[0] );
+				return 1;
+			}
+
 			strncpy( s_outputFile, argv[i + 1], sizeof( s_outputFile ) );
 			s_outputFile[sizeof( s_outputFile ) - 1] = '\0';
 			i++;
@@ -127,12 +166,21 @@ int main( int argc, char **argv )
 		}
 	}
 
-	CMapWorld *mapWorld = new CMapWorld;
+	if ( s_inputFile[0] == '\0' || s_outputFile[0] == '\0' )
+	{
+		Sys_Error( "Both input and output files arguments are required.\n" );
+
+		PrintUsage( argv[0] );
+		return 1;
+	}
+
+	// Spawn da world
+	s_currentWorld = new CMapWorld;
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	JMFSerializer jmfSerializer( s_inputFile, 0, 0, mapWorld );
+	JMFSerializer jmfSerializer( s_inputFile, 0, 0, s_currentWorld );
 #else
-	JMFSerializer jmfSerializer( s_inputFile, mapWorld );
+	JMFSerializer jmfSerializer( s_inputFile, s_currentWorld );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( !jmfSerializer.Import() )
 	{
@@ -141,9 +189,9 @@ int main( int argc, char **argv )
 	}
 
 #if JACK_API_VERSION >= API_VERSION_STEAM_BETA
-	JMFSerializer mapSerializer( s_outputFile, 0, 0, mapWorld );
+	JMFSerializer mapSerializer( s_outputFile, 0, 0, s_currentWorld );
 #else
-	JMFSerializer mapSerializer( s_outputFile, mapWorld );
+	JMFSerializer mapSerializer( s_outputFile, s_currentWorld );
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 	if ( !mapSerializer.Export() )
 	{
@@ -151,7 +199,11 @@ int main( int argc, char **argv )
 		return 1;
 	}
 
-	delete mapWorld;
+	if ( s_currentWorld )
+	{
+		delete s_currentWorld;
+		s_currentWorld = NULL;
+	}
 
 	return 0;
 }

@@ -89,6 +89,8 @@ JMFSerializer::JMFSerializer( const char *filePath, struct qWorld_s *worldDef )
 	m_mapWorld = worldDef->m_mapWorld;
 
 	m_jmfVersion = 0;
+
+	m_exportPath[0] = '\0';
 }
 
 /*
@@ -132,12 +134,28 @@ bool JMFSerializer::Export()
 
 	// Export info
 	{
-		// TODO
-		int hasExportPath = 0;
+		if ( m_exportPath[0] == '\0' )
+		{
+			setExportPath( m_filePath );
+		}
+
+		// NOTE: Originally exportPath is a element of a list inside m_project and hasExportPath is a size of that list,
+		// but since only one element of the list is used there's no reason to replicate the original logic.
+
+		int hasExportPath = ( m_exportPath[0] != '\0' );
 		if ( !WriteData( &hasExportPath, sizeof( int ) ) )
 		{
 			Sys_Error( "can't write export info" );
 			return false;
+		}
+
+		if ( hasExportPath != 0 )
+		{
+			if ( !WriteString( m_exportPath ) )
+			{
+				Sys_Error( "can't write export info" );
+				return false;
+			}
 		}
 	}
 
