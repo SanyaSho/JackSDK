@@ -90,9 +90,15 @@ typedef const char *(*vpFilterTextureName_t)( int formatIndex, const char *textu
 typedef bool (*vpLoadTexture_t)( int formatIndex, const char *textureName, byte *buf, int bufSize );
 
 
+typedef struct packageInfo_s
+{
+	/* Count of supported textures inside a package */
+	int m_textureCount;
+} packageInfo_t;
+//COMPILE_TIME_ASSERT( sizeof( packageInfo_t ) == ??? );
+
 /* filePath - path to a file */
-/* numMipTex - count of TYP_MIPTEX inside a WAD2/WAD3 */
-typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, int *numMipTex );
+typedef bool (*vpGetPackageInfo_t)( int formatIndex, const char *filePath, packageInfo_s *packageInfo );
 
 /* filePath - path to a file */
 /* Iterates all of the TYP_MIPTEX files inside a WAD2/WAD3 archive and registers them with Shader_Create/Shader_Finish */

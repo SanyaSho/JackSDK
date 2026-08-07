@@ -155,7 +155,7 @@ DLL_EXPORT int vpImport( int formatIndex, const char *filePath, qWorld_s *worldD
 vpGetPackageInfo
 ===============
 */
-DLL_EXPORT bool vpGetPackageInfo( int formatIndex, const char *filePath, int *numMipTex )
+DLL_EXPORT bool vpGetPackageInfo( int formatIndex, const char *filePath, packageInfo_s *packageInfo )
 {
 	if ( formatIndex != 0 )
 		return false;
@@ -194,7 +194,7 @@ DLL_EXPORT bool vpGetPackageInfo( int formatIndex, const char *filePath, int *nu
 			mipTexCount++;
 	}
 
-	*numMipTex = mipTexCount;
+	packageInfo->m_textureCount = mipTexCount;
 	fclose( f );
 
 	return true;
