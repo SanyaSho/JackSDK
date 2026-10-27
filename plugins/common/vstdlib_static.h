@@ -57,6 +57,10 @@ extern char *V_Strupr( char *start );
 extern int V_Atoi( const char *string );
 extern float V_Atof( const char *string );
 
-extern void V_AddPointToBounds( const vec3_t &point, vec3_t &mins, vec3_t &maxs );
+extern void V_AddPointToBounds( const float *point, float *mins, float *maxs );
+
+extern void V_AddBoxToBounds( const float *boxMin, const float *boxMax, float *mins, float *maxs );
+
+extern void V_ClearBounds( float *bboxMin, float *bboxMax );
 
 #endif // !VSTDLIB_STATIC_H

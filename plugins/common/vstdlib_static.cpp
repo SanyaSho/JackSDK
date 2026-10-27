@@ -450,14 +450,49 @@ float V_Atof( const char *string )
 V_AddPointToBounds
 ================
 */
-void V_AddPointToBounds( const vec3_t &point, vec3_t &mins, vec3_t &maxs )
+void V_AddPointToBounds( const float *point, float *mins, float *maxs )
 {
-	mins.x = std::min( mins.x, point.x );
-	maxs.x = std::max( maxs.x, point.x );
+	mins[0] = std::min( mins[0], point[0] );
+	maxs[0] = std::max( maxs[0], point[0] );
 
-	mins.y = std::min( mins.y, point.y );
-	maxs.y = std::max( maxs.y, point.y );
+	mins[1] = std::min( mins[1], point[1] );
+	maxs[1] = std::max( maxs[1], point[1] );
 
-	mins.z = std::min( mins.z, point.z );
-	maxs.z = std::max( maxs.z, point.z );
+	mins[2] = std::min( mins[2], point[2] );
+	maxs[2] = std::max( maxs[2], point[2] );
+}
+
+/*
+================
+V_AddBoxToBounds
+================
+*/
+void V_AddBoxToBounds( const float *boxMin, const float *boxMax, float *mins, float *maxs )
+{
+	mins[0] = std::min( mins[0], boxMin[0] );
+	maxs[0] = std::max( maxs[0], boxMax[0] );
+
+	mins[1] = std::min( mins[1], boxMin[1] );
+	maxs[1] = std::max( maxs[1], boxMax[1] );
+
+	mins[2] = std::min( mins[2], boxMin[2] );
+	maxs[2] = std::max( maxs[2], boxMax[2] );
+}
+
+/*
+================
+V_ClearBounds
+================
+*/
+void V_ClearBounds( float *bboxMin, float *bboxMax )
+{
+	if ( bboxMin )
+	{
+		bboxMin[0] = bboxMin[1] = bboxMin[2] = 999999.f;
+	}
+
+	if ( bboxMax )
+	{
+		bboxMax[0] = bboxMax[1] = bboxMax[2] = -999999.f;
+	}
 }

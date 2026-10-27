@@ -169,7 +169,7 @@ void AssimpStudioRender::GetModelBounds( int flags, vec3_t *bboxMin, vec3_t *bbo
 		for ( int j = 0; j < mesh->mNumVertices; j++ )
 		{
 			// Doing this cast is fine because aiVector3D has the same memory layout as vec3_t
-			V_AddPointToBounds( *(vec3_t *)&mesh->mVertices[j], mins, maxs );
+			V_AddPointToBounds( (float *)&mesh->mVertices[j], mins.Base(), maxs.Base() );
 		}
 	}
 
