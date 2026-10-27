@@ -21,8 +21,8 @@ set( SRCDIR "${CMAKE_CURRENT_LIST_DIR}" )
 # 10 - Freeware
 # 100 - Steam Public
 # 121 - Steam Beta
-option( OVERRIDE_API_VERSION "Change defininon of JACK_API_VERSION" -1 )
-if( NOT ${OVERRIDE_API_VERSION} EQUAL -1 )
+set( OVERRIDE_API_VERSION "-1" CACHE STRING "Change defininon of JACK_API_VERSION" )
+if( NOT ${OVERRIDE_API_VERSION} STREQUAL "-1" )
 	add_compile_definitions( JACK_API_VERSION=${OVERRIDE_API_VERSION} )
 endif()
 

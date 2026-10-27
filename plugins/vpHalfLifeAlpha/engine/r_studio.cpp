@@ -1286,7 +1286,7 @@ void StudioRender::GetModelBounds( qEntity_t *ent, int flags, vec3_t *bboxMin, v
 				vec3_t modelPos;
 				VectorTransform( pstudioverts[k], bonetransform[pvertbone[k]], modelPos );
 
-				V_AddPointToBounds( modelPos, mins, maxs );
+				V_AddPointToBounds( modelPos.Base(), mins.Base(), maxs.Base() );
 			}
 		}
 	}
