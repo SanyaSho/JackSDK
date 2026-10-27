@@ -26,6 +26,9 @@ public:
 	CMapEntity();
 	virtual ~CMapEntity();
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qEntity_t *create( const char *className, const vec3_t &origin, int editorFlags )
 	{
 		CMapEntity *mapEntity = new CMapEntity;
@@ -55,12 +58,12 @@ public:
 	void addToVisGroup( CVisGroup *visGroup );
 	void removeFromAllVisGroups();
 
+	void updateKeys( bool keepkeys );
+
 protected:
 	void reset();
 
 	void clearEpairs() { clearEpairs( &m_entityData->epairs ); }
-
-	void updateKeys( bool keepkeys );
 
 	void freeUserData();
 

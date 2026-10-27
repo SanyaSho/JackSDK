@@ -25,6 +25,9 @@ public:
 	CMapBrush();
 	virtual ~CMapBrush();
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qBrush_s *create()
 	{
 		CMapBrush *mapBrush = new CMapBrush;
@@ -55,6 +58,9 @@ public:
 
 	void setTexDef( const qTexDef_s &texDef );
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qOverlay_s *create()
 	{
 		CMapOverlay *mapOverlay = new CMapOverlay;
@@ -76,6 +82,9 @@ public:
 
 	void setTexDef( const qTexDef_s &texDef );
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qPatch_s *create( int numColumns, int numRows )
 	{
 		CMapPatch *mapPatch = new CMapPatch( numColumns, numRows );

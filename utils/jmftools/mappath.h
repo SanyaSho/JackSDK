@@ -22,6 +22,9 @@ public:
 	CMapPath();
 	virtual ~CMapPath();
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qPath_t *create()
 	{
 		CMapPath *mapPath = new CMapPath;
@@ -31,7 +34,7 @@ public:
 public:
 	qPath_t *m_pathData;
 	rgba_t m_cbColor;
-	bool m_unknown;
+	bool m_spline;
 };
 
 class CMapNode
@@ -40,6 +43,9 @@ public:
 	CMapNode();
 	virtual ~CMapNode();
 
+	void updateParms();
+
+public:
 	static qNode_t *create()
 	{
 		CMapNode *mapNode = new CMapNode;
@@ -48,6 +54,8 @@ public:
 
 protected:
 	void clearEpairs() { CMapEntity::clearEpairs( &m_nodeData->epairs ); }
+
+	epair_s *findEpairByKey( const char *key );
 
 public:
 	qNode_t *m_nodeData;

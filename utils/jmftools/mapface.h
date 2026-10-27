@@ -19,6 +19,9 @@ public:
 
 	void setTexDef( const qTexDef_s &texDef );
 
+	void build( int buildFlags = 0 );
+
+public:
 	static qFace_s *create( int vertexCount )
 	{
 		CMapFace *mapFace = new CMapFace( vertexCount );

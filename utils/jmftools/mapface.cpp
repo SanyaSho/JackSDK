@@ -87,3 +87,13 @@ void CMapFace::setTexDef( const qTexDef_s &texDef )
 {
 	m_faceData->m_texDef = texDef;
 }
+
+/*
+===============
+build
+===============
+*/
+void CMapFace::build( int buildFlags )
+{
+	ClearBits( m_faceData->m_editorFlags, EFL_DIRTY );
+}

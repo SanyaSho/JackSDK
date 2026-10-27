@@ -29,6 +29,8 @@
 #include "serializer_jmf.h"
 #include "serializer_map.h"
 
+#include "vstdlib_static.h"
+
 /*
 ===============
 V_VersionString
@@ -113,7 +115,7 @@ static void BuildEditorFunctionsTable()
 
 static void PrintUsage( const char *exeName )
 {
-	Sys_Printf( "Usage: %s -i <inputfile> -o <outputfile>", exeName );
+	Sys_Printf( "Usage: %s -i <inputfile> -f [format] -o [outputfile]\n  -i (or --input) - Input file\n  -f (or --format) - Output file format. Not required.\n  -o (or --output) - Output file. Not required.", exeName );
 }
 
 static char s_inputFile[MAX_PATH] = { 0 };
@@ -160,18 +162,37 @@ int main( int argc, char **argv )
 			s_outputFile[sizeof( s_outputFile ) - 1] = '\0';
 			i++;
 		}
+		else if ( !stricmp( argv[i], "-f" ) || !stricmp( argv[i], "--format" ) )
+		{
+			if ( i + 1 >= argc || argv[i + 1][0] == '-' )
+			{
+				PrintUsage( argv[0] );
+				return 1;
+			}
+
+
+		}
 		else
 		{
 			break;
 		}
 	}
 
-	if ( s_inputFile[0] == '\0' || s_outputFile[0] == '\0' )
+	if ( s_inputFile[0] == '\0' )
 	{
-		Sys_Error( "Both input and output files arguments are required.\n" );
+		Sys_Error( "Input file is not set.\n" );
 
 		PrintUsage( argv[0] );
 		return 1;
+	}
+
+	if ( s_outputFile[0] == '\0' )
+	{
+		strncpy( s_outputFile, s_inputFile, sizeof( s_outputFile ) );
+		s_outputFile[sizeof( s_outputFile ) - 1] = '\0';
+
+		V_StripExtension( s_outputFile );
+		strncat( s_outputFile, ".map", 4 );
 	}
 
 	// Spawn da world

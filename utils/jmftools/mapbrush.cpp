@@ -27,6 +27,8 @@
 #include "mappath.h"
 #include "mapworld.h"
 
+#include "vstdlib_static.h"
+
 /*
 ===============
 Constructor
@@ -111,6 +113,64 @@ void CMapBrush::removeFromAllVisGroups()
 {
 }
 
+/*
+===============
+build
+===============
+*/
+void CMapBrush::build( int buildFlags )
+{
+	// ...
+
+	V_ClearBounds( m_brushData->m_bboxMin.Base(), m_brushData->m_bboxMax.Base() );
+
+	for ( qFace_s *faceDef = m_brushData->m_faceList; faceDef != NULL; faceDef = faceDef->next )
+	{
+		faceDef->m_mapFace->m_cbColor = m_cbColor;
+
+		// ...
+
+		for ( int i = 0; i < faceDef->m_vertexCount; ++i )
+		{
+			V_AddPointToBounds( faceDef->m_vertices[i].coords.Base(), m_brushData->m_bboxMin.Base(), m_brushData->m_bboxMax.Base() );
+		}
+	}
+
+	if ( m_brushData->m_patch )
+	{
+		if ( FBitSet( m_brushData->m_patch->m_editorFlags, EFL_DIRTY ) )
+		{
+			m_brushData->m_patch->m_mapPatch->build( buildFlags );
+		}
+
+		for ( int i = 0; i < m_brushData->m_patch->m_glVertexCount; ++i )
+		{
+			// ...
+		}
+	}
+
+	if ( m_brushData->m_overlay )
+	{
+		if ( FBitSet( m_brushData->m_overlay->m_editorFlags, EFL_DIRTY ) )
+		{
+			m_brushData->m_overlay->m_mapOverlay->build( buildFlags );
+		}
+
+		for ( int i = 0; i < 4; ++i )
+		{
+			V_AddPointToBounds( m_brushData->m_overlay->m_data[i].coords.Base(), m_brushData->m_bboxMin.Base(), m_brushData->m_bboxMax.Base() );
+		}
+	}
+
+	// ...
+
+	// ...
+
+	m_brushSize = ( m_brushData->m_bboxMin + m_brushData->m_bboxMax ) * 0.5f;
+
+	ClearBits( m_brushData->m_editorFlags, EFL_DIRTY );
+}
+
 
 /*
 ===============
@@ -151,6 +211,16 @@ setTexDef
 void CMapOverlay::setTexDef( const qTexDef_s &texDef )
 {
 	m_overlayData->m_texDef = texDef;
+}
+
+/*
+===============
+build
+===============
+*/
+void CMapOverlay::build( int buildFlags )
+{
+	ClearBits( m_overlayData->m_editorFlags, EFL_DIRTY );
 }
 
 
@@ -205,4 +275,14 @@ setTexDef
 void CMapPatch::setTexDef( const qTexDef_s &texDef )
 {
 	m_patchData->m_texDef = texDef;
+}
+
+/*
+===============
+build
+===============
+*/
+void CMapPatch::build( int buildFlags )
+{
+	ClearBits( m_patchData->m_editorFlags, EFL_DIRTY );
 }

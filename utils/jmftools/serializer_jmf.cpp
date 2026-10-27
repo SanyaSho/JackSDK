@@ -917,7 +917,8 @@ bool JMFSerializer::SerializePath( qPath_s *pathDef )
 		}
 #endif // JACK_API_VERSION >= API_VERSION_STEAM_BETA
 
-		//pathDef->m_mapPath->build( 0 );
+		pathDef->m_mapPath->build();
+
 		pathDef->m_editorFlags &= ~0xFFFDFFFD; // TODO
 
 		return true;
@@ -1306,8 +1307,9 @@ bool JMFSerializer::SerializeEntity( qEntity_s *entityDef )
 			SerializeBrush( NULL, entityDef );
 		}
 
-		//entityDef->m_mapEntity->updateKeys( true );
-		//entityDef->m_mapEntity->build( 906 );
+		entityDef->m_mapEntity->updateKeys( true );
+
+		entityDef->m_mapEntity->build( ENT_BLDFLG_BIT1 | ENT_BLDFLG_BIT3 | ENT_BLDFLG_UPDATE_SKY_PARAMS | ENT_BLDFLG_REBUILD_USERDATA | ENT_BLDFLG_UPDATE_CLASSINFO );
 
 		if ( groupId > 0 )
 		{
@@ -1575,7 +1577,7 @@ bool JMFSerializer::SerializeBrush( qBrush_s *brushDef, qEntity_s *entityDef )
 			brushDef->m_patch = patchDef;
 
 			patchDef->m_mapPatch->setTexDef( texDef );
-			//patchDef->m_mapPatch->build( 2048 );
+			patchDef->m_mapPatch->build( ENT_BLDFLG_PATCH_CALCANDOPTIMIZE );
 			break;
 		}
 		case BRUSH_EXTRADATA_OVERLAY:
@@ -1612,12 +1614,12 @@ bool JMFSerializer::SerializeBrush( qBrush_s *brushDef, qEntity_s *entityDef )
 			brushDef->m_overlay = overlayDef;
 
 			overlayDef->m_mapOverlay->setTexDef( texDef );
-			//overlayDef->m_mapOverlay->build( 0 );
+			overlayDef->m_mapOverlay->build();
 			break;
 		}
 		}
 
-		//brushDef->m_mapBrush->build( 10 );
+		brushDef->m_mapBrush->build( ENT_BLDFLG_BIT1 | ENT_BLDFLG_BIT3 );
 
 		if ( groupId > 0 )
 		{
@@ -1731,7 +1733,7 @@ bool JMFSerializer::SerializeFace( qFace_s *faceDef, qBrush_s *brushDef )
 		GetNewEditorId( faceDef, m_mapWorld->m_lastUsedFaceEditorId );
 
 		faceDef->m_mapFace->setTexDef( texDef );
-		//faceDef->m_mapFace->build( 16 );
+		faceDef->m_mapFace->build( ENT_BLDFLG_BIT4 );
 
 		ClearBits( faceDef->m_editorFlags, EFL_SELECTED );
 

@@ -92,6 +92,16 @@ CMapEntity::~CMapEntity()
 
 /*
 ===============
+build
+===============
+*/
+void CMapEntity::build( int buildFlags )
+{
+	ClearBits( m_entityData->m_editorFlags, EFL_DIRTY );
+}
+
+/*
+===============
 addToVisGroup
 ===============
 */
