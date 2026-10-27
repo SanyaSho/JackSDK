@@ -29,7 +29,7 @@ static void ControlsTest_InternalCommand()
 #define TEST_MSGBOX_NORMAL ( 1 << 0 )
 #define TEST_MSGBOX_OKCANCEL ( 1 << 1 )
 #define TEST_MSGBOX_YESNO ( 1 << 2 )
-#define TEXT_MSGBOX_CONTROLS ( 1 << 3 )
+#define TEST_MSGBOX_CONTROLS ( 1 << 3 )
 
 void MessageBoxTest( int state )
 {
@@ -102,7 +102,7 @@ void MessageBoxTest( int state )
 	/*
 	 Will spawn a dialog window with various controls to play with
 	*/
-	if ( ( mask & TEXT_MSGBOX_CONTROLS ) != 0 )
+	if ( ( mask & TEST_MSGBOX_CONTROLS ) != 0 )
 	{
 		Dialog_Begin( "MyDialog" );
 		{
