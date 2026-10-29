@@ -11,7 +11,7 @@ For various API examples, see [vpExamplePlugin](plugins/vpExamplePlugin) plugin 
 
 For some working plugin prototype you can check out [vpHalfLifeAlpha](plugins/vpHalfLifeAlpha) plugin source tree.
 
-You can also take a look on [README.md](sdk/README.md) inside the `sdk` folder.
+You can also take a look on [README.md](https://github.com/SanyaSho/JackSDK_SDK/blob/master/README.md) inside the `sdk` folder.
 
 ## Licensing
 SDK Headers are licensed under the LGPL-2.1-or-later license; For more information about licensing see [LICENSE.md](LICENSE.md)
