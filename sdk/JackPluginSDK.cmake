@@ -12,48 +12,46 @@
 include_guard( GLOBAL )
 
 function( target_use_jackpluginsdk target JACK_SDK_DIR )
-	set( JACK_SDK_HEADER_FILES )
-	BEGIN_SRC( JACK_SDK_HEADER_FILES "SDK Header Files" )
-		SRC_GRP(
-			SOURCES
-			#{
-				"${JACK_SDK_DIR}/public/BaseTypes.h"
-				"${JACK_SDK_DIR}/public/InternalStructSizeOfs.h"
-				"${JACK_SDK_DIR}/public/PluginAPI.h"
-				"${JACK_SDK_DIR}/public/PluginActions.h"
-				"${JACK_SDK_DIR}/public/PluginCamera.h"
-				"${JACK_SDK_DIR}/public/PluginData.h"
-				"${JACK_SDK_DIR}/public/PluginEditorFunctions.h"
-				"${JACK_SDK_DIR}/public/PluginEntity.h"
-				"${JACK_SDK_DIR}/public/PluginFaces.h"
-				"${JACK_SDK_DIR}/public/PluginGroups.h"
-				"${JACK_SDK_DIR}/public/PluginMath.h"
-				"${JACK_SDK_DIR}/public/PluginMeta.h"
-				"${JACK_SDK_DIR}/public/PluginNodes.h"
-				"${JACK_SDK_DIR}/public/PluginPaths.h"
-				"${JACK_SDK_DIR}/public/PluginPrimitives.h"
-				"${JACK_SDK_DIR}/public/PluginProfile.h"
-				"${JACK_SDK_DIR}/public/PluginRender.h"
-				"${JACK_SDK_DIR}/public/PluginWorld.h"
-			#}
-		)
 
-		SRC_GRP(
-			SUBGROUP "GLEW"
-			SOURCES
-			#{
-				"${JACK_SDK_DIR}/GLEW/include/GL/eglew.h"
-				"${JACK_SDK_DIR}/GLEW/include/GL/glew.h"
-				"${JACK_SDK_DIR}/GLEW/include/GL/glxew.h"
-				"${JACK_SDK_DIR}/GLEW/include/GL/wglew.h"
-			#}
-		)
-	END_SRC( JACK_SDK_HEADER_FILES "SDK Header Files" )
+	set(
+		JACK_SDK_HEADER_FILES
+
+		"${JACK_SDK_DIR}/public/BaseTypes.h"
+		"${JACK_SDK_DIR}/public/InternalStructSizeOfs.h"
+		"${JACK_SDK_DIR}/public/PluginAPI.h"
+		"${JACK_SDK_DIR}/public/PluginActions.h"
+		"${JACK_SDK_DIR}/public/PluginCamera.h"
+		"${JACK_SDK_DIR}/public/PluginData.h"
+		"${JACK_SDK_DIR}/public/PluginEditorFunctions.h"
+		"${JACK_SDK_DIR}/public/PluginEntity.h"
+		"${JACK_SDK_DIR}/public/PluginFaces.h"
+		"${JACK_SDK_DIR}/public/PluginGroups.h"
+		"${JACK_SDK_DIR}/public/PluginMath.h"
+		"${JACK_SDK_DIR}/public/PluginMeta.h"
+		"${JACK_SDK_DIR}/public/PluginNodes.h"
+		"${JACK_SDK_DIR}/public/PluginPaths.h"
+		"${JACK_SDK_DIR}/public/PluginPrimitives.h"
+		"${JACK_SDK_DIR}/public/PluginProfile.h"
+		"${JACK_SDK_DIR}/public/PluginRender.h"
+		"${JACK_SDK_DIR}/public/PluginWorld.h"
+	)
+	source_group( "SDK Header Files" FILES ${JACK_SDK_HEADER_FILES} )
+
+	set(
+		JACK_SDK_GLEW_HEADER_FILES
+
+		"${JACK_SDK_DIR}/GLEW/include/GL/eglew.h"
+		"${JACK_SDK_DIR}/GLEW/include/GL/glew.h"
+		"${JACK_SDK_DIR}/GLEW/include/GL/glxew.h"
+		"${JACK_SDK_DIR}/GLEW/include/GL/wglew.h"
+	)
+	source_group( "SDK Header Files//GLEW" FILES ${JACK_SDK_GLEW_HEADER_FILES} )
 
 	target_sources(
 		${target} PRIVATE
 
 		${JACK_SDK_HEADER_FILES}
+		${JACK_SDK_GLEW_HEADER_FILES}
 	)
 
 	target_include_directories(
